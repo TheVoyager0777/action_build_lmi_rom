@@ -98,7 +98,7 @@ jobs:
             URL=${{ github.event.inputs.URL }}
             DATE=${URL%/*}
             date=${DATE##*/}
-            product_size=$(echo ${{ env.product_size }} / 4096" | bc)
+            product_size=$(echo "${{ env.product_size }} / 4096" | bc)
             vendor_size=$(echo "${{ env.vendor_size }} / 4096" | bc)
             system_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system.img | awk {'print $1'})
             system_ext_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system_ext.img | awk {'print $1'})
