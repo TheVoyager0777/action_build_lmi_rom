@@ -135,8 +135,7 @@ jobs:
             sudo rm -rf "$GITHUB_WORKSPACE"/images
             md5=$(md5sum "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip)
             zipmd5=${md5:0:10}
-            mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"$date"_$zipmd5_12.0.zip
-            echo "artifact_name=miui_LMIPRE_"$date"_$zipmd5" >> $GITHUB_ENV
+            mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"$date"_"$zipmd5"_12.0.zip
        - name: 6.上传到阿里云盘
          run: |
             curl https://rclone.org/install.sh | sudo bash
