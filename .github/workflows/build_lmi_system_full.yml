@@ -116,7 +116,7 @@ jobs:
             system_ext_size=$(echo "$system_ext_size + 41943040" | bc)
             system_ext_size=$(echo "$system_ext_size / 4096" | bc)
             system_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system | awk {'print $1'})
-            system_size=$(echo "$system_size + 157286400" | bc)
+            system_size=$(echo "$system_size + 125829120" | bc)
             system_size=$(echo "$system_size / 4096" | bc)
             UTC=$(date -u +%s)
             for i in product vendor system_ext system
@@ -140,6 +140,8 @@ jobs:
                 rm -rf "$GITHUB_WORKSPACE"/simages/$i.new.dat
             done
             rm -rf "$GITHUB_WORKSPACE"/simages
+            z_sise=$(echo "$$product_size + $vendor_size + $system_size + $system_ext_size + 134217728" | bc)
+            echo 总大小为$z_sise
             sed -i "s/product_size/$product_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sed -i "s/vendor_size/$vendor_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sed -i "s/system_size/$system_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
