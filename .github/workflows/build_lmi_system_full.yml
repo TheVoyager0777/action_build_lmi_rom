@@ -140,7 +140,7 @@ jobs:
                 rm -rf "$GITHUB_WORKSPACE"/simages/$i.new.dat
             done
             rm -rf "$GITHUB_WORKSPACE"/simages
-            z_sise=$(echo "$$product_size + $vendor_size + $system_size + $system_ext_size + 134217728" | bc)
+            z_sise=$(echo "$product_size + $vendor_size + $system_size + $system_ext_size + 134217728" | bc)
             echo 总大小为$z_sise
             sed -i "s/product_size/$product_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sed -i "s/vendor_size/$vendor_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
