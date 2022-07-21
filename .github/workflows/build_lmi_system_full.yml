@@ -66,8 +66,10 @@ jobs:
             done
             rm -rf "$GITHUB_WORKSPACE"/payload
             rm -rf "$GITHUB_WORKSPACE"/PSYCHE
+            echo "system_ext_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system_ext.img | awk {'print $1'})" >> $GITHUB_ENV
             sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/system_ext.img "$GITHUB_WORKSPACE"/images
             rm -rf "$GITHUB_WORKSPACE"/images/system_ext.img
+            echo "product_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/product.img | awk {'print $1'})" >> $GITHUB_ENV
             sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/product.img "$GITHUB_WORKSPACE"/images
             rm -rf "$GITHUB_WORKSPACE"/images/product.img
        - name: 4.替换相关文件
@@ -101,12 +103,9 @@ jobs:
             URL=${{ github.event.inputs.URL }}
             DATE=${URL%/*}
             date=${DATE##*/}
-            product_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/product | awk {'print $1'})
-            product_size=$(echo "$product_size + 41943040" | bc)
-            product_size=$(echo "$product_size / 4096" | bc)
+            product_size=$(echo "${{ env.product_size }} / 4096" | bc)
             vendor_size=$(echo "${{ env.vendor_size }} / 4096" | bc)
-            system_ext_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system_ext | awk {'print $1'})
-            system_ext_size=$(echo "$system_ext_size + 41943040" | bc)
+            system_ext_size=$(echo "${{ env.system_ext_size }} + 1048576" | bc)
             system_ext_size=$(echo "$system_ext_size / 4096" | bc)
             system_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system.img | awk {'print $1'})
             UTC=$(date -u +%s)
