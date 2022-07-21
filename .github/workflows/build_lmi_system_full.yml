@@ -65,8 +65,6 @@ jobs:
             done
             rm -rf "$GITHUB_WORKSPACE"/payload
             rm -rf "$GITHUB_WORKSPACE"/PSYCHE
-            sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/system.img "$GITHUB_WORKSPACE"/images
-            rm -rf "$GITHUB_WORKSPACE"/images/system.img
             sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/system_ext.img "$GITHUB_WORKSPACE"/images
             rm -rf "$GITHUB_WORKSPACE"/images/system_ext.img
             sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/product.img "$GITHUB_WORKSPACE"/images
@@ -85,10 +83,6 @@ jobs:
             sudo rm -rf "$GITHUB_WORKSPACE"/LMI/vendor/recovery-from-boot.p
             sudo rm -rf "$GITHUB_WORKSPACE"/LMI/vendor/bin/install-recovery.sh
             sudo unzip -o "$GITHUB_WORKSPACE"/nfc.zip -d "$GITHUB_WORKSPACE"/images/system_ext
-            sudo rm -rf "$GITHUB_WORKSPACE"/images/system/cache
-            sudo mkdir -p "$GITHUB_WORKSPACE"/images/system/cache
-            sudo sed -i 's/ro.product.mod_device=[^*]*/ro.product.mod_device=lmi_pre/' "$GITHUB_WORKSPACE"/images/system/system/build.prop
-            sudo sed -i 's/ro.miui.cust_device=[^*]*/ro.miui.cust_device=lmi/' "$GITHUB_WORKSPACE"/images/system/system/build.prop
             sudo mv -f "$GITHUB_WORKSPACE"/vbmeta.img "$GITHUB_WORKSPACE"/LMI/firmware-update
             sudo mv -f "$GITHUB_WORKSPACE"/vbmeta_system.img "$GITHUB_WORKSPACE"/LMI/firmware-update
             sudo cp -r "$GITHUB_WORKSPACE"/LMI/firmware-update "$GITHUB_WORKSPACE"/images
@@ -115,15 +109,12 @@ jobs:
             system_ext_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system_ext | awk {'print $1'})
             system_ext_size=$(echo "$system_ext_size + 41943040" | bc)
             system_ext_size=$(echo "$system_ext_size / 4096" | bc)
-            system_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system | awk {'print $1'})
-            system_size=$(echo "$system_size + 125829120" | bc)
-            system_size=$(echo "$system_size / 4096" | bc)
+            system_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system.img | awk {'print $1'})
             UTC=$(date -u +%s)
-            for i in product vendor system_ext system
+            for i in product vendor system_ext
             do
                 sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/$i "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config
                 "$GITHUB_WORKSPACE"/tools/mke2fs -O ^has_journal -L $i -I 256 -M /$i -m 0 -t ext4 -b 4096 "$GITHUB_WORKSPACE"/images/$i.img $(eval echo "$"$i"_size")
-                echo $(eval echo "$"$i"_size")
                 sudo "$GITHUB_WORKSPACE"/tools/e2fsdroid -e -T $UTC -C "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config -S "$GITHUB_WORKSPACE"/images/TI_config/"$i"_file_contexts -f "$GITHUB_WORKSPACE"/images/$i -a /$i "$GITHUB_WORKSPACE"/images/$i.img
                 resize2fs -f -M "$GITHUB_WORKSPACE"/images/$i.img
                 eval "$i"_size=$(du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})
@@ -141,8 +132,6 @@ jobs:
                 rm -rf "$GITHUB_WORKSPACE"/simages/$i.new.dat
             done
             rm -rf "$GITHUB_WORKSPACE"/simages
-            z_sise=$(echo "$product_size + $vendor_size + $system_size + $system_ext_size + 134217728" | bc)
-            echo 总大小为$z_sise
             sed -i "s/product_size/$product_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sed -i "s/vendor_size/$vendor_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sed -i "s/system_size/$system_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
