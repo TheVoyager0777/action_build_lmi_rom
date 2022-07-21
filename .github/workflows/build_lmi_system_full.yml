@@ -65,6 +65,8 @@ jobs:
             done
             rm -rf "$GITHUB_WORKSPACE"/payload
             rm -rf "$GITHUB_WORKSPACE"/PSYCHE
+            sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/system_ext.img "$GITHUB_WORKSPACE"/images
+            rm -rf "$GITHUB_WORKSPACE"/images/system_ext.img
             sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/product.img "$GITHUB_WORKSPACE"/images
             rm -rf "$GITHUB_WORKSPACE"/images/product.img
        - name: 4.替换相关文件
@@ -80,6 +82,7 @@ jobs:
             sudo sed -i "s/ro.miui.notch=1/ro.miui.notch=0/g" "$GITHUB_WORKSPACE"/images/product/etc/build.prop
             sudo rm -rf "$GITHUB_WORKSPACE"/LMI/vendor/recovery-from-boot.p
             sudo rm -rf "$GITHUB_WORKSPACE"/LMI/vendor/bin/install-recovery.sh
+            7z x "$GITHUB_WORKSPACE"/nfc.zip -r -o "$GITHUB_WORKSPACE"/images/system_ext
             sudo mv -f "$GITHUB_WORKSPACE"/vbmeta.img "$GITHUB_WORKSPACE"/LMI/firmware-update
             sudo mv -f "$GITHUB_WORKSPACE"/vbmeta_system.img "$GITHUB_WORKSPACE"/LMI/firmware-update
             sudo cp -r "$GITHUB_WORKSPACE"/LMI/firmware-update "$GITHUB_WORKSPACE"/images
@@ -103,10 +106,12 @@ jobs:
             vendor_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/vendor | awk {'print $1'})
             vendor_size=$(echo "$vendor_size + 41943040" | bc)
             vendor_size=$(echo "$vendor_size / 4096" | bc)
+            system_ext_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system_ext | awk {'print $1'})
+            system_ext_size=$(echo "$system_ext_size + 41943040" | bc)
+            system_ext_size=$(echo "$system_ext_size / 4096" | bc)
             system_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system.img | awk {'print $1'})
-            system_ext_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system_ext.img | awk {'print $1'})
             UTC=$(date -u +%s)
-            for i in product vendor
+            for i in product vendor system_ext
             do
                 sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/$i "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config
                 "$GITHUB_WORKSPACE"/tools/mke2fs -O ^has_journal -L $i -I 256 -M /$i -m 0 -t ext4 -b 4096 "$GITHUB_WORKSPACE"/images/$i.img $(eval echo "$"$i"_size")
