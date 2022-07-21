@@ -114,7 +114,7 @@ jobs:
             vendor_size=$(echo "${{ env.vendor_size }} / 4096" | bc)
             system_ext_size=$(echo "${{ env.system_ext_size }} + 1048576" | bc)
             system_ext_size=$(echo "$system_ext_size / 4096" | bc)
-            system_size=$(echo "${{ env.system_size }} + 1048576" | bc)
+            system_size=$(echo "${{ env.system_size }} + 20971520" | bc)
             system_size=$(echo "$system_size / 4096" | bc)
             UTC=$(date -u +%s)
             for i in product vendor system_ext system
