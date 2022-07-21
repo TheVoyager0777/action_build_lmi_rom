@@ -66,6 +66,9 @@ jobs:
             done
             rm -rf "$GITHUB_WORKSPACE"/payload
             rm -rf "$GITHUB_WORKSPACE"/PSYCHE
+            echo "system_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system.img | awk {'print $1'})" >> $GITHUB_ENV
+            sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/system.img "$GITHUB_WORKSPACE"/images
+            rm -rf "$GITHUB_WORKSPACE"/images/system.img
             echo "system_ext_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system_ext.img | awk {'print $1'})" >> $GITHUB_ENV
             sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/system_ext.img "$GITHUB_WORKSPACE"/images
             rm -rf "$GITHUB_WORKSPACE"/images/system_ext.img
@@ -83,6 +86,10 @@ jobs:
             sudo cp -f "$GITHUB_WORKSPACE"/lmi.xml "$GITHUB_WORKSPACE"/images/product/etc/device_features/
             sudo cp -f "$GITHUB_WORKSPACE"/lmipro.xml "$GITHUB_WORKSPACE"/images/product/etc/device_features/
             sudo sed -i "/ro.miui.notch/d" "$GITHUB_WORKSPACE"/images/product/etc/build.prop
+            sudo rm -rf "$GITHUB_WORKSPACE"/images/system/cache
+            sudo mkdir -p "$GITHUB_WORKSPACE"/images/system/cache
+            sudo sed -i 's/ro.product.mod_device=[^*]*/ro.product.mod_device=lmi_pre/' "$GITHUB_WORKSPACE"/images/system/system/build.prop
+            sudo sed -i 's/ro.miui.cust_device=[^*]*/ro.miui.cust_device=lmi/' "$GITHUB_WORKSPACE"/images/system/system/build.prop
             sudo rm -rf "$GITHUB_WORKSPACE"/LMI/vendor/recovery-from-boot.p
             sudo rm -rf "$GITHUB_WORKSPACE"/LMI/vendor/bin/install-recovery.sh
             sudo unzip -o "$GITHUB_WORKSPACE"/nfc.zip -d "$GITHUB_WORKSPACE"/images/system_ext
@@ -107,9 +114,10 @@ jobs:
             vendor_size=$(echo "${{ env.vendor_size }} / 4096" | bc)
             system_ext_size=$(echo "${{ env.system_ext_size }} + 1048576" | bc)
             system_ext_size=$(echo "$system_ext_size / 4096" | bc)
-            system_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system.img | awk {'print $1'})
+            system_size=$(echo "${{ env.system_size }} + 1048576" | bc)
+            system_size=$(echo "$system_size / 4096" | bc)
             UTC=$(date -u +%s)
-            for i in product vendor system_ext
+            for i in product vendor system_ext system
             do
                 sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/$i "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config
                 "$GITHUB_WORKSPACE"/tools/mke2fs -O ^has_journal -L $i -I 256 -M /$i -m 0 -t ext4 -b 4096 "$GITHUB_WORKSPACE"/images/$i.img $(eval echo "$"$i"_size")
