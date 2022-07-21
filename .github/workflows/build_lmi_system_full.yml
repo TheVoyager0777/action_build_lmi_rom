@@ -82,7 +82,7 @@ jobs:
             sudo sed -i "s/ro.miui.notch=1/ro.miui.notch=0/g" "$GITHUB_WORKSPACE"/images/product/etc/build.prop
             sudo rm -rf "$GITHUB_WORKSPACE"/LMI/vendor/recovery-from-boot.p
             sudo rm -rf "$GITHUB_WORKSPACE"/LMI/vendor/bin/install-recovery.sh
-            7z x "$GITHUB_WORKSPACE"/nfc.zip -r -o "$GITHUB_WORKSPACE"/images/system_ext
+            7z x "$GITHUB_WORKSPACE"/nfc.zip -r -o"$GITHUB_WORKSPACE"/images/system_ext
             sudo mv -f "$GITHUB_WORKSPACE"/vbmeta.img "$GITHUB_WORKSPACE"/LMI/firmware-update
             sudo mv -f "$GITHUB_WORKSPACE"/vbmeta_system.img "$GITHUB_WORKSPACE"/LMI/firmware-update
             sudo cp -r "$GITHUB_WORKSPACE"/LMI/firmware-update "$GITHUB_WORKSPACE"/images
