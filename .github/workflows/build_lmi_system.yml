@@ -59,7 +59,7 @@ jobs:
             cd "$GITHUB_WORKSPACE"/id
             $apktool d -q -b -f -m "$GITHUB_WORKSPACE"/images/system/system/framework/framework-ext-res/framework-ext-res.apk
             echo 解读id完成
-            sudo sh "$GITHUB_WORKSPACE"/升降修复.sh
+            sudo sh "$GITHUB_WORKSPACE"/popupfix.sh
        - name: 5.打包
          run: |
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/mke2fs
