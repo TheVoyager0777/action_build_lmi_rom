@@ -109,8 +109,9 @@ jobs:
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/brotli
             URL=${{ github.event.inputs.URL }}
             DATE=${URL%/*}
-            date=${DATE##*/}113
-            product_size=$(echo "${{ env.product_size }} + 5242880" | bc)
+            date=${DATE##*/}
+            pota_size=$(echo "1048576 * 10 " | bc)
+            product_size=$(echo "${{ env.product_size }} + $pota_size" | bc)
             product_size=$(echo "$product_size / 4096" | bc)
             vendor_size=$(echo "${{ env.vendor_size }} / 4096" | bc)
             system_ext_size=$(echo "${{ env.system_ext_size }} + 1048576" | bc)
