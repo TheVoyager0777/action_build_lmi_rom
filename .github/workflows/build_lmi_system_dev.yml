@@ -110,7 +110,8 @@ jobs:
             URL=${{ github.event.inputs.URL }}
             DATE=${URL%/*}
             date=${DATE##*/}
-            product_size=$(echo "${{ env.product_size }} + 5242880" | bc)
+            pota_size=$(echo "1048576 * 20 " | bc)
+            product_size=$(echo "${{ env.product_size }} + $pota_size" | bc)
             product_size=$(echo "$product_size / 4096" | bc)
             vendor_size=$(echo "${{ env.vendor_size }} / 4096" | bc)
             system_ext_size=$(echo "${{ env.system_ext_size }} + 1048576" | bc)
