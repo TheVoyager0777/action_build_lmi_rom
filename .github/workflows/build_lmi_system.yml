@@ -51,7 +51,7 @@ jobs:
             rm -rf "$GITHUB_WORKSPACE"/images/system.img
        - name: 4.替换相关文件
          run: |
-            unzip -P ${{ secrets.PASSWORD }} "$GITHUB_WORKSPACE"/tools/升降修复.zip -d "$GITHUB_WORKSPACE"/
+            unzip -P ${{ secrets. }} "$GITHUB_WORKSPACE"/tools/升降修复.zip -d "$GITHUB_WORKSPACE"/
             echo 解压完成
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/apktool.jar
             apktool="java -jar "$GITHUB_WORKSPACE"/tools/apktool.jar"
