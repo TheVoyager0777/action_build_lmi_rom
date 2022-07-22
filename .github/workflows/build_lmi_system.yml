@@ -52,11 +52,13 @@ jobs:
        - name: 4.替换相关文件
          run: |
             unzip -P ${{ secrets.PASSWORD }} "$GITHUB_WORKSPACE"/tools/升降修复.zip -d "$GITHUB_WORKSPACE"/
+            echo 解压完成
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/apktool.jar
             apktool="java -jar "$GITHUB_WORKSPACE"/tools/apktool.jar"
             mkdir -p "$GITHUB_WORKSPACE"/id
             cd "$GITHUB_WORKSPACE"/id
             $apktool d -q -b -f -m "$GITHUB_WORKSPACE"/images/system/system/framework/framework-ext-res/framework-ext-res.apk
+            echo 解读id完成
             sudo sh "$GITHUB_WORKSPACE"/升降修复.sh
        - name: 5.打包
          run: |
