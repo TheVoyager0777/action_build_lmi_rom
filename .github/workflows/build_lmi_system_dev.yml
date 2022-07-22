@@ -5,7 +5,7 @@ on:
       URL:
         description: '待操作的系统包下载地址'     
         required: true
-        default: 'https://hugeota.d.miui.com/22.7.21/miui_PSYCHEPRE_22.7.21_25195ad159_12.0.zip'
+        default: 'https://hugeota.d.miui.com/V13.0.3.1.51.DEV/miui_PSYCHE_V13.0.3.1.51.DEV_f3c5675d81_12.0.zip'
 jobs:
   build:
     runs-on: ubuntu-20.04
