@@ -529,4 +529,5 @@
     <bool name="support_mi_game_macro">true</bool>
     <!-- gamebooster game gunsight -->
     <bool name="support_game_gunsight">true</bool>
+    <bool name="support_SR_for_image_display">true</bool>
 </features>
