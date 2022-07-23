@@ -90,6 +90,9 @@ jobs:
             sudo mkdir -p "$GITHUB_WORKSPACE"/images/system/cache
             sudo sed -i 's/ro.product.mod_device=[^*]*/ro.product.mod_device=lmi_pre/' "$GITHUB_WORKSPACE"/images/system/system/build.prop
             sudo sed -i 's/ro.miui.cust_device=[^*]*/ro.miui.cust_device=lmi/' "$GITHUB_WORKSPACE"/images/system/system/build.prop
+            sudo sed -i 's/S[^*]*CNXM/SJKCNXM/' "$GITHUB_WORKSPACE"/images/system/system/build.prop
+            sudo sed -i 's/S[^*]*CNXM/SJKCNXM/' "$GITHUB_WORKSPACE"/images/product/etc/build.prop
+            sudo sed -i 's/S[^*]*CNXM/SJKCNXM/' "$GITHUB_WORKSPACE"/images/system_ext/etc/build.prop
             sudo rm -rf "$GITHUB_WORKSPACE"/LMI/vendor/recovery-from-boot.p
             sudo rm -rf "$GITHUB_WORKSPACE"/LMI/vendor/bin/install-recovery.sh
             sudo unzip -o "$GITHUB_WORKSPACE"/nfc.zip -d "$GITHUB_WORKSPACE"/images/system_ext
