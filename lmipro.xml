@@ -317,8 +317,8 @@
     <integer name="extra_min_preview_size">921600</integer>
     <!--Led light features-->
     <bool name="support_led_light">true</bool>
-    <bool name="support_led_color">false</bool>
-    <bool name="support_color_lamp">true</bool>
+    <bool name="support_led_color">true</bool>
+    <bool name="support_color_lamp">false</bool>
     <bool name="support_audio_loopback">true</bool>
     <bool name="support_new_silentmode">true</bool>
     <!-- whether CN hardware can flash Global rom -->
