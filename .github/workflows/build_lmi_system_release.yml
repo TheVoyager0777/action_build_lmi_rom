@@ -173,8 +173,7 @@ jobs:
             sudo systemctl stop alist
             sudo mv -f /home/runner/.config/rclone/data.db /opt/alist/data
             sudo systemctl start alist
-            rclone mkdir 123pan:/LMI_Packages
-            rclone sync -P ./zip/* 123pan:/LMI_Packages
+            rclone sync -P ./zip/* 123pan:/
        - name: 8.删除工作流运行
          uses: Mattraks/delete-workflow-runs@v2
          with:
