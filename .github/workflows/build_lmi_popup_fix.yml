@@ -8,7 +8,7 @@ on:
         default: 'https://hugeota.d.miui.com/22.7.22/miui_PSYCHEPRE_22.7.22_07f86d2521_12.0.zip'
 jobs:
   build:
-    runs-on: arch64
+    runs-on: ubuntu-20.04
     steps:
        - uses: actions/checkout@master  
        - name: 1.安装依赖
