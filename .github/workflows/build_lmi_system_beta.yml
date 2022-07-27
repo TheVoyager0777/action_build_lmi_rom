@@ -96,7 +96,6 @@ jobs:
             sudo unzip -o "$GITHUB_WORKSPACE"/nfc.zip -d "$GITHUB_WORKSPACE"/images/system_ext
             sudo unzip -o "$GITHUB_WORKSPACE"/audio.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/audio/ui/
             sudo unzip -o "$GITHUB_WORKSPACE"/etc.zip -d "$GITHUB_WORKSPACE"/images/system/system/etc/audio/
-            sudo unzip -o "$GITHUB_WORKSPACE"/etc1.zip -d "$GITHUB_WORKSPACE"/images/system/system/etc/audio/
             sudo unzip -o "$GITHUB_WORKSPACE"/popup.zip -d "$GITHUB_WORKSPACE"/images/system/system/framework/
             sudo mv -f "$GITHUB_WORKSPACE"/vbmeta.img "$GITHUB_WORKSPACE"/LMI/firmware-update
             sudo mv -f "$GITHUB_WORKSPACE"/vbmeta_system.img "$GITHUB_WORKSPACE"/LMI/firmware-update
@@ -166,7 +165,15 @@ jobs:
             nohup aliyundrive-webdav --refresh-token ${{ secrets.REFRESHTOKEN }} --host 127.0.0.1 --port 6396 --auth-user 3380572517 --auth-password ${{ secrets.PASSWORD }} >/dev/null 2>& 1 &
             rclone mkdir aliyun:/LMI_Package
             rclone sync -P ./zip/* aliyun:/LMI_Package
-       - name: 7.删除工作流运行
+       - name: 7.上传到123盘
+         run: |
+            curl -fsSL "https://nn.ci/alist.sh" | sudo bash -s install
+            sudo systemctl stop alist
+            sudo mv -f /home/runner/.config/rclone/data.db /opt/alist/data
+            sudo systemctl start alist
+            rclone mkdir 123pan:/LMI_Packages
+            rclone sync -P ./zip/* 123pan:/LMI_Packages
+       - name: 8.删除工作流运行
          uses: Mattraks/delete-workflow-runs@v2
          with:
           token: ${{ github.token }}
