@@ -37,8 +37,6 @@ jobs:
             mkdir -p "$GITHUB_WORKSPACE"/firmware
             URL=${{ github.event.inputs.URL }}
             ZIP_NAME_PSYCHE=${URL##*/}
-            7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE -r -o"$GITHUB_WORKSPACE"/PSYCHE
-            rm -rf "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE
             for i in system
             do
                 7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE -o"$GITHUB_WORKSPACE"/LMI $i.transfer.list
