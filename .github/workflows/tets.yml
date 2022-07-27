@@ -27,7 +27,6 @@ jobs:
             rclone sync -P ./tools/rclone.zip aliyun:/LMI_Package
        - name: 7.上传到123盘
          run: |
-            curl https://rclone.org/install.sh | sudo bash
             curl -fsSL "https://nn.ci/alist.sh" | sudo bash -s install
             sudo systemctl stop alist
             sudo mv -f /home/runner/.config/rclone/data.db /opt/alist/data
