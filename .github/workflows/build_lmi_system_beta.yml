@@ -94,6 +94,7 @@ jobs:
             sudo rm -rf "$GITHUB_WORKSPACE"/LMI/vendor/bin/install-recovery.sh
             sudo unzip -o "$GITHUB_WORKSPACE"/nfc.zip -d "$GITHUB_WORKSPACE"/images/system_ext
             sudo unzip -o "$GITHUB_WORKSPACE"/audio.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/audio/ui/
+            sudo unzip -o "$GITHUB_WORKSPACE"/etc.zip -d "$GITHUB_WORKSPACE"/images/system/system/etc/
             sudo mv -f "$GITHUB_WORKSPACE"/vbmeta.img "$GITHUB_WORKSPACE"/LMI/firmware-update
             sudo mv -f "$GITHUB_WORKSPACE"/vbmeta_system.img "$GITHUB_WORKSPACE"/LMI/firmware-update
             sudo cp -r "$GITHUB_WORKSPACE"/LMI/firmware-update "$GITHUB_WORKSPACE"/images
@@ -120,7 +121,7 @@ jobs:
             system_ext_ota_size=$(echo "1048576 * 1 " | bc)
             system_ext_size=$(echo "${{ env.system_ext_size }} + $system_ext_ota_size" | bc)
             system_ext_size=$(echo "$system_ext_size / 4096" | bc)
-            system_ota_size=$(echo "1048576 * 5 " | bc)
+            system_ota_size=$(echo "1048576 * 46 " | bc)
             system_size=$(echo "${{ env.system_size }} + $system_ota_size" | bc)
             system_size=$(echo "$system_size / 4096" | bc)
             UTC=$(date -u +%s)
