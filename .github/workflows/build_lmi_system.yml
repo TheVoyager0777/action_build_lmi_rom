@@ -5,7 +5,7 @@ on:
       URL:
         description: '待操作的系统包下载地址'     
         required: true
-        default: 'https://hugeota.d.miui.com/22.7.19/miui_LMIPRE_22.7.19_0c8ec819b7_12.0.zip'
+        default: 'https://hugeota.d.miui.com/V13.0.4.0.SJKCNXM/miui_LMI_V13.0.4.0.SJKCNXM_285b75b959_12.0.zip'
 jobs:
   build:
     runs-on: ubuntu-20.04
@@ -38,14 +38,16 @@ jobs:
             URL=${{ github.event.inputs.URL }}
             ZIP_NAME=${URL##*/}
             7z x "$GITHUB_WORKSPACE"/$ZIP_NAME -r -o"$GITHUB_WORKSPACE"/LMI
-            "$GITHUB_WORKSPACE"/tools/brotli -d "$GITHUB_WORKSPACE"/LMI/system.new.dat.br
-            rm -rf "$GITHUB_WORKSPACE"/LMI/system.new.dat.br
-            python3 "$GITHUB_WORKSPACE"/tools/sdat2img.py "$GITHUB_WORKSPACE"/LMI/system.transfer.list "$GITHUB_WORKSPACE"/LMI/system.new.dat "$GITHUB_WORKSPACE"/LMI/system.img
-            rm -rf "$GITHUB_WORKSPACE"/LMI/system.patch.dat
-            rm -rf "$GITHUB_WORKSPACE"/LMI/system.transfer.list
-            rm -rf "$GITHUB_WORKSPACE"/LMI/syetem.new.dat
-            sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/LMI/system.img "$GITHUB_WORKSPACE"/images
-            rm -rf "$GITHUB_WORKSPACE"/LMI/system.img
+            for i in system
+            "$GITHUB_WORKSPACE"/tools/brotli -d "$GITHUB_WORKSPACE"/LMI/$i.new.dat.br
+            rm -rf "$GITHUB_WORKSPACE"/LMI/$i.new.dat.br
+            python3 "$GITHUB_WORKSPACE"/tools/sdat2img.py "$GITHUB_WORKSPACE"/LMI/$i.transfer.list "$GITHUB_WORKSPACE"/LMI/$i.new.dat "$GITHUB_WORKSPACE"/LMI/$i.img
+            rm -rf "$GITHUB_WORKSPACE"/LMI/$i.patch.dat
+            rm -rf "$GITHUB_WORKSPACE"/LMI/$i.transfer.list
+            rm -rf "$GITHUB_WORKSPACE"/LMI/$i.new.dat
+            sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/LMI/$i.img "$GITHUB_WORKSPACE"/images
+            rm -rf "$GITHUB_WORKSPACE"/LMI/$i.img
+            done
        - name: 4.替换相关文件
          run: |
          
@@ -56,7 +58,7 @@ jobs:
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/e2fsdroid
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/img2simg
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/brotli
-            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_.zip "$GITHUB_WORKSPACE"/images/system/system/etc/*
+            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_.zip "$GITHUB_WORKSPACE"/images/system_ext/priv-app/Settings/*
             echo "artifact_name=miui_LMIPRE_" >> $GITHUB_ENV
        - name: 6.上传到Artifact
          uses: actions/upload-artifact@v3
