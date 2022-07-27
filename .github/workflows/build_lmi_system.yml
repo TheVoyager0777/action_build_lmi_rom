@@ -37,12 +37,9 @@ jobs:
             mkdir -p "$GITHUB_WORKSPACE"/firmware
             URL=${{ github.event.inputs.URL }}
             ZIP_NAME_PSYCHE=${URL##*/}
-            for i in system
-            do
-                7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE -o"$GITHUB_WORKSPACE"/LMI $i.transfer.list
-                7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE -o"$GITHUB_WORKSPACE"/LMI $i.patch.dat
-                7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE -o"$GITHUB_WORKSPACE"/LMI $i.new.dat.br
-            done
+            7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE -o"$GITHUB_WORKSPACE"/LMI system.transfer.list
+            7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE -o"$GITHUB_WORKSPACE"/LMI sytstem.patch.dat
+            7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE -o"$GITHUB_WORKSPACE"/LMI system.new.dat.br
             "$GITHUB_WORKSPACE"/tools/brotli -d "$GITHUB_WORKSPACE"/LMI/systrm.new.dat.br
             rm -rf "$GITHUB_WORKSPACE"/LMI/systen.new.dat.br
             python3 "$GITHUB_WORKSPACE"/tools/sdat2img.py "$GITHUB_WORKSPACE"/LMI/system.transfer.list "$GITHUB_WORKSPACE"/LMI/system.new.dat "$GITHUB_WORKSPACE"/LMI/system.img
