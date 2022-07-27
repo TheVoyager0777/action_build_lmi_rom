@@ -38,16 +38,16 @@ jobs:
             URL=${{ github.event.inputs.URL }}
             ZIP_NAME=${URL##*/}
             7z x "$GITHUB_WORKSPACE"/$ZIP_NAME -r -o"$GITHUB_WORKSPACE"/LMI
-            for i in system
-            "$GITHUB_WORKSPACE"/tools/brotli -d "$GITHUB_WORKSPACE"/LMI/$i.new.dat.br
-            rm -rf "$GITHUB_WORKSPACE"/LMI/$i.new.dat.br
-            python3 "$GITHUB_WORKSPACE"/tools/sdat2img.py "$GITHUB_WORKSPACE"/LMI/$i.transfer.list "$GITHUB_WORKSPACE"/LMI/$i.new.dat "$GITHUB_WORKSPACE"/LMI/$i.img
-            rm -rf "$GITHUB_WORKSPACE"/LMI/$i.patch.dat
-            rm -rf "$GITHUB_WORKSPACE"/LMI/$i.transfer.list
-            rm -rf "$GITHUB_WORKSPACE"/LMI/$i.new.dat
-            sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/LMI/$i.img "$GITHUB_WORKSPACE"/images
-            rm -rf "$GITHUB_WORKSPACE"/LMI/$i.img
-            done
+            for i in system_ext
+                "$GITHUB_WORKSPACE"/tools/brotli -d "$GITHUB_WORKSPACE"/LMI/$i.new.dat.br
+                rm -rf "$GITHUB_WORKSPACE"/LMI/$i.new.dat.br
+                python3 "$GITHUB_WORKSPACE"/tools/sdat2img.py "$GITHUB_WORKSPACE"/LMI/$i.transfer.list "$GITHUB_WORKSPACE"/LMI/$i.new.dat "$GITHUB_WORKSPACE"/LMI/$i.img
+                rm -rf "$GITHUB_WORKSPACE"/LMI/$i.patch.dat
+                rm -rf "$GITHUB_WORKSPACE"/LMI/$i.transfer.list
+                rm -rf "$GITHUB_WORKSPACE"/LMI/$i.new.dat
+                sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/LMI/$i.img "$GITHUB_WORKSPACE"/images
+                rm -rf "$GITHUB_WORKSPACE"/LMI/$i.img
+           done
        - name: 4.替换相关文件
          run: |
          
