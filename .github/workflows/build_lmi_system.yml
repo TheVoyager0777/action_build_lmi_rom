@@ -56,7 +56,7 @@ jobs:
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/e2fsdroid
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/img2simg
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/brotli
-            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_.zip "$GITHUB_WORKSPACE"/images/system/system/ect/*
+            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_.zip "$GITHUB_WORKSPACE"/images/system/system/etc/*
             mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_.zip
             echo "artifact_name=miui_LMIPRE_" >> $GITHUB_ENV
        - name: 6.上传到Artifact
