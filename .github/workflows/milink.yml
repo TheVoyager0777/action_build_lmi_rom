@@ -37,11 +37,11 @@ jobs:
             mkdir -p "$GITHUB_WORKSPACE"/firmware
             URL=${{ github.event.inputs.URL }}
             ZIP_NAME=${URL##*/}
-            7z x "$GITHUB_WORKSPACE"/$ZIP_NAME -r -o"$GITHUB_WORKSPACE"/LMI
+            7z x "$GITHUB_WORKSPACE"/$ZIP_NAME -r -o"$GITHUB_WORKSPACE"/PSYCHE
             for i in system
             do
                 "$GITHUB_WORKSPACE"/tools/payload-dumper-go -p $i "$GITHUB_WORKSPACE"/PSYCHE/payload.bin
-                mv "$GITHUB_WORKSPACE"/payload/$i.img "$GITHUB_WORKSPACE"/Lmi/$i.img
+                mv "$GITHUB_WORKSPACE"/payload/$i.img "$GITHUB_WORKSPACE"/LMI/$i.img
                 sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/LMI/$i.img "$GITHUB_WORKSPACE"/images
                 rm -rf "$GITHUB_WORKSPACE"/LMI/$i.img
             done
