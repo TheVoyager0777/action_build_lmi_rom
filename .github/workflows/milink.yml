@@ -52,7 +52,7 @@ jobs:
             sudo mkdir -p "$GITHUB_WORKSPACE"/MiLink/1/
             sudo unzip -o ""$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk" 'classes*.dex' -d "$GITHUB_WORKSPACE"/MiLink/1/
             cd "$GITHUB_WORKSPACE"/MiLink/1/
-            sudo zip -r "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk
+            sudo zip -r "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk ./*
             $Apktool d -q -b -r -f -m -o "$GITHUB_WORKSPACE"/MiLink/ "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk
             mod="$GITHUB_WORKSPACE"/MiLink/smali*/com/miui/circulate/world/permission/method/PermissionCheck\$BaseCheck.smali
             sudo sed -i '/^.method public check()Z/,/^.end method/{//!d}' $mod
