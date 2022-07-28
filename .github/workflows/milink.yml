@@ -51,15 +51,23 @@ jobs:
             done
        - name: 4.替换相关文件
          run: |
-         
-         
+            sudo chmod 777 "$GITHUB_WORKSPACE"/tools/apktool.jar
+            Apktool="java -jar "$GITHUB_WORKSPACE"/tools/apktool.jar"
+            sudo mkdir -p "$GITHUB_WORKSPACE"/MiLink/
+            $Apktool d -q -b -r -f -m -o "$GITHUB_WORKSPACE"/MiLink/ "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk
+            mod="$GITHUB_WORKSPACE"/MiLink/smali*/com/miui/circulate/world/permission/method/PermissionCheck\$BaseCheck.smali
+            sudo sed -i '/^.method public check()Z/,/^.end method/{//!d}' $mod
+            sudo sed -i -e '/^.method public check()Z/a\    .locals 1\n\n    const/4 v0, 0x1\n\n   return v0' $mod
+            $Apktool b -q -f -c -o "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk "$GITHUB_WORKSPACE"/MiLink/
+            sudo rm -rf "$GITHUB_WORKSPACE"/image/system/system/app/MiLinkCirculate/oat
+            sudo cp -f "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk "$GITHUB_WORKSPACE"/images/MiLinkCirculate.apk
        - name: 5.打包
          run: |
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/mke2fs
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/e2fsdroid
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/img2simg
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/brotli
-            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_.zip "$GITHUB_WORKSPACE"/images/
+            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_.zip "$GITHUB_WORKSPACE"/images/MiLinkCirculate.apk
             echo "artifact_name=miui_LMIPRE_" >> $GITHUB_ENV
        - name: 6.上传到Artifact
          uses: actions/upload-artifact@v3
