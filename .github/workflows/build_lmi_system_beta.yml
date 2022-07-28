@@ -77,7 +77,8 @@ jobs:
             rm -rf "$GITHUB_WORKSPACE"/images/product.img
        - name: 4.替换相关文件
          run: |
-            apktool=${java -jar "$GITHUB_WORKSPACE"/tool/apktool-2.4.2.jar}
+            sudo chmod 777 "$GITHUB_WORKSPACE"/tools/apktool-2.4.2.jar
+            apktool="java -jar "$GITHUB_WORKSPACE"/tool/apktool-2.4.2.jar"
             sudo mkdir -p "$GITHUB_WORKSPACE"/images/system/system/etc/audio
             sudo rm -rf "$GITHUB_WORKSPACE"/images/product/etc/device_features/*
             sudo rm -rf "$GITHUB_WORKSPACE"/images/product/overlay/DeviceAndroidConfig.apk
