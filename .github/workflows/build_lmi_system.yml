@@ -51,8 +51,7 @@ jobs:
             done
        - name: 4.替换相关文件
          run: |
-         
-         
+            
        - name: 5.打包
          run: |
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/mke2fs
