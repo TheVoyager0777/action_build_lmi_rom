@@ -77,8 +77,8 @@ jobs:
             rm -rf "$GITHUB_WORKSPACE"/images/product.img
        - name: 4.替换相关文件
          run: |
-            sudo chmod 777 "$GITHUB_WORKSPACE"/tools/apktool-2.4.2.jar
-            apktool="java -jar "$GITHUB_WORKSPACE"/tool/apktool-2.4.2.jar"
+            sudo chmod 777 "$GITHUB_WORKSPACE"/tools/apktool.jar
+            apktool="java -jar "$GITHUB_WORKSPACE"/tool/apktool.jar"
             sudo mkdir -p "$GITHUB_WORKSPACE"/images/system/system/etc/audio
             sudo rm -rf "$GITHUB_WORKSPACE"/images/product/etc/device_features/*
             sudo rm -rf "$GITHUB_WORKSPACE"/images/product/overlay/DeviceAndroidConfig.apk
@@ -100,11 +100,11 @@ jobs:
             sudo unzip -o "$GITHUB_WORKSPACE"/etc.zip -d "$GITHUB_WORKSPACE"/images/system/system/etc/audio/
             sudo unzip -o "$GITHUB_WORKSPACE"/popup.zip -d "$GITHUB_WORKSPACE"/images/system/system/framework/
             sudo mkdir -p "$GITHUB_WORKSPACE"/MiLink/
-            sudo $apktool d -q -b -r -f -m "$GITHUB_WORKSPACE"/image/system/system/app/MiLinkCirculate/MiLinkCirculate.apk -o "$GITHUB_WORKSPACE"/MiLink/
+            sudo $apktool d -q -b -r -f -m -o "$GITHUB_WORKSPACE"/MiLink/ "$GITHUB_WORKSPACE"/image/system/system/app/MiLinkCirculate/MiLinkCirculate.apk
             mod="$GITHUB_WORKSPACE"/MiLink/com/miui/circulate/world/permission/method/PermissionCheck\$BaseCheck.smali
             sudo sed -i '/^.method public check()Z/,/^.end method/{//!d}' $mod
             sudo sed -i -e '/^.method public check()Z/a\    .locals 1\n\n    const/4 v0, 0x1\n\n   return v0' $mod
-            sudo $apktool b -q -f -c "$GITHUB_WORKSPACE"/MiLink/ -o MiLinkCirculate.apk
+            sudo $apktool b -q -f -c -o "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk "$GITHUB_WORKSPACE"/MiLink/
             sudo rm -rf "$GITHUB_WORKSPACE"/image/system/system/app/MiLinkCirculate/oat
             sudo cp -f "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk "$GITHUB_WORKSPACE"/image/system/system/app/MiLinkCirculate/MiLinkCirculate.apk
             sudo mv -f "$GITHUB_WORKSPACE"/vbmeta.img "$GITHUB_WORKSPACE"/LMI/firmware-update
