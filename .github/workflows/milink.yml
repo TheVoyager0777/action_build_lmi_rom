@@ -49,14 +49,14 @@ jobs:
          run: |
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/apktool.jar
             Apktool="java -jar "$GITHUB_WORKSPACE"/tools/apktool.jar"
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MiLink/1/
+            sudo mkdir -p "$GITHUB_WORKSPACE"/MiLink/
             $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MiLink/ "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk
             mod="$GITHUB_WORKSPACE"/MiLink/smali*/com/miui/circulate/world/permission/method/PermissionCheck\$BaseCheck.smali
             sudo sed -i '/^.method public check()Z/,/^.end method/{//!d}' $mod
             sudo sed -i -e '/^.method public check()Z/a\    .locals 1\n\n    const/4 v0, 0x1\n\n   return v0' $mod
             $Apktool b -q -f -o "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk "$GITHUB_WORKSPACE"/MiLink/
             cd "$GITHUB_WORKSPACE"/MiLink/build/apk
-            sudo zip -r "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk ./classes*.dex
+            sudo zip -r "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk ./*.dex
             sudo rm -rf "$GITHUB_WORKSPACE"/image/system/system/app/MiLinkCirculate/oat
        - name: 5.打包
          run: |
