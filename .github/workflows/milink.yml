@@ -1,0 +1,75 @@
+name: milink
+on: 
+  workflow_dispatch:
+    inputs:
+      URL:
+        description: '待操作的系统包下载地址'     
+        required: true
+        default: 'https://hugeota.d.miui.com/22.7.26/miui_PSYCHEPRE_22.7.26_df79e398c7_12.0.zip'
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+       - uses: actions/checkout@master  
+       - name: 1.安装依赖
+         run: |
+            sudo apt install python3 python3-pip aria2 zip p7zip-full
+            sudo apt --fix-broken install
+            sudo apt update --fix-missing
+            pip3 install --upgrade pip
+            pip3 install pycryptodome
+            pip3 install docopt
+            pip3 install requests
+            pip3 install beautifulsoup4
+            pip3 install --ignore-installed pyyaml
+       - name: 2.下载系统包
+         run: |
+            aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${{ github.event.inputs.URL }}
+       - name: 3.解包
+         run: |
+            sudo chmod 777 "$GITHUB_WORKSPACE"/tools/payload-dumper-go
+            sudo chmod 777 "$GITHUB_WORKSPACE"/tools/brotli
+            mkdir -p "$GITHUB_WORKSPACE"/PSYCHE
+            mkdir -p "$GITHUB_WORKSPACE"/LMI
+            mkdir -p "$GITHUB_WORKSPACE"/images
+            mkdir -p "$GITHUB_WORKSPACE"/simages
+            mkdir -p "$GITHUB_WORKSPACE"/zip
+            mkdir -p "$GITHUB_WORKSPACE"/firmware
+            URL=${{ github.event.inputs.URL }}
+            ZIP_NAME=${URL##*/}
+            7z x "$GITHUB_WORKSPACE"/$ZIP_NAME -r -o"$GITHUB_WORKSPACE"/LMI
+            for i in system
+            do
+                "$GITHUB_WORKSPACE"/tools/brotli -d "$GITHUB_WORKSPACE"/LMI/$i.new.dat.br
+                rm -rf "$GITHUB_WORKSPACE"/LMI/$i.new.dat.br
+                python3 "$GITHUB_WORKSPACE"/tools/sdat2img.py "$GITHUB_WORKSPACE"/LMI/$i.transfer.list "$GITHUB_WORKSPACE"/LMI/$i.new.dat "$GITHUB_WORKSPACE"/LMI/$i.img
+                rm -rf "$GITHUB_WORKSPACE"/LMI/$i.patch.dat
+                rm -rf "$GITHUB_WORKSPACE"/LMI/$i.transfer.list
+                rm -rf "$GITHUB_WORKSPACE"/LMI/$i.new.dat
+                sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/LMI/$i.img "$GITHUB_WORKSPACE"/images
+                rm -rf "$GITHUB_WORKSPACE"/LMI/$i.img
+            done
+       - name: 4.替换相关文件
+         run: |
+         
+         
+       - name: 5.打包
+         run: |
+            sudo chmod 777 "$GITHUB_WORKSPACE"/tools/mke2fs
+            sudo chmod 777 "$GITHUB_WORKSPACE"/tools/e2fsdroid
+            sudo chmod 777 "$GITHUB_WORKSPACE"/tools/img2simg
+            sudo chmod 777 "$GITHUB_WORKSPACE"/tools/brotli
+            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_.zip "$GITHUB_WORKSPACE"/images/
+            echo "artifact_name=miui_LMIPRE_" >> $GITHUB_ENV
+       - name: 6.上传到Artifact
+         uses: actions/upload-artifact@v3
+         with:
+          name: ${{ env.artifact_name }}
+          path: "./zip/*"
+       - name: 7.删除工作流运行
+         uses: Mattraks/delete-workflow-runs@v2
+         with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: 0
+          keep_minimum_runs: 0
