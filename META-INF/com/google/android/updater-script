@@ -87,4 +87,3 @@ package_extract_file("firmware-update/dtbo.img", "/dev/block/bootdevice/by-name/
 package_extract_file("firmware-update/vbmeta.img", "/dev/block/bootdevice/by-name/vbmeta");
 package_extract_file("firmware-update/vbmeta_system.img", "/dev/block/bootdevice/by-name/vbmeta_system");
 set_progress(1.000000);
-run_program("/sbin/rm", "-rf", "/data/system/package_cache/");
