@@ -58,6 +58,7 @@ jobs:
             cd "$GITHUB_WORKSPACE"/MiLink/build/apk
             sudo 7z a -tzip "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk ./*.dex -mx0
             sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/oat/*
+            sudo zipalign -v 4 "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/oat/MiLinkCirculate.apk
        - name: 5.打包
          run: |
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/mke2fs
