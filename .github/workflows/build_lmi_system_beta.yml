@@ -13,6 +13,7 @@ jobs:
     steps:
        - uses: actions/checkout@master
        - name: 获取配置
+         run: |
             source "$GITHUB_WORKSPACE"/config.env
             echo "ROM_URL=$ROM_URL" >> $GITHUB_ENV
        - name: 1.安装依赖
