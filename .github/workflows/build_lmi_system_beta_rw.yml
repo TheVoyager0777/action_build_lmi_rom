@@ -129,7 +129,7 @@ jobs:
             product_size=$(echo "$product_size + $product_ota_size" | bc)
             product_size=$(echo "$product_size / 4096" | bc)
             vendor_ota_size=$(echo "1048576 * 20 " | bc)
-            vendor_size=$(sudo du -sb "$GITHUB_WORKSPACE"/LMI/vendor | awk {'print $1'})
+            vendor_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/vendor | awk {'print $1'})
             vendor_size=$(echo "$vendor_size + $vendor_ota_size" | bc)
             vendor_size=$(echo "$vendor_size / 4096" | bc)
             system_ext_ota_size=$(echo "1048576 * 21 " | bc)
