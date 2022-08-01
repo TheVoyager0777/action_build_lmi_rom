@@ -2,7 +2,7 @@ name: build_lmi_system_beta
 on: 
   workflow_dispatch:
     inputs:
-      URL:
+      123:
         description: '123云盘'     
         required: true
         default: '0'
