@@ -3,14 +3,22 @@ on:
   workflow_dispatch:
     inputs:
       URL:
-        description: '待操作的系统包下载地址'     
+        description: '123云盘'     
         required: true
-        default: 'https://hugeota.d.miui.com/22.7.28/miui_PSYCHEPRE_22.7.28_414ec720b1_12.0.zip'
+        default: '0'
+
 jobs:
   build:
     runs-on: ubuntu-20.04
     steps:
        - uses: actions/checkout@master  
+         id: config
+         with:
+           path: config.env
+       - name: 获取配置
+         run: |
+            function required () { if ! [[ "$1" ]]; then echo "$2 variable can't be null." && exit 1; fi }
+            required "${{ steps.config.outputs.rom.url }}" "ROM_URL config"
        - name: 1.安装依赖
          run: |
             sudo apt install python3 python3-pip aria2 zip p7zip-full zipalign
@@ -25,7 +33,7 @@ jobs:
             pip3 install --ignore-installed pyyaml
        - name: 2.下载系统包
          run: |
-            aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${{ github.event.inputs.URL }}
+            aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" "${{ steps.config.outputs.rom.url }}"
             aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" https://hugeota.d.miui.com/22.7.19/miui_LMIPRE_22.7.19_0c8ec819b7_12.0.zip
        - name: 3.解包
          run: |
