@@ -95,6 +95,8 @@ jobs:
             sudo sed -i 's/ro.miui.cust_device=[^*]*/ro.miui.cust_device=lmi/' "$GITHUB_WORKSPACE"/images/system/system/build.prop
             sudo rm -rf "$GITHUB_WORKSPACE"/LMI/vendor/recovery-from-boot.p
             sudo rm -rf "$GITHUB_WORKSPACE"/LMI/vendor/bin/install-recovery.sh
+            sudo sed -i "/ro.vendor.audio.game.effect/d" "$GITHUB_WORKSPACE"/LMI/vendor/build.prop
+            sudo sed -i "/ro.apex.updataable/a " "$GITHUB_WORKSPACE"/LMI/vendor/build.prop
             sudo unzip -o "$GITHUB_WORKSPACE"/nfc.zip -d "$GITHUB_WORKSPACE"/images/system_ext
             sudo unzip -o "$GITHUB_WORKSPACE"/audio.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/audio/ui/
             sudo unzip -o "$GITHUB_WORKSPACE"/etc.zip -d "$GITHUB_WORKSPACE"/images/system/system/etc/audio/
@@ -107,7 +109,7 @@ jobs:
             $Apktool b -q -f -o "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk "$GITHUB_WORKSPACE"/MiLink/
             cd "$GITHUB_WORKSPACE"/MiLink/build/apk
             sudo 7z a "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk ./*.dex -mx0
-            sudo rm -rf "$GITHUB_WORKSPACE"/image/system/system/app/MiLinkCirculate/oat/*
+            sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/oat
             sudo mv "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk
             sudo zipalign -v 4 "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk
             sudo mv -f "$GITHUB_WORKSPACE"/vbmeta.img "$GITHUB_WORKSPACE"/LMI/firmware-update
