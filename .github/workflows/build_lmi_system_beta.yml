@@ -16,6 +16,8 @@ jobs:
          run: |
             source "$GITHUB_WORKSPACE"/config.env
             echo "ROM_URL=$ROM_URL" >> $GITHUB_ENV
+            echo "camera1=$camera1" >> $GITHUB_ENV
+            echo "camera2=$camera2" >> $GITHUB_ENV
        - name: 1.安装依赖
          run: |
             sudo apt install python3 python3-pip aria2 zip p7zip-full zipalign
@@ -117,6 +119,17 @@ jobs:
             sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/oat
             sudo mv "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk
             sudo zipalign -v 4 "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk
+            sudo mkdir -p "$GITHUB_WORKSPACE"/MiuiCamera/
+            $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MiuiCamera/ "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk
+            mod="$GITHUB_WORKSPACE"/MiuiCamera/smali*/${{ env.camera1 }}
+            sudo sed -i '/^${{ env.camera2 }}/,/^.end method/{//!d}' $mod
+            sudo sed -i -e '/^${{ env.camera2 }}/a\    .locals 1\n\n    const/4 v0, 0x0\n\n   return v0' $mod
+            $Apktool b -q -f -o "$GITHUB_WORKSPACE"/MiuiCamera/MiuiCamera.apk "$GITHUB_WORKSPACE"/MiuiCamera/
+            cd "$GITHUB_WORKSPACE"/MiuiCamera/build/apk
+            sudo 7z a "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk ./*.dex -mx0
+            sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/oat
+            sudo mv "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk "$GITHUB_WORKSPACE"/MiuiCamera/MiuiCamera.apk
+            sudo zipalign -v 4 "$GITHUB_WORKSPACE"/MiuiCamera/MiuiCamera.apk "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk
             sudo mv -f "$GITHUB_WORKSPACE"/vbmeta.img "$GITHUB_WORKSPACE"/LMI/firmware-update
             sudo mv -f "$GITHUB_WORKSPACE"/vbmeta_system.img "$GITHUB_WORKSPACE"/LMI/firmware-update
             sudo cp -r "$GITHUB_WORKSPACE"/LMI/firmware-update "$GITHUB_WORKSPACE"/images
