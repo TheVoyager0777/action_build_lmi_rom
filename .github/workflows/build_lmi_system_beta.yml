@@ -12,6 +12,9 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
        - uses: actions/checkout@master
+       - name: 获取配置
+            source "$GITHUB_WORKSPACE"/config.env
+            echo "ROM_URL=$ROM_URL">> $GITHUB_ENV
        - name: 1.安装依赖
          run: |
             sudo apt install python3 python3-pip aria2 zip p7zip-full zipalign
@@ -26,8 +29,7 @@ jobs:
             pip3 install --ignore-installed pyyaml
        - name: 2.下载系统包
          run: |
-            source "$GITHUB_WORKSPACE"/config.env
-            aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" $ROM_URL
+            aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" "${{ env.ROM_URL }}
             aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" https://hugeota.d.miui.com/22.7.19/miui_LMIPRE_22.7.19_0c8ec819b7_12.0.zip
        - name: 3.解包
          run: |
@@ -39,7 +41,7 @@ jobs:
             mkdir -p "$GITHUB_WORKSPACE"/simages
             mkdir -p "$GITHUB_WORKSPACE"/zip
             mkdir -p "$GITHUB_WORKSPACE"/firmware
-            URL=${{ github.event.inputs.URL }}
+            URL="${{ env.ROM_URL }}
             ZIP_NAME_PSYCHE=${URL##*/}
             7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE -r -o"$GITHUB_WORKSPACE"/PSYCHE
             rm -rf "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE
