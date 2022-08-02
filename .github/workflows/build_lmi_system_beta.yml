@@ -32,10 +32,8 @@ jobs:
             pip3 install --ignore-installed pyyaml
        - name: 2.下载系统包
          run: |
-            if [[ ${{ github.event.inputs.YUN }} == '1' ]];then
             aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${{ env.ROM_URL }}
             aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" https://hugeota.d.miui.com/22.7.19/miui_LMIPRE_22.7.19_0c8ec819b7_12.0.zip
-            fi
        - name: 3.解包
          run: |
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/payload-dumper-go
@@ -203,13 +201,14 @@ jobs:
             rclone sync -P ./zip/* aliyun:/LMI_Package
        - name: 7.上传到123云盘
          run: |
-            if ${{ github.event.inputs.YUN }} == '1'
+            if [[ ${{ github.event.inputs.YUN }} == '1' ]];then
             curl -fsSL "https://nn.ci/alist.sh" | sudo bash -s install
             sudo systemctl stop alist
             sudo mv -f /home/runner/.config/rclone/data.db /opt/alist/data
             sudo systemctl start alist
             rclone mkdir 123pan:/LMI_Packages
             rclone sync -P ./zip/* 123pan:/LMI_Packages
+            fi
        - name: 8.删除工作流运行
          uses: Mattraks/delete-workflow-runs@v2
          with:
