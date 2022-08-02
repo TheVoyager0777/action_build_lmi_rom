@@ -177,7 +177,7 @@ jobs:
                 rm -rf "$GITHUB_WORKSPACE"/images/$i.img
                 python3 "$GITHUB_WORKSPACE"/tools/img2sdat.py "$GITHUB_WORKSPACE"/simages/$i.img -o "$GITHUB_WORKSPACE"/simages/ -v 4 -p $i
                 rm -rf "$GITHUB_WORKSPACE"/simages/$i.img
-                "$GITHUB_WORKSPACE"/tools/brotli -q 7 "$GITHUB_WORKSPACE"/simages/$i.new.dat -o "$GITHUB_WORKSPACE"/images/$i.new.dat.br
+                "$GITHUB_WORKSPACE"/tools/brotli -q 5 "$GITHUB_WORKSPACE"/simages/$i.new.dat -o "$GITHUB_WORKSPACE"/images/$i.new.dat.br
                 mv "$GITHUB_WORKSPACE"/simages/$i.transfer.list "$GITHUB_WORKSPACE"/simages/$i.patch.dat "$GITHUB_WORKSPACE"/images
                 rm -rf "$GITHUB_WORKSPACE"/simages/$i.new.dat
             done
