@@ -1,16 +1,18 @@
 name: build_lmi_system_beta_rw
 on: 
   workflow_dispatch:
-    inputs:
-      URL:
-        description: '待操作的系统包下载地址'     
-        required: true
-        default: 'https://hugeota.d.miui.com/22.7.28/miui_PSYCHEPRE_22.7.28_414ec720b1_12.0.zip'
+
 jobs:
   build:
     runs-on: ubuntu-20.04
     steps:
-       - uses: actions/checkout@master  
+       - uses: actions/checkout@master
+       - name: 获取配置
+         run: |
+            source "$GITHUB_WORKSPACE"/config.env
+            echo "ROM_URL=$ROM_URL" >> $GITHUB_ENV
+            echo "camera1=$camera1" >> $GITHUB_ENV
+            echo "camera2=$camera2" >> $GITHUB_ENV
        - name: 1.安装依赖
          run: |
             sudo apt install python3 python3-pip aria2 zip p7zip-full zipalign
@@ -25,7 +27,7 @@ jobs:
             pip3 install --ignore-installed pyyaml
        - name: 2.下载系统包
          run: |
-            aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${{ github.event.inputs.URL }}
+            aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${{ env.ROM_URL }}
             aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" https://hugeota.d.miui.com/22.7.19/miui_LMIPRE_22.7.19_0c8ec819b7_12.0.zip
        - name: 3.解包
          run: |
@@ -37,7 +39,7 @@ jobs:
             mkdir -p "$GITHUB_WORKSPACE"/simages
             mkdir -p "$GITHUB_WORKSPACE"/zip
             mkdir -p "$GITHUB_WORKSPACE"/firmware
-            URL=${{ github.event.inputs.URL }}
+            URL=${{ env.ROM_URL }}
             ZIP_NAME_PSYCHE=${URL##*/}
             7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE -r -o"$GITHUB_WORKSPACE"/PSYCHE
             rm -rf "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE
@@ -56,6 +58,7 @@ jobs:
             rm -rf "$GITHUB_WORKSPACE"/LMI/vendor.patch.dat
             rm -rf "$GITHUB_WORKSPACE"/LMI/vendor.transfer.list
             rm -rf "$GITHUB_WORKSPACE"/LMI/vendor.new.dat
+            echo "vendor_size=$(sudo du -sb "$GITHUB_WORKSPACE"/LMI/vendor.img | awk {'print $1'})" >> $GITHUB_ENV
             sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/LMI/vendor.img "$GITHUB_WORKSPACE"/LMI
             rm -rf "$GITHUB_WORKSPACE"/LMI/vendor.img
             for i in system product system_ext
@@ -65,10 +68,13 @@ jobs:
             done
             rm -rf "$GITHUB_WORKSPACE"/payload
             rm -rf "$GITHUB_WORKSPACE"/PSYCHE
+            echo "system_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system.img | awk {'print $1'})" >> $GITHUB_ENV
             sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/system.img "$GITHUB_WORKSPACE"/images
             rm -rf "$GITHUB_WORKSPACE"/images/system.img
+            echo "system_ext_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system_ext.img | awk {'print $1'})" >> $GITHUB_ENV
             sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/system_ext.img "$GITHUB_WORKSPACE"/images
             rm -rf "$GITHUB_WORKSPACE"/images/system_ext.img
+            echo "product_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/product.img | awk {'print $1'})" >> $GITHUB_ENV
             sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/product.img "$GITHUB_WORKSPACE"/images
             rm -rf "$GITHUB_WORKSPACE"/images/product.img
        - name: 4.替换相关文件
@@ -91,6 +97,8 @@ jobs:
             sudo sed -i 's/ro.miui.cust_device=[^*]*/ro.miui.cust_device=lmi/' "$GITHUB_WORKSPACE"/images/system/system/build.prop
             sudo rm -rf "$GITHUB_WORKSPACE"/LMI/vendor/recovery-from-boot.p
             sudo rm -rf "$GITHUB_WORKSPACE"/LMI/vendor/bin/install-recovery.sh
+            sudo sed -i "/ro.vendor.audio.game.effect/d" "$GITHUB_WORKSPACE"/LMI/vendor/build.prop
+            sudo sed -i "/import/i ro.vendor.audio.support.sound.id=true\nro.vendor.audio.voip.assistant=true\nro.vendor.audio.aiasst.support=true\nro.vendor.media.video.frc.support=true\nro.vendor.audio.spk.stereo=true\nro.vendor.audio.vocal.support=true\nro.vendor.audio.surround.support=true\nro.vendor.audio.spk.clean=true\nro.vendor.video_box.version=2" "$GITHUB_WORKSPACE"/LMI/vendor/build.prop
             sudo unzip -o "$GITHUB_WORKSPACE"/nfc.zip -d "$GITHUB_WORKSPACE"/images/system_ext
             sudo unzip -o "$GITHUB_WORKSPACE"/audio.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/audio/ui/
             sudo unzip -o "$GITHUB_WORKSPACE"/etc.zip -d "$GITHUB_WORKSPACE"/images/system/system/etc/audio/
@@ -103,7 +111,7 @@ jobs:
             $Apktool b -q -f -o "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk "$GITHUB_WORKSPACE"/MiLink/
             cd "$GITHUB_WORKSPACE"/MiLink/build/apk
             sudo 7z a "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk ./*.dex -mx0
-            sudo rm -rf "$GITHUB_WORKSPACE"/image/system/system/app/MiLinkCirculate/oat/*
+            sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/oat
             sudo mv "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk
             sudo zipalign -v 4 "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk
             sudo mv -f "$GITHUB_WORKSPACE"/vbmeta.img "$GITHUB_WORKSPACE"/LMI/firmware-update
@@ -121,31 +129,27 @@ jobs:
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/e2fsdroid
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/img2simg
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/brotli
-            URL=${{ github.event.inputs.URL }}
+            URL=${{ env.ROM_URL }}
             DATE=${URL%/*}
             date=${DATE##*/}
-            product_ota_size=$(echo "1048576 * 20 " | bc)
-            product_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/product | awk {'print $1'})
-            product_size=$(echo "$product_size + $product_ota_size" | bc)
+            product_ota_size=$(echo "1048576 * 0 " | bc)
+            product_size=$(echo "${{ env.product_size }} + $product_ota_size" | bc)
             product_size=$(echo "$product_size / 4096" | bc)
-            vendor_ota_size=$(echo "1048576 * 20 " | bc)
-            vendor_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/vendor | awk {'print $1'})
-            vendor_size=$(echo "$vendor_size + $vendor_ota_size" | bc)
+            vendor_ota_size=$(echo "1048576 * 0 " | bc)
+            vendor_size=$(echo "${{ env.vendor_size }} + $vendor_ota_size" | bc)
             vendor_size=$(echo "$vendor_size / 4096" | bc)
-            system_ext_ota_size=$(echo "1048576 * 21 " | bc)
-            system_ext_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system_ext | awk {'print $1'})
-            system_ext_size=$(echo "$system_ext_size + $system_ext_ota_size" | bc)
+            system_ext_ota_size=$(echo "1048576 * 1 " | bc)
+            system_ext_size=$(echo "${{ env.system_ext_size }} + $system_ext_ota_size" | bc)
             system_ext_size=$(echo "$system_ext_size / 4096" | bc)
-            system_ota_size=$(echo "1048576 * 136 " | bc)
-            system_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system | awk {'print $1'})
-            system_size=$(echo "$system_size + $system_ota_size" | bc)
+            system_ota_size=$(echo "1048576 * 46 " | bc)
+            system_size=$(echo "${{ env.system_size }} + $system_ota_size" | bc)
             system_size=$(echo "$system_size / 4096" | bc)
             UTC=$(date -u +%s)
             for i in product vendor system_ext system
             do
                 sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/$i "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config
                 "$GITHUB_WORKSPACE"/tools/mke2fs -O ^has_journal -L $i -I 256 -M /$i -m 0 -t ext4 -b 4096 "$GITHUB_WORKSPACE"/images/$i.img $(eval echo "$"$i"_size")
-                sudo "$GITHUB_WORKSPACE"/tools/e2fsdroid -T 1230768000 -C "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config -S "$GITHUB_WORKSPACE"/images/TI_config/"$i"_file_contexts -f "$GITHUB_WORKSPACE"/images/$i -a /$i -e "$GITHUB_WORKSPACE"/images/$i.img
+                sudo "$GITHUB_WORKSPACE"/tools/e2fsdroid -T 1230768000 -C "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config -S "$GITHUB_WORKSPACE"/images/TI_config/"$i"_file_contexts -f "$GITHUB_WORKSPACE"/images/$i -a /$i -e -s "$GITHUB_WORKSPACE"/images/$i.img
                 resize2fs -f -M "$GITHUB_WORKSPACE"/images/$i.img
                 eval "$i"_size=$(du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})
                 sudo rm -rf "$GITHUB_WORKSPACE"/images/$i
@@ -171,14 +175,14 @@ jobs:
             md5=$(md5sum "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip)
             zipmd5=${md5:0:10}
             mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"$date"_"$zipmd5"_12.0.zip
-       - name: 6.上传到阿里云盘
+       - name: 7.上传到123云盘
          run: |
-            curl https://rclone.org/install.sh | sudo bash
-            mkdir -p ~/.config/rclone/
-            unzip -P ${{ secrets.PASSWORD }} "$GITHUB_WORKSPACE"/tools/rclone.zip -d ~/.config/rclone/
-            nohup aliyundrive-webdav --refresh-token ${{ secrets.REFRESHTOKEN }} --host 127.0.0.1 --port 6396 --auth-user 3380572517 --auth-password ${{ secrets.PASSWORD }} >/dev/null 2>& 1 &
-            rclone mkdir aliyun:/LMI_Package
-            rclone sync -P ./zip/* aliyun:/LMI_Package
+            curl -fsSL "https://nn.ci/alist.sh" | sudo bash -s install
+            sudo systemctl stop alist
+            sudo mv -f /home/runner/.config/rclone/data.db /opt/alist/data
+            sudo systemctl start alist
+            sleep 10s
+            rclone sync -P ./zip/* 123pan:/
        - name: 8.删除工作流运行
          uses: Mattraks/delete-workflow-runs@v2
          with:
