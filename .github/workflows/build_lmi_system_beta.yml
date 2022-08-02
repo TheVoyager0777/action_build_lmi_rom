@@ -201,7 +201,7 @@ jobs:
             rclone sync -P ./zip/* aliyun:/LMI_Package
        - name: 7.上传到123云盘
          run: |
-            if: ${{ github.event.inputs.YUN }} == '1'
+            if ${{ github.event.inputs.YUN }} == '1'
             curl -fsSL "https://nn.ci/alist.sh" | sudo bash -s install
             sudo systemctl stop alist
             sudo mv -f /home/runner/.config/rclone/data.db /opt/alist/data
