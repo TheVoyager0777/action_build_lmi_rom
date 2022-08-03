@@ -58,13 +58,17 @@ jobs:
             cd "$GITHUB_WORKSPACE"/MiuiCamera/one/
             sudo 7z a -tzip "$GITHUB_WORKSPACE"/MiuiCamera/one/MiuiCamera.apk ./*
             sudo $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MiuiCamera/one/MiuiCamera/ "$GITHUB_WORKSPACE"/MiuiCamera/one/MiuiCamera.apk
+            echo 编译完成
             mod="$GITHUB_WORKSPACE"/MiuiCamera/one/MiuiCamera/smali*/${{ env.camera1 }}
             sudo sed -i '/^${{ env.camera2 }}/,/^.end method/{//!d}' $mod
             sudo sed -i -e '/^${{ env.camera2 }}/a\    .registers 1\n\n    const/4 p0, 0x0\n\n   return p0' $mod
+            echo 修改完成
             sudo mkdir -p "$GITHUB_WORKSPACE"/MiuiCamera/two/MiuiCamera/smali/${{ env.camera1 }}
             sudo cp -rf "$GITHUB_WORKSPACE"/MiuiCamera/one/MiuiCamera/smali*/${{ env.camera1 }} "$GITHUB_WORKSPACE"/MiuiCamera/two/MiuiCamera/smali/${{ env.camera1 }}
             sudo cp -rf "$GITHUB_WORKSPACE"/MiuiCamera/one/MiuiCamera/apktool.yml "$GITHUB_WORKSPACE"/MiuiCamera/two/MiuiCamera/
+            echo 开始反编译
             sudo $Apktool b -q -f -o "$GITHUB_WORKSPACE"/MiuiCamera/two/MiuiCamera.apk $GITHUB_WORKSPACE"/MiuiCamera/two/MiuiCamera/
+            echo 反编译完成
             filepath=$GITHUB_WORKSPACE/MiuiCamera/one/
             for file in `ls -a $filepath`
             do
@@ -77,6 +81,7 @@ jobs:
                 sudo cp -rf $GITHUB_WORKSPACE/MiuiCamera/one/$file $GITHUB_WORKSPACE/MiuiCamera/three/classes$new.dex
               fi
             done
+            echo 移动文件完成
             sudo unzip -o "$GITHUB_WORKSPACE"/MiuiCamera/two/MiuiCamera.apk -d "$GITHUB_WORKSPACE"/MiuiCamera/three/
             cd "$GITHUB_WORKSPACE"/MiuiCamera/three/
             sudo 7z a "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk ./*.dex -mx0
