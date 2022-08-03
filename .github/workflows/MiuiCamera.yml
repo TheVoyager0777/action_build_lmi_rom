@@ -55,8 +55,7 @@ jobs:
             sudo mkdir -p "$GITHUB_WORKSPACE"/MiuiCamera/2/
             sudo mkdir -p "$GITHUB_WORKSPACE"/MiuiCamera/3/
             sudo unzip -o "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk 'classes*.dex' -d "$GITHUB_WORKSPACE"/MiuiCamera/1/
-            sudo 7z a "$GITHUB_WORKSPACE"/MiuiCamera/1/MiuiCamera.apk ./*.dex "$GITHUB_WORKSPACE"/MiuiCamera/1/
-            $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MiuiCamera/1/ "$GITHUB_WORKSPACE"/MiuiCamera/1/MiuiCamera.apk
+            $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MiuiCamera/1/ "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk
             mod="$GITHUB_WORKSPACE"/MiuiCamera/1/MiuiCamera/smali*/${{ env.camera1 }}
             sudo sed -i '/^${{ env.camera2 }}/,/^.end method/{//!d}' $mod
             sudo sed -i -e '/^${{ env.camera2 }}/a\    .registers 1\n\n    const/4 p0, 0x0\n\n   return p0' $mod
