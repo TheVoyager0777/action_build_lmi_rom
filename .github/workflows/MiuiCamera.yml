@@ -65,7 +65,7 @@ jobs:
             sudo cp -rf "$GITHUB_WORKSPACE"/MiuiCamera/one/MiuiCamera/smali*/${{ env.camera1 }} "$GITHUB_WORKSPACE"/MiuiCamera/two/MiuiCamera/smali/${{ env.camera1 }}
             sudo cp -rf "$GITHUB_WORKSPACE"/MiuiCamera/one/MiuiCamera/apktool.yml "$GITHUB_WORKSPACE"/MiuiCamera/two/MiuiCamera/
             sudo $Apktool b -q -f -o "$GITHUB_WORKSPACE"/MiuiCamera/two/MiuiCamera.apk $GITHUB_WORKSPACE"/MiuiCamera/two/MiuiCamera/
-            filepath="$GITHUB_WORKSPACE"/MiuiCamera/one/
+            filepath=$GITHUB_WORKSPACE/MiuiCamera/one/
             for file in `ls -a $filepath`
             do
               if [ "${file##*.}"x = "dex"x ];then
@@ -74,7 +74,7 @@ jobs:
                    old=1
                 fi
                 new=$(echo $old|awk '{for(i=1;i<=NF;i++){$i+=1}}1')
-                sudo cp -rf "$GITHUB_WORKSPACE"/MiuiCamera/one/$file "$GITHUB_WORKSPACE"/MiuiCamera/three/classes$new.dex
+                sudo cp -rf $GITHUB_WORKSPACE/MiuiCamera/one/$file $GITHUB_WORKSPACE/MiuiCamera/three/classes$new.dex
               fi
             done
             sudo unzip -o "$GITHUB_WORKSPACE"/MiuiCamera/two/MiuiCamera.apk -d "$GITHUB_WORKSPACE"/MiuiCamera/three/
