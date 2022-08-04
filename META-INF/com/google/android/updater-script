@@ -86,5 +86,5 @@ package_extract_file("firmware-update/logo.img", "/dev/block/bootdevice/by-name/
 package_extract_file("firmware-update/dtbo.img", "/dev/block/bootdevice/by-name/dtbo");
 package_extract_file("firmware-update/vbmeta.img", "/dev/block/bootdevice/by-name/vbmeta");
 package_extract_file("firmware-update/vbmeta_system.img", "/dev/block/bootdevice/by-name/vbmeta_system");
-delete_recursive("/data/system/package_cache")
+delete_recursive("/data/system/package_cache");
 set_progress(1.000000);
