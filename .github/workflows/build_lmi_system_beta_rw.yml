@@ -117,7 +117,7 @@ jobs:
             for files in MIGalleryLockscreen MIUIDriveMode MIUIDuokanReader MIUIGameCenter MIUINewHome MIUIYoupin; do
             device=$(find "$GITHUB_WORKSPACE"/images/system/system/data-app/ -name $files)
             for file in $device; do
-            size=$(du -b $file | cut -d '/' -f1)
+            size=$(sudo du -sb $file | awk {'print $1'})
             sizes=$(echo "$sizes + $size" | bc)
             sudo rm -rf $file
             done
