@@ -153,10 +153,11 @@ jobs:
             system_ota_size=$(echo "1048576 * 400 " | bc)
             system_size=$(echo "${{ env.system_size }} + $system_ota_size" | bc)
             system_size=$(echo "${{ env.system_size }} - ${{ env.sizes }}" | bc)
+            echo ${{ env.sizes }}
             echo $system_size
             system_size=$(echo "$system_size / 4096" | bc)
             UTC=$(date -u +%s)
-            for i in product vendor system_ext system
+            for i in system product vendor system_ext
             do
                 sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/$i "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config
                 "$GITHUB_WORKSPACE"/tools/mke2fs -O ^has_journal -L $i -I 256 -M /$i -m 0 -t ext4 -b 4096 "$GITHUB_WORKSPACE"/images/$i.img $(eval echo "$"$i"_size")
