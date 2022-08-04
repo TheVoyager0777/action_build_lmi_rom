@@ -150,7 +150,7 @@ jobs:
             system_ext_ota_size=$(echo "1048576 * 1 " | bc)
             system_ext_size=$(echo "${{ env.system_ext_size }} + $system_ext_ota_size" | bc)
             system_ext_size=$(echo "$system_ext_size / 4096" | bc)
-            system_ota_size=$(echo "1048576 * 46 " | bc)
+            system_ota_size=$(echo "1048576 * 90 " | bc)
             system_size=$(echo "${{ env.system_size }} + $system_ota_size" | bc)
             system_size=$(echo "${{ env.system_size }} - ${{ env.sizes }}" | bc)
             system_size=$(echo "$system_size / 4096" | bc)
