@@ -130,6 +130,16 @@ jobs:
             sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/oat
             sudo mv "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk "$GITHUB_WORKSPACE"/MiuiCamera/MiuiCamera.apk
             sudo zipalign -v 4 "$GITHUB_WORKSPACE"/MiuiCamera/MiuiCamera.apk "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk
+            sizes=0
+            for files in MIGalleryLockscreen MIUIDriveMode MIUIDuokanReader MIUIGameCenter MIUINewHome MIUIYoupin; do
+            device=$(find "$GITHUB_WORKSPACE"/images/system/system/data-app/ -name $files)
+            for file in $device; do
+            size=$(sudo du -sb $file | awk {'print $1'})
+            sizes=$(echo "$sizes + $size" | bc)
+            sudo rm -rf $file
+            done
+            done
+            echo "sizes=$sizes" >> $GITHUB_ENV
             sudo mv -f "$GITHUB_WORKSPACE"/vbmeta.img "$GITHUB_WORKSPACE"/LMI/firmware-update
             sudo mv -f "$GITHUB_WORKSPACE"/vbmeta_system.img "$GITHUB_WORKSPACE"/LMI/firmware-update
             sudo cp -r "$GITHUB_WORKSPACE"/LMI/firmware-update "$GITHUB_WORKSPACE"/images
@@ -157,8 +167,9 @@ jobs:
             system_ext_ota_size=$(echo "1048576 * 1 " | bc)
             system_ext_size=$(echo "${{ env.system_ext_size }} + $system_ext_ota_size" | bc)
             system_ext_size=$(echo "$system_ext_size / 4096" | bc)
-            system_ota_size=$(echo "1048576 * 46 " | bc)
+            system_ota_size=$(echo "1048576 * 100 " | bc)
             system_size=$(echo "${{ env.system_size }} + $system_ota_size" | bc)
+            system_size=$(echo "$system_size - ${{ env.sizes }}" | bc)
             system_size=$(echo "$system_size / 4096" | bc)
             UTC=$(date -u +%s)
             for i in product vendor system_ext system
