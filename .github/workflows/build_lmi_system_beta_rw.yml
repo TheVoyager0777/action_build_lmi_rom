@@ -150,14 +150,14 @@ jobs:
             system_ext_ota_size=$(echo "1048576 * 1 " | bc)
             system_ext_size=$(echo "${{ env.system_ext_size }} + $system_ext_ota_size" | bc)
             system_ext_size=$(echo "$system_ext_size / 4096" | bc)
-            system_ota_size=$(echo "1048576 * 100 " | bc)
+            system_ota_size=$(echo "1048576 * 46 " | bc)
             system_size=$(echo "${{ env.system_size }} + $system_ota_size" | bc)
             system_size=$(echo "$system_size - ${{ env.sizes }}" | bc)
             echo ${{ env.sizes }}
             echo $system_size
             system_size=$(echo "$system_size / 4096" | bc)
             UTC=$(date -u +%s)
-            for i in system product vendor system_ext
+            for i in system
             do
                 sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/$i "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config
                 "$GITHUB_WORKSPACE"/tools/mke2fs -O ^has_journal -L $i -I 256 -M /$i -m 0 -t ext4 -b 4096 "$GITHUB_WORKSPACE"/images/$i.img $(eval echo "$"$i"_size")
@@ -167,7 +167,7 @@ jobs:
                 sudo rm -rf "$GITHUB_WORKSPACE"/images/$i
             done
             sudo rm -rf "$GITHUB_WORKSPACE"/images/TI_config
-            for i in product system system_ext vendor
+            for i in system
             do
                 "$GITHUB_WORKSPACE"/tools/img2simg "$GITHUB_WORKSPACE"/images/$i.img "$GITHUB_WORKSPACE"/simages/$i.img
                 rm -rf "$GITHUB_WORKSPACE"/images/$i.img
@@ -187,22 +187,6 @@ jobs:
             md5=$(md5sum "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip)
             zipmd5=${md5:0:10}
             mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"$date"_"$zipmd5"_12.0.zip
-       - name: 6.上传到阿里云盘
-         run: |
-            curl https://rclone.org/install.sh | sudo bash
-            mkdir -p ~/.config/rclone/
-            unzip -P ${{ secrets.PASSWORD }} "$GITHUB_WORKSPACE"/tools/rclone.zip -d ~/.config/rclone/
-            nohup aliyundrive-webdav --refresh-token ${{ secrets.REFRESHTOKEN }} --host 127.0.0.1 --port 6396 --auth-user 3380572517 --auth-password ${{ secrets.PASSWORD }} >/dev/null 2>& 1 &
-            rclone mkdir aliyun:/LMI_Package
-            rclone sync -P ./zip/* aliyun:/LMI_Package
-       - name: 7.上传到123云盘
-         run: |
-            curl -fsSL "https://nn.ci/alist.sh" | sudo bash -s install
-            sudo systemctl stop alist
-            sudo mv -f /home/runner/.config/rclone/data.db /opt/alist/data
-            sudo systemctl start alist
-            sleep 10s
-            rclone sync -P ./zip/* 123pan:/
        - name: 8.删除工作流运行
          uses: Mattraks/delete-workflow-runs@v2
          with:
