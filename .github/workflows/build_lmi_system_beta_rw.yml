@@ -42,15 +42,6 @@ jobs:
             ZIP_NAME_PSYCHE=${URL##*/}
             7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE -r -o"$GITHUB_WORKSPACE"/PSYCHE
             rm -rf "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE
-            "$GITHUB_WORKSPACE"/tools/brotli -d "$GITHUB_WORKSPACE"/LMI/vendor.new.dat.br
-            rm -rf "$GITHUB_WORKSPACE"/LMI/vendor.new.dat.br
-            python3 "$GITHUB_WORKSPACE"/tools/sdat2img.py "$GITHUB_WORKSPACE"/LMI/vendor.transfer.list "$GITHUB_WORKSPACE"/LMI/vendor.new.dat "$GITHUB_WORKSPACE"/LMI/vendor.img
-            rm -rf "$GITHUB_WORKSPACE"/LMI/vendor.patch.dat
-            rm -rf "$GITHUB_WORKSPACE"/LMI/vendor.transfer.list
-            rm -rf "$GITHUB_WORKSPACE"/LMI/vendor.new.dat
-            echo "vendor_size=$(sudo du -sb "$GITHUB_WORKSPACE"/LMI/vendor.img | awk {'print $1'})" >> $GITHUB_ENV
-            sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/LMI/vendor.img "$GITHUB_WORKSPACE"/LMI
-            rm -rf "$GITHUB_WORKSPACE"/LMI/vendor.img
             for i in system
             do
                 "$GITHUB_WORKSPACE"/tools/payload-dumper-go -p $i "$GITHUB_WORKSPACE"/PSYCHE/payload.bin
