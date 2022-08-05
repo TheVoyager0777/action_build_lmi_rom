@@ -28,7 +28,6 @@ jobs:
        - name: 2.下载系统包
          run: |
             aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${{ env.ROM_URL }}
-            aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" https://hugeota.d.miui.com/22.7.19/miui_LMIPRE_22.7.19_0c8ec819b7_12.0.zip
        - name: 3.解包
          run: |
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/payload-dumper-go
@@ -43,15 +42,6 @@ jobs:
             ZIP_NAME_PSYCHE=${URL##*/}
             7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE -r -o"$GITHUB_WORKSPACE"/PSYCHE
             rm -rf "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE
-            ZIP_NAME_LMI=miui_LMIPRE_22.7.19_0c8ec819b7_12.0.zip
-            7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_LMI -r -o"$GITHUB_WORKSPACE"/LMI firmware-update
-            7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_LMI -r -o"$GITHUB_WORKSPACE"/LMI boot.img
-            for i in odm vendor
-            do
-                7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_LMI -o"$GITHUB_WORKSPACE"/LMI $i.transfer.list
-                7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_LMI -o"$GITHUB_WORKSPACE"/LMI $i.patch.dat
-                7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_LMI -o"$GITHUB_WORKSPACE"/LMI $i.new.dat.br
-            done
             "$GITHUB_WORKSPACE"/tools/brotli -d "$GITHUB_WORKSPACE"/LMI/vendor.new.dat.br
             rm -rf "$GITHUB_WORKSPACE"/LMI/vendor.new.dat.br
             python3 "$GITHUB_WORKSPACE"/tools/sdat2img.py "$GITHUB_WORKSPACE"/LMI/vendor.transfer.list "$GITHUB_WORKSPACE"/LMI/vendor.new.dat "$GITHUB_WORKSPACE"/LMI/vendor.img
@@ -61,7 +51,7 @@ jobs:
             echo "vendor_size=$(sudo du -sb "$GITHUB_WORKSPACE"/LMI/vendor.img | awk {'print $1'})" >> $GITHUB_ENV
             sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/LMI/vendor.img "$GITHUB_WORKSPACE"/LMI
             rm -rf "$GITHUB_WORKSPACE"/LMI/vendor.img
-            for i in system product system_ext
+            for i in system
             do
                 "$GITHUB_WORKSPACE"/tools/payload-dumper-go -p $i "$GITHUB_WORKSPACE"/PSYCHE/payload.bin
                 mv "$GITHUB_WORKSPACE"/payload/$i.img "$GITHUB_WORKSPACE"/images/$i.img
@@ -71,12 +61,6 @@ jobs:
             echo "system_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system.img | awk {'print $1'})" >> $GITHUB_ENV
             sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/system.img "$GITHUB_WORKSPACE"/images
             rm -rf "$GITHUB_WORKSPACE"/images/system.img
-            echo "system_ext_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system_ext.img | awk {'print $1'})" >> $GITHUB_ENV
-            sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/system_ext.img "$GITHUB_WORKSPACE"/images
-            rm -rf "$GITHUB_WORKSPACE"/images/system_ext.img
-            echo "product_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/product.img | awk {'print $1'})" >> $GITHUB_ENV
-            sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/product.img "$GITHUB_WORKSPACE"/images
-            rm -rf "$GITHUB_WORKSPACE"/images/product.img
        - name: 4.替换相关文件
          run: |
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/apktool.jar
@@ -150,7 +134,7 @@ jobs:
             system_ext_ota_size=$(echo "1048576 * 1 " | bc)
             system_ext_size=$(echo "${{ env.system_ext_size }} + $system_ext_ota_size" | bc)
             system_ext_size=$(echo "$system_ext_size / 4096" | bc)
-            system_ota_size=$(echo "1048576 * 46 " | bc)
+            system_ota_size=$(echo "1048576 * 36 " | bc)
             system_size=$(echo "${{ env.system_size }} + $system_ota_size" | bc)
             system_size=$(echo "$system_size - ${{ env.sizes }}" | bc)
             echo ${{ env.sizes }}
@@ -166,28 +150,7 @@ jobs:
                 eval "$i"_size=$(du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})
                 sudo rm -rf "$GITHUB_WORKSPACE"/images/$i
             done
-            sudo rm -rf "$GITHUB_WORKSPACE"/images/TI_config
-            for i in system
-            do
-                "$GITHUB_WORKSPACE"/tools/img2simg "$GITHUB_WORKSPACE"/images/$i.img "$GITHUB_WORKSPACE"/simages/$i.img
-                rm -rf "$GITHUB_WORKSPACE"/images/$i.img
-                python3 "$GITHUB_WORKSPACE"/tools/img2sdat.py "$GITHUB_WORKSPACE"/simages/$i.img -o "$GITHUB_WORKSPACE"/simages/ -v 4 -p $i
-                rm -rf "$GITHUB_WORKSPACE"/simages/$i.img
-                "$GITHUB_WORKSPACE"/tools/brotli -q 5 "$GITHUB_WORKSPACE"/simages/$i.new.dat -o "$GITHUB_WORKSPACE"/images/$i.new.dat.br
-                mv "$GITHUB_WORKSPACE"/simages/$i.transfer.list "$GITHUB_WORKSPACE"/simages/$i.patch.dat "$GITHUB_WORKSPACE"/images
-                rm -rf "$GITHUB_WORKSPACE"/simages/$i.new.dat
-            done
-            rm -rf "$GITHUB_WORKSPACE"/simages
-            sed -i "s/product_size/$product_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
-            sed -i "s/vendor_size/$vendor_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
-            sed -i "s/system_size/$system_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
-            sed -i "s/system_ext_size/$system_ext_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
-            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip "$GITHUB_WORKSPACE"/images/*
-            sudo rm -rf "$GITHUB_WORKSPACE"/images
-            md5=$(md5sum "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip)
-            zipmd5=${md5:0:10}
-            mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"$date"_"$zipmd5"_12.0.zip
-       - name: 8.删除工作流运行
+       - name: 5.打包
          uses: Mattraks/delete-workflow-runs@v2
          with:
           token: ${{ github.token }}
