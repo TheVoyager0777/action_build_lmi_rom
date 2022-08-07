@@ -10,7 +10,7 @@ jobs:
        - name: 获取配置
          run: |
             source "$GITHUB_WORKSPACE"/config.env
-            echo "ROM_URL=https://hugeota.d.miui.com/22.8.2/miui_PSYCHEPRE_22.8.2_586b520754_12.0.zip" >> $GITHUB_ENV
+            echo "ROM_URL=$ROM_URL" >> $GITHUB_ENV
             echo "camera1=$camera1" >> $GITHUB_ENV
             echo "camera2=$camera2" >> $GITHUB_ENV
        - name: 1.安装依赖
@@ -42,33 +42,16 @@ jobs:
             ZIP_NAME_PSYCHE=${URL##*/}
             7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE -r -o"$GITHUB_WORKSPACE"/PSYCHE
             rm -rf "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE
-            for i in system product system_ext
+            for i in system_ext
             do
                 "$GITHUB_WORKSPACE"/tools/payload-dumper-go -p $i "$GITHUB_WORKSPACE"/PSYCHE/payload.bin
                 mv "$GITHUB_WORKSPACE"/payload/$i.img "$GITHUB_WORKSPACE"/images/$i.img
             done
             rm -rf "$GITHUB_WORKSPACE"/payload
             rm -rf "$GITHUB_WORKSPACE"/PSYCHE
-            echo "system_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system.img | awk {'print $1'})" >> $GITHUB_ENV
-            sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/system.img "$GITHUB_WORKSPACE"/images
-            rm -rf "$GITHUB_WORKSPACE"/images/system.img
-            echo "system_ext_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system_ext.img | awk {'print $1'})" >> $GITHUB_ENV
-            sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/system_ext.img "$GITHUB_WORKSPACE"/images
-            rm -rf "$GITHUB_WORKSPACE"/images/system_ext.img
-            echo "product_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/product.img | awk {'print $1'})" >> $GITHUB_ENV
-            sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/product.img "$GITHUB_WORKSPACE"/images
-            rm -rf "$GITHUB_WORKSPACE"/images/product.img
-       - name: 4.替换相关文件
-         run: |
-            mkdir -p "$GITHUB_WORKSPACE"/LMI/product/
-            mkdir -p "$GITHUB_WORKSPACE"/LMI/system_ext/
-            mkdir -p "$GITHUB_WORKSPACE"/LMI/system/
-            sudo mv "$GITHUB_WORKSPACE"/images/product/etc/selinux/* "$GITHUB_WORKSPACE"/LMI/product/
-            sudo mv "$GITHUB_WORKSPACE"/images/system_ext/etc/selinux/* "$GITHUB_WORKSPACE"/LMI/system_ext/
-            sudo mv "$GITHUB_WORKSPACE"/images/system/system/etc/selinux/* "$GITHUB_WORKSPACE"/LMI/system/
        - name: 5.打包
          run: |
-            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip "$GITHUB_WORKSPACE"/LMI/*
+            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_e.zip "$GITHUB_WORKSPACE"/images/*
        - name: 6.上传到阿里云盘
          run: |
             curl https://rclone.org/install.sh | sudo bash
