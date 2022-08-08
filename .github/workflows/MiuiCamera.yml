@@ -93,11 +93,14 @@ jobs:
          run: |
             sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_.zip "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/
             echo "artifact_name=miui_LMIPRE_" >> $GITHUB_ENV
-       - name: 6.上传到Artifact
-         uses: actions/upload-artifact@v3
-         with:
-          name: ${{ env.artifact_name }}
-          path: "./zip/*"
+       - name: 6.上传到阿里云盘
+         run: |
+            curl https://rclone.org/install.sh | sudo bash
+            mkdir -p ~/.config/rclone/
+            unzip -P ${{ secrets.PASSWORD }} "$GITHUB_WORKSPACE"/tools/rclone.zip -d ~/.config/rclone/
+            nohup aliyundrive-webdav --refresh-token ${{ secrets.REFRESHTOKEN }} --host 127.0.0.1 --port 6396 --auth-user 3380572517 --auth-password ${{ secrets.PASSWORD }} >/dev/null 2>& 1 &
+            rclone mkdir aliyun:/LMI_Package
+            rclone sync -P ./zip/* aliyun:/LMI_Package
        - name: 7.删除工作流运行
          uses: Mattraks/delete-workflow-runs@v2
          with:
