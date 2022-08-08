@@ -119,6 +119,10 @@ jobs:
             sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/oat
             sudo mv "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk
             sudo zipalign -v 4 "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk
+            sudo mkdir -p $GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/lib/arm64/
+            sudo mv "$GITHUB_WORKSPACE"/MiLink/lib/arm64-v8a/* "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/lib/arm64/
+            MiLink_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/lib/arm64/ | awk {'print $1'})
+            echo "MiLink_size=$MiLink_size" >> $GITHUB_ENV
             sudo mkdir -p "$GITHUB_WORKSPACE"/MiuiCamera/
             $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MiuiCamera/ "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk
             mod="$GITHUB_WORKSPACE"/MiuiCamera/smali*/${{ env.camera1 }}
@@ -172,7 +176,7 @@ jobs:
             system_ext_size=$(echo "$system_ext_size / 4096" | bc)
             system_ota_size=$(echo "1048576 * 50 " | bc)
             system_size=$(echo "${{ env.system_size }} + $system_ota_size" | bc)
-            system_size=$(echo "$system_size + ${{ env.camera_size }}" | bc)
+            system_size=$(echo "$system_size + ${{ env.camera_size }} + ${{ env.MiLink_size }}" | bc)
             system_size=$(echo "$system_size - ${{ env.sizes }}" | bc)
             system_size=$(echo "$system_size / 4096" | bc)
             UTC=$(date -u +%s)
