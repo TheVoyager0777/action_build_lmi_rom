@@ -119,7 +119,7 @@ jobs:
             sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/oat
             sudo mv "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk
             sudo zipalign -v 4 "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk
-            sudo mkdir -p $GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/lib/arm64/
+            sudo mkdir -p "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/lib/arm64/
             sudo mv "$GITHUB_WORKSPACE"/MiLink/lib/arm64-v8a/* "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/lib/arm64/
             MiLink_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/lib/arm64/ | awk {'print $1'})
             echo "MiLink_size=$MiLink_size" >> $GITHUB_ENV
