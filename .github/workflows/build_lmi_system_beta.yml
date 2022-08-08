@@ -104,7 +104,7 @@ jobs:
             sudo rm -rf "$GITHUB_WORKSPACE"/LMI/vendor/recovery-from-boot.p
             sudo rm -rf "$GITHUB_WORKSPACE"/LMI/vendor/bin/install-recovery.sh
             sudo sed -i "/ro.vendor.audio.game.effect/d" "$GITHUB_WORKSPACE"/LMI/vendor/build.prop
-            sudo sed -i "/import/i ro.vendor.audio.support.sound.id=true\nro.vendor.audio.voip.assistant=true\nro.vendor.audio.aiasst.support=true\nro.vendor.media.video.frc.support=true\nro.vendor.audio.spk.stereo=true\nro.vendor.audio.vocal.support=true\nro.vendor.audio.surround.support=true\nro.vendor.audio.spk.clean=true\nro.vendor.video_box.version=2" "$GITHUB_WORKSPACE"/LMI/vendor/build.prop
+            sudo sed -i "/import/i persist.sys.ai_perload_cloud=1\nro.vendor.audio.support.sound.id=true\nro.vendor.audio.voip.assistant=true\nro.vendor.audio.aiasst.support=true\nro.vendor.media.video.frc.support=true\nro.vendor.audio.spk.stereo=true\nro.vendor.audio.vocal.support=true\nro.vendor.audio.surround.support=true\nro.vendor.audio.spk.clean=true\nro.vendor.video_box.version=2" "$GITHUB_WORKSPACE"/LMI/vendor/build.prop
             sudo unzip -o "$GITHUB_WORKSPACE"/nfc.zip -d "$GITHUB_WORKSPACE"/images/system_ext
             sudo unzip -o "$GITHUB_WORKSPACE"/audio.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/audio/ui/
             sudo unzip -o "$GITHUB_WORKSPACE"/etc.zip -d "$GITHUB_WORKSPACE"/images/system/system/etc/audio/
