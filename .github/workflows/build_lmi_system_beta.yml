@@ -66,6 +66,14 @@ jobs:
             echo "vendor_size=$(sudo du -sb "$GITHUB_WORKSPACE"/LMI/vendor.img | awk {'print $1'})" >> $GITHUB_ENV
             sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/LMI/vendor.img "$GITHUB_WORKSPACE"/LMI
             rm -rf "$GITHUB_WORKSPACE"/LMI/vendor.img
+            "$GITHUB_WORKSPACE"/tools/brotli -d "$GITHUB_WORKSPACE"/LMI/odm.new.dat.br
+            rm -rf "$GITHUB_WORKSPACE"/LMI/odm.new.dat.br
+            python3 "$GITHUB_WORKSPACE"/tools/sdat2img.py "$GITHUB_WORKSPACE"/LMI/odm.transfer.list "$GITHUB_WORKSPACE"/LMI/odm.new.dat "$GITHUB_WORKSPACE"/LMI/odm.img
+            rm -rf "$GITHUB_WORKSPACE"/LMI/odm.patch.dat
+            rm -rf "$GITHUB_WORKSPACE"/LMI/odm.transfer.list
+            rm -rf "$GITHUB_WORKSPACE"/LMI/odm.new.dat
+            sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/LMI/odm.img "$GITHUB_WORKSPACE"/LMI
+            rm -rf "$GITHUB_WORKSPACE"/LMI/odm.img
             for i in system product system_ext
             do
                 "$GITHUB_WORKSPACE"/tools/payload-dumper-go -p $i "$GITHUB_WORKSPACE"/PSYCHE/payload.bin
@@ -180,8 +188,9 @@ jobs:
             system_size=$(echo "$system_size + ${{ env.camera_size }} + ${{ env.MiLink_size }}" | bc)
             system_size=$(echo "$system_size - ${{ env.sizes }}" | bc)
             system_size=$(echo "$system_size / 4096" | bc)
+            odm_size=10485760
             UTC=$(date -u +%s)
-            for i in product vendor system_ext system
+            for i in product vendor system_ext system odm
             do
                 sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/$i "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config
                 "$GITHUB_WORKSPACE"/tools/mke2fs -O ^has_journal -L $i -I 256 -M /$i -m 0 -t ext4 -b 4096 "$GITHUB_WORKSPACE"/images/$i.img $(eval echo "$"$i"_size")
@@ -191,7 +200,7 @@ jobs:
                 sudo rm -rf "$GITHUB_WORKSPACE"/images/$i
             done
             sudo rm -rf "$GITHUB_WORKSPACE"/images/TI_config
-            for i in product system system_ext vendor
+            for i in product system system_ext vendor odm
             do
                 "$GITHUB_WORKSPACE"/tools/img2simg "$GITHUB_WORKSPACE"/images/$i.img "$GITHUB_WORKSPACE"/simages/$i.img
                 rm -rf "$GITHUB_WORKSPACE"/images/$i.img
@@ -206,6 +215,7 @@ jobs:
             sed -i "s/vendor_size/$vendor_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sed -i "s/system_size/$system_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sed -i "s/system_ext_size/$system_ext_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
+            sed -i "s/odm_size/$odm_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip "$GITHUB_WORKSPACE"/images/*
             sudo rm -rf "$GITHUB_WORKSPACE"/images
             md5=$(md5sum "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip)
