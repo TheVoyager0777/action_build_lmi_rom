@@ -188,9 +188,9 @@ jobs:
             system_size=$(echo "$system_size + ${{ env.camera_size }} + ${{ env.MiLink_size }}" | bc)
             system_size=$(echo "$system_size - ${{ env.sizes }}" | bc)
             system_size=$(echo "$system_size / 4096" | bc)
-            odm_size=10485760
+            odm_size=$(echo "1048576 * 10 " | bc)
             UTC=$(date -u +%s)
-            for i in product vendor system_ext system odm
+            for i in odm
             do
                 sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/$i "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config
                 "$GITHUB_WORKSPACE"/tools/mke2fs -O ^has_journal -L $i -I 256 -M /$i -m 0 -t ext4 -b 4096 "$GITHUB_WORKSPACE"/images/$i.img $(eval echo "$"$i"_size")
@@ -199,6 +199,7 @@ jobs:
                 eval "$i"_size=$(du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})
                 sudo rm -rf "$GITHUB_WORKSPACE"/images/$i
             done
+            echo $odm_size
             sudo rm -rf "$GITHUB_WORKSPACE"/images/TI_config
             for i in product system system_ext vendor odm
             do
