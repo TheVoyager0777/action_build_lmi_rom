@@ -101,7 +101,7 @@ jobs:
             sudo cp -f "$GITHUB_WORKSPACE"/AospFrameworkResOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
             sudo cp -f "$GITHUB_WORKSPACE"/DevicesAndroidOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
             sudo cp -f "$GITHUB_WORKSPACE"/DevicesOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
-            sudo cp -f "$GITHUB_WORKSPACE"/MiuiFrameworkResOverlay.apk "$GITHUB_WORKSPACE"/images/product/over
+            sudo cp -f "$GITHUB_WORKSPACE"/MiuiFrameworkResOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
             sudo cp -f "$GITHUB_WORKSPACE"/lmi.xml "$GITHUB_WORKSPACE"/images/product/etc/device_features/
             sudo cp -f "$GITHUB_WORKSPACE"/lmipro.xml "$GITHUB_WORKSPACE"/images/product/etc/device_features/
             sudo sed -i "/ro.miui.notch/d" "$GITHUB_WORKSPACE"/images/product/etc/build.prop
