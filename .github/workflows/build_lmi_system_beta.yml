@@ -189,6 +189,7 @@ jobs:
             system_size=$(echo "$system_size - ${{ env.sizes }}" | bc)
             system_size=$(echo "$system_size / 4096" | bc)
             odm_size=$(echo "1048576 * 10 " | bc)
+            odm_size=$(echo "$odm_size / 4096" | bc)
             UTC=$(date -u +%s)
             for i in odm product vendor system_ext system
             do
