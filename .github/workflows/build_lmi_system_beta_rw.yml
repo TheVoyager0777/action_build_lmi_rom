@@ -47,11 +47,14 @@ jobs:
                 "$GITHUB_WORKSPACE"/tools/payload-dumper-go -p $i "$GITHUB_WORKSPACE"/PSYCHE/payload.bin
                 mv "$GITHUB_WORKSPACE"/payload/$i.img "$GITHUB_WORKSPACE"/images/$i.img
             done
+            for i in sdx55 sdx55m modem_pr
+            do
+                7z x "$GITHUB_WORKSPACE"/images/modem.img -r -o"$GITHUB_WORKSPACE"/simages image/$i
+            done
             rm -rf "$GITHUB_WORKSPACE"/payload
-            rm -rf "$GITHUB_WORKSPACE"/PSYCHE
        - name: 5.打包
          run: |
-            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_e.zip "$GITHUB_WORKSPACE"/images/*
+            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_e.zip "$GITHUB_WORKSPACE"/simages/*
        - name: 6.上传到阿里云盘
          run: |
             curl https://rclone.org/install.sh | sudo bash
