@@ -42,7 +42,7 @@ jobs:
             ZIP_NAME_PSYCHE=${URL##*/}
             7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE -r -o"$GITHUB_WORKSPACE"/PSYCHE
             rm -rf "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE
-            for i in product
+            for i in modem
             do
                 "$GITHUB_WORKSPACE"/tools/payload-dumper-go -p $i "$GITHUB_WORKSPACE"/PSYCHE/payload.bin
                 mv "$GITHUB_WORKSPACE"/payload/$i.img "$GITHUB_WORKSPACE"/images/$i.img
