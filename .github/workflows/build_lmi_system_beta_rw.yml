@@ -86,7 +86,6 @@ jobs:
          run: |
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/apktool.jar
             Apktool="java -jar "$GITHUB_WORKSPACE"/tools/apktool.jar"
-            sudo mkdir -p "$GITHUB_WORKSPACE"/images/system/system/etc/audio
             sudo rm -rf "$GITHUB_WORKSPACE"/images/product/etc/device_features/*
             sudo rm -rf "$GITHUB_WORKSPACE"/images/product/overlay/DeviceAndroidConfig.apk
             sudo rm -rf "$GITHUB_WORKSPACE"/images/product/overlay/DeviceConfig.apk
@@ -107,9 +106,7 @@ jobs:
             sudo sed -i "/ro.vendor.audio.game.effect/d" "$GITHUB_WORKSPACE"/LMI/vendor/build.prop
             sudo sed -i "/import/i ro.vendor.audio.support.sound.id=true\nro.vendor.audio.voip.assistant=true\nro.vendor.audio.aiasst.support=true\nro.vendor.media.video.frc.support=true\nro.vendor.audio.spk.stereo=true\nro.vendor.audio.vocal.support=true\nro.vendor.audio.surround.support=true\nro.vendor.audio.spk.clean=true\nro.vendor.video_box.version=2" "$GITHUB_WORKSPACE"/LMI/vendor/build.prop
             sudo unzip -o "$GITHUB_WORKSPACE"/nfc.zip -d "$GITHUB_WORKSPACE"/images/system_ext
-            sudo unzip -o "$GITHUB_WORKSPACE"/audio.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/audio/ui/
             sudo unzip -o "$GITHUB_WORKSPACE"/etc.zip -d "$GITHUB_WORKSPACE"/images/system/system/etc/audio/
-            sudo unzip -o "$GITHUB_WORKSPACE"/popup.zip -d "$GITHUB_WORKSPACE"/images/system/system/framework/
             sudo mkdir -p "$GITHUB_WORKSPACE"/MiLink/
             $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MiLink/ "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk
             mod="$GITHUB_WORKSPACE"/MiLink/smali*/com/miui/circulate/world/permission/method/PermissionCheck\$BaseCheck.smali
@@ -125,20 +122,6 @@ jobs:
             sudo mv "$GITHUB_WORKSPACE"/MiLink/lib/arm64-v8a/* "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/lib/arm64/
             MiLink_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/lib/arm64/ | awk {'print $1'})
             echo "MiLink_size=$MiLink_size" >> $GITHUB_ENV
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MiuiCamera/
-            $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MiuiCamera/ "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk
-            mod="$GITHUB_WORKSPACE"/MiuiCamera/smali*/${{ env.camera1 }}
-            sudo sed -i '/^${{ env.camera2 }}/,/^.end method/{//!d}' $mod
-            sudo sed -i -e '/^${{ env.camera2 }}/a\    .registers 1\n\n    const/4 p0, 0x0\n\n   return p0' $mod
-            $Apktool b -q -f -o "$GITHUB_WORKSPACE"/MiuiCamera/MiuiCamera.apk "$GITHUB_WORKSPACE"/MiuiCamera/
-            cd "$GITHUB_WORKSPACE"/MiuiCamera/build/apk
-            sudo 7z a "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk ./*.dex -mx0
-            sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/oat
-            sudo mv "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk "$GITHUB_WORKSPACE"/MiuiCamera/MiuiCamera.apk
-            sudo zipalign -v 4 "$GITHUB_WORKSPACE"/MiuiCamera/MiuiCamera.apk "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk
-            sudo mv "$GITHUB_WORKSPACE"/MiuiCamera/lib/arm64-v8a/* "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/lib/arm64/
-            camera_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/lib/arm64/ | awk {'print $1'})
-            echo "camera_size=$camera_size" >> $GITHUB_ENV
             sizes=0
             for files in MIGalleryLockscreen MIUIDriveMode MIUIDuokanReader MIUIGameCenter MIUINewHome MIUIYoupin; do
             device=$(find "$GITHUB_WORKSPACE"/images/system/system/data-app/ -name $files)
@@ -179,7 +162,7 @@ jobs:
             system_ext_size=$(echo "$system_ext_size / 4096" | bc)
             system_ota_size=$(echo "1048576 * 50 " | bc)
             system_size=$(echo "${{ env.system_size }} + $system_ota_size" | bc)
-            system_size=$(echo "$system_size + ${{ env.camera_size }} + ${{ env.MiLink_size }}" | bc)
+            system_size=$(echo "$system_size + ${{ env.MiLink_size }}" | bc)
             system_size=$(echo "$system_size - ${{ env.sizes }}" | bc)
             system_size=$(echo "$system_size / 4096" | bc)
             UTC=$(date -u +%s)
