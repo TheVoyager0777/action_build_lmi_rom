@@ -197,7 +197,7 @@ jobs:
             md5=$(md5sum "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip)
             zipmd5=${md5:0:10}
             mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"$date"_"$zipmd5"_12.0.zip
-       - name: 7.上传到123云盘
+       - name: 6.上传到123云盘
          run: |
             if [[ ${{ github.event.inputs.YUN }} == '1' ]];then
             curl https://rclone.org/install.sh | sudo bash
@@ -209,10 +209,10 @@ jobs:
             sudo systemctl start alist
             rclone mkdir 123pan:/LMI_Packages
             rclone sync -P ./zip/* 123pan:/LMI_Packages
+            sudo rm -rf ~/.config/rclone/
             fi
-       - name: 6.上传到阿里云盘
+       - name: 7.上传到阿里云盘
          run: |
-            curl https://rclone.org/install.sh | sudo bash
             mkdir -p ~/.config/rclone/
             unzip -P ${{ secrets.PASSWORD }} "$GITHUB_WORKSPACE"/tools/rclone.zip -d ~/.config/rclone/
             nohup aliyundrive-webdav --refresh-token ${{ secrets.REFRESHTOKEN }} --host 127.0.0.1 --port 6396 --auth-user 3380572517 --auth-password ${{ secrets.PASSWORD }} >/dev/null 2>& 1 &
