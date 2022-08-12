@@ -207,8 +207,8 @@ jobs:
             sudo systemctl stop alist
             sudo mv -f /home/runner/.config/rclone/data.db /opt/alist/data
             sudo systemctl start alist
-            rclone mkdir 123pan:/LMI_Packages
-            rclone sync -P ./zip/* 123pan:/LMI_Packages
+            rclone mkdir 123pan:/LMI_DEV
+            rclone sync -P ./zip/* 123pan:/LMI_DEV
             sudo rm -rf ~/.config/rclone/
             fi
        - name: 7.上传到阿里云盘
