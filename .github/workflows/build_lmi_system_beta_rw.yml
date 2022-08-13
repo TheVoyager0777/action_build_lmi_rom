@@ -156,20 +156,25 @@ jobs:
             com_product_ota_size=${{ env.product_ota_size }}
             if [[ $com_product_oat_size -lt $com_product_size ]];then
               product_ota_size=$(echo "$com_product_oat_size - $com_product_size" | bc)
+              echo 1.$product_ota_size
             elif [[ $com_product_oat_size -gt $com_product_size ]];then
               increase_size=$(echo "$com_product_oat_size - $com_product_size" | bc)
               if [[ $increase_size -le 52428800 ]];then
                 product_ota_size=$increase_size
+                echo 2.$product_ota_size
               elif [[ $increase_size -le 104857600 ]];then
                 product_ota_size=$(echo "$increase_size + 5242880" | bc)
+                echo 3.$product_ota_size
               else
                 Variables_size=$(echo "$increase_size / 1048576" | bc)
                 Variables_size1=$(echo "$Variables_size + 1" | bc)
                 Variables_size2=$(echo "$Variables_size1 * 5242880" | bc)
                 product_ota_size=$Variables_size2
+                echo 4.$product_ota_size
               fi
             fi
             product_size=$(echo "${{ env.product_size }} + $product_ota_size" | bc)
+            echo $product_ota_size
             echo $product_size
             product_size=$(echo "$product_size / 4096" | bc)
             vendor_ota_size=$(echo "1048576 * 0 " | bc)
