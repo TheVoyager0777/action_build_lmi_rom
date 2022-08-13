@@ -153,7 +153,7 @@ jobs:
             product_ota_size=$(echo "1048576 * 0 " | bc)
             echo "product_ota_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/product | awk {'print $1'})" >> $GITHUB_ENV
             com_product_size=${{ env.product_size }}
-            com_product_ota_size=${{ env.product_oat_size }}
+            com_product_ota_size=${{ env.product_ota_size }}
             if [[ $com_product_oat_size -lt $com_product_size ]];then
               product_ota_size=$(echo "$com_product_oat_size - $com_product_size" | bc)
             elif [[ $com_product_oat_size -gt $com_product_size ]];then
