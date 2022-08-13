@@ -150,10 +150,9 @@ jobs:
             URL=${{ env.ROM_URL }}
             DATE=${URL%/*}
             date=${DATE##*/}
-            product_ota_size=$(echo "1048576 * 0 " | bc)
-            echo "product_ota_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/product | awk {'print $1'})" >> $GITHUB_ENV
+            product_ota_size=0
             com_product_size=${{ env.product_size }}
-            com_product_ota_size=${{ env.product_ota_size }}
+            com_product_ota_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/product | awk {'print $1'})
             if [[ $com_product_oat_size -lt $com_product_size ]];then
               product_ota_size=$(echo "$com_product_oat_size - $com_product_size" | bc)
               echo 1.$product_ota_size
