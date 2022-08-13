@@ -170,6 +170,7 @@ jobs:
               fi
             fi
             product_size=$(echo "${{ env.product_size }} + $product_ota_size" | bc)
+            echo $product_size
             product_size=$(echo "$product_size / 4096" | bc)
             vendor_ota_size=$(echo "1048576 * 0 " | bc)
             vendor_size=$(echo "${{ env.vendor_size }} + $vendor_ota_size" | bc)
