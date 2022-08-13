@@ -151,6 +151,22 @@ jobs:
             DATE=${URL%/*}
             date=${DATE##*/}
             product_ota_size=$(echo "1048576 * 0 " | bc)
+            echo "product_ota_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/product | awk {'print $1'})" >> $GITHUB_ENV
+            if [[ ${{ env.product_oat_size }} -lt ${{ env.product_size }} ]];then
+              product_ota_size=$(echo "${{ env.product_oat_size }} - ${{ env.product_size }}" | bc)
+            elif [[ ${{ env.product_oat_size }} -gt ${{ env.product_size }} ]];then
+              increase_size=$(echo "${{ env.product_oat_size }} - ${{ env.product_size }}" | bc)
+              if [[ $increase_size -le 52428800 ]];then
+                product_ota_size=$increase_size
+              elif [[ $increase_size -le 104857600 ]];then
+                product_ota_size=$(echo "$increase_size + 5242880" | bc)
+              else
+                Variables_size=$(echo "$increase_size / 1048576" | bc)
+                Variables_size1=$(echo "$Variables_size + 1" | bc)
+                Variables_size2=$(echo "$Variables_size1 * 5242880" | bc)
+                product_ota_size=$Variables_size2
+              fi
+            fi
             product_size=$(echo "${{ env.product_size }} + $product_ota_size" | bc)
             product_size=$(echo "$product_size / 4096" | bc)
             vendor_ota_size=$(echo "1048576 * 0 " | bc)
