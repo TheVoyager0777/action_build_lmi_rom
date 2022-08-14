@@ -158,82 +158,30 @@ jobs:
             vendor_size=${{ env.vendor_size }}
             system_ext_size=${{ env.system_ext_size }}
             system_size=${{ env.system_size }}
-            product_ota_size=0
-            product_org_ota_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/product | awk {'print $1'})
-            if [[ $product_org_ota_size -lt $product_org_size ]];then
-              product_ota_size=$(echo "$product_org_ota_size - $product_org_size" | bc)
-            elif [[ $product_org_ota_size -gt $product_org_size ]];then
-              increase_size=$(echo "$product_org_ota_size - $product_org_size" | bc)
-              if [[ $increase_size -le 52428800 ]];then
-                product_ota_size=$increase_size
-              elif [[ $increase_size -le 104857600 ]];then
-                product_ota_size=$(echo "$increase_size + 5242880" | bc)
-              else
-                Variables_size=$(echo "$increase_size / 1048576" | bc)
-                Variables_size1=$(echo "$Variables_size + 1" | bc)
-                Variables_size2=$(echo "$Variables_size1 * 5242880" | bc)
-                product_ota_size=$Variables_size2
-              fi
+            for i in product vendor system_ext system
+            do
+            eval "$i"_ota_size=0
+            eval "$i"_org_ota_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})
+            if [[ $(eval echo "$"$i"_org_ota_size") -lt $(eval echo "$"$i"_org_size") ]];then
+              increase_size=$(echo "$(eval echo "$"$i"_org_size") - $(eval echo "$"$i"_org_ota_size")" | bc)
+              Variables_size=$(echo "$increase_size / 20" | bc)
+              Variables_size1=$(echo "$increase_size + $Variables_size" | bc)
+              Variables_size2=$(echo "0 - $Variables_size1" | bc)
+              eval "$i"_ota_size=$Variables_size2
+            elif [[ $""$i"_org_ota_size" -gt $""$i"_org_size" ]];then
+              increase_size=$(echo "$(eval echo "$"$i"_org_ota_size") - $(eval echo "$"$i"_org_size")" | bc)
+              Variables_size=$(echo "$increase_size / 20" | bc)
+              Variables_size1=$(echo "$increase_size + $Variables_size" | bc)
+              eval "$i"_ota_size=$Variables_size1
             fi
+            done
             product_size=$(echo "$product_size + $product_ota_size" | bc)
             product_size=$(echo "$product_size / 4096" | bc)
-            vendor_ota_size=0
-            vendor_org_ota_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/vendor | awk {'print $1'})
-            if [[ $vendor_org_ota_size -lt $vendor_org_size ]];then
-              vendor_ota_size=$(echo "$vendor_org_ota_size - $vendor_org_size" | bc)
-            elif [[ $vendor_org_ota_size -gt $vendor_org_size ]];then
-              increase_size=$(echo "$vendor_org_ota_size - $vendor_org_size" | bc)
-              if [[ $increase_size -le 52428800 ]];then
-                vendor_ota_size=$increase_size
-              elif [[ $increase_size -le 104857600 ]];then
-                vendor_ota_size=$(echo "$increase_size + 5242880" | bc)
-              else
-                Variables_size=$(echo "$increase_size / 1048576" | bc)
-                Variables_size1=$(echo "$Variables_size + 1" | bc)
-                Variables_size2=$(echo "$Variables_size1 * 5242880" | bc)
-                vendor_ota_size=$Variables_size2
-              fi
-            fi
             vendor_size=$(echo "$vendor_size + $vendor_ota_size" | bc)
             vendor_size=$(echo "$vendor_size / 4096" | bc)
-            system_ext_ota_size=0
-            system_ext_org_ota_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system_ext | awk {'print $1'})
-            if [[ $system_ext_org_ota_size -lt $system_ext_org_size ]];then
-              system_ext_ota_size=$(echo "$system_ext_org_ota_size - $system_ext_org_size" | bc)
-            elif [[ $system_ext_org_ota_size -gt $system_ext_org_size ]];then
-              increase_size=$(echo "$system_ext_org_ota_size - $system_ext_org_size" | bc)
-              if [[ $increase_size -le 52428800 ]];then
-                system_ext_ota_size=$increase_size
-              elif [[ $increase_size -le 104857600 ]];then
-                system_ext_ota_size=$(echo "$increase_size + 5242880" | bc)
-              else
-                Variables_size=$(echo "$increase_size / 1048576" | bc)
-                Variables_size1=$(echo "$Variables_size + 1" | bc)
-                Variables_size2=$(echo "$Variables_size1 * 5242880" | bc)
-                system_ext_ota_size=$Variables_size2
-              fi
-            fi
             system_ext_size=$(echo "$system_ext_size + $system_ext_ota_size" | bc)
             system_ext_size=$(echo "$system_ext_size / 4096" | bc)
-            system_ota_size=0
-            system_org_ota_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/system | awk {'print $1'})
-            if [[ $system_org_ota_size -lt $system_org_size ]];then
-              system_ota_size=$(echo "$system_org_ota_size - $system_org_size" | bc)
-            elif [[ $system_org_ota_size -gt $system_org_size ]];then
-              increase_size=$(echo "$system_org_ota_size - $system_org_size" | bc)
-              if [[ $increase_size -le 52428800 ]];then
-                system_ota_size=$increase_size
-              elif [[ $increase_size -le 104857600 ]];then
-                system_ota_size=$(echo "$increase_size + 5242880" | bc)
-              else
-                Variables_size=$(echo "$increase_size / 1048576" | bc)
-                Variables_size1=$(echo "$Variables_size + 1" | bc)
-                Variables_size2=$(echo "$Variables_size1 * 5242880" | bc)
-                system_ota_size=$Variables_size2
-              fi
-            fi
             system_size=$(echo "$system_size + $system_ota_size" | bc)
-            echo $system_size
             system_size=$(echo "$system_size / 4096" | bc)
             UTC=$(date -u +%s)
             for i in product vendor system_ext system
