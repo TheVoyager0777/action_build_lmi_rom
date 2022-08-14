@@ -61,18 +61,18 @@ jobs:
                 rm -rf "$GITHUB_WORKSPACE"/images/$i.patch.dat
                 rm -rf "$GITHUB_WORKSPACE"/images/$i.transfer.list
                 rm -rf "$GITHUB_WORKSPACE"/images/$i.new.dat
-                echo "$i_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})" >> $GITHUB_ENV
+                echo ""$i"_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})" >> $GITHUB_ENV
                 sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/$i.img "$GITHUB_WORKSPACE"/images
-                echo "com_$i_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})" >> $GITHUB_ENV
+                echo "com_"$i"_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})" >> $GITHUB_ENV
                 rm -rf "$GITHUB_WORKSPACE"/images/vendor.img
             done
             for i in system product system_ext
             do
                 "$GITHUB_WORKSPACE"/tools/payload-dumper-go -p $i "$GITHUB_WORKSPACE"/PSYCHE/payload.bin
                 mv "$GITHUB_WORKSPACE"/payload/$i.img "$GITHUB_WORKSPACE"/images/$i.img
-                echo "$i_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})" >> $GITHUB_ENV
+                echo ""$i"_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})" >> $GITHUB_ENV
                 sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/$i.img "$GITHUB_WORKSPACE"/images
-                echo "com_$i_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})" >> $GITHUB_ENV
+                echo "com_"$i"_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})" >> $GITHUB_ENV
                 rm -rf "$GITHUB_WORKSPACE"/images/$i.img
             done
             rm -rf "$GITHUB_WORKSPACE"/payload
