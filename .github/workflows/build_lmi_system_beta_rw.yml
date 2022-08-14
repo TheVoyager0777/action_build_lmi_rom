@@ -152,30 +152,30 @@ jobs:
             for i in product vendor system_ext system
             do
             eval com_"$i"_ota_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})
-            echo $"$com_"$i"_ota_size"
-            if [[ $com_"$i"_oat_size -lt $com_"$i"_size ]];then
-              eval "$i"_ota_size=$(echo "$com_"$i"_ota_size - $com_"$i"_size" | bc)
-              echo 1.$"$"$i"_ota_size"
-            elif [[ $com_"$i"_oat_size -gt $com_"$i"_size ]];then
-              increase_size=$(echo "$com_"$i"_oat_size - $com_"$i"_size" | bc)
+            eval echo $"$"com_"$i"_ota_size""
+            if [[ $"com_"$i"_oat_size" -lt $"com_"$i"_size" ]];then
+              eval "$i"_ota_size=$(echo "$"com_"$i"_ota_size" - $"com_"$i"_size"" | bc)
+              eval echo 1.$"$""$i"_ota_size""
+            elif [[ $"com_"$i"_oat_size" -gt $"com_"$i"_size" ]];then
+              increase_size=$(echo "$"com_"$i"_oat_size" - $"com_"$i"_size"" | bc)
               if [[ $increase_size -le 52428800 ]];then
                 eval "$i"_ota_size=$increase_size
-                echo 2.$"$i"_ota_size
+                eval echo 2.$""$i"_ota_size"
               elif [[ $increase_size -le 104857600 ]];then
                 eval "$i"_ota_size=$(echo "$increase_size + 5242880" | bc)
-                echo 3.$"$i"_ota_size
+                eval echo 3.$""$i"_ota_size"
               else
                 Variables_size=$(echo "$increase_size / 1048576" | bc)
                 Variables_size1=$(echo "$Variables_size + 1" | bc)
                 Variables_size2=$(echo "$Variables_size1 * 5242880" | bc)
                 eval "$i"_ota_size=$Variables_size2
-                echo 4.$"$i"_ota_size
+                eval echo 4.$""$i"_ota_size"
               fi
             fi
-            eval "$i"_size=$(echo "$"$i"_size + $"$i"_ota_size" | bc)
-            echo $"$i"_ota_size
-            echo $"$i"_size
-            eval "$i"_size=$(echo "$"$i"_size / 4096" | bc)
+            eval "$i"_size=$(echo "$""$i"_size" + $""$i"_ota_size"" | bc)
+            eval echo "$""$i"_ota_size""
+            eval echo "$""$i"_size""
+            eval "$i"_size=$(echo "$""$i"_size" / 4096" | bc)
             done
             UTC=$(date -u +%s)
             for i in product vendor system_ext system
