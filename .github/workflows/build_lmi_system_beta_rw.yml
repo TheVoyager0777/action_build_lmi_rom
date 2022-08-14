@@ -156,10 +156,10 @@ jobs:
             for i in product vendor system_ext system
             do
             eval "$i"_org_ota_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})
-            if [[ $""$i"_org_ota_size" -lt $""$i"_org_size" ]];then
-              eval "$i"_ota_size=$(echo "$""$i"_org_ota_size" - $""$i"_org_size"" | bc)
+            if [[ $(eval echo "$"$i"_org_ota_size") -lt $(eval echo "$"$i"_org_size") ]];then
+              eval "$i"_ota_size=$(echo "$(eval echo "$"$i"_org_ota_size") - $(eval echo "$"$i"_org_size")" | bc)
             elif [[ $""$i"_org_ota_size" -gt $""$i"_org_size" ]];then
-              increase_size=$(echo "$""$i"_org_ota_size" - $""$i"_org_size"" | bc)
+              increase_size=$(echo "$(eval echo "$"$i"_org_ota_size") - $(eval echo "$"$i"_org_size")" | bc)
               if [[ $increase_size -le 52428800 ]];then
                 eval "$i"_ota_size=$increase_size
               elif [[ $increase_size -le 104857600 ]];then
