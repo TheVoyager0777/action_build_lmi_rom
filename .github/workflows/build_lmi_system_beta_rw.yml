@@ -151,11 +151,11 @@ jobs:
             system_size=${{ env.system_size }}
             for i in product vendor system_ext system
             do
-            eval com_"$i"_ota_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})
-            echo $com_"$i"_ota_size
+            com_"$i"_ota_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})
+            echo $"$com_"$i"_ota_size"
             if [[ $com_"$i"_oat_size -lt $com_"$i"_size ]];then
-              eval "$i"_ota_size=$(echo "$com_"$i"_ota_size - $com_"$i"_size" | bc)
-              echo 1.$"$i"_ota_size
+              "$i"_ota_size=$(echo "$com_"$i"_ota_size - $com_"$i"_size" | bc)
+              echo 1.$"$"$i"_ota_size"
             elif [[ $com_"$i"_oat_size -gt $com_"$i"_size ]];then
               increase_size=$(echo "$com_"$i"_oat_size - $com_"$i"_size" | bc)
               if [[ $increase_size -le 52428800 ]];then
