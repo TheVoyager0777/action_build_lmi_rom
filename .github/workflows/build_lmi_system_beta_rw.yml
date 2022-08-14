@@ -160,7 +160,7 @@ jobs:
             for i in product vendor system_ext system
             do
             eval "$i"_org_ota_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})
-            eval "$i"_ota_size=$(echo "$(eval echo "$"$i"_org_size") * 1.2" | bc)
+            eval "$i"_ota_size=$(echo "$(eval echo "$"$i"_org_size") * 1.02" | bc)
             done
             product_size=$(echo "$product_size + $product_ota_size" | bc)
             product_size=$(echo "$product_size / 4096" | bc)
