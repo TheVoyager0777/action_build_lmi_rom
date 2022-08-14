@@ -141,45 +141,36 @@ jobs:
             URL=${{ env.ROM_URL }}
             DATE=${URL%/*}
             date=${DATE##*/}
-            product_ota_size=0
-            com_product_size=${{ env.com_product_size }}
-            com_product_ota_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/product | awk {'print $1'})
-            echo $com_product_ota_size
-            if [[ $com_product_oat_size -lt $com_product_size ]];then
-              product_ota_size=$(echo "$com_product_ota_size - $com_product_size" | bc)
-              echo 1.$product_ota_size
-            elif [[ $com_product_oat_size -gt $com_product_size ]];then
-              increase_size=$(echo "$com_product_ota_size - $com_product_size" | bc)
+            for i in product vendor system_ext system
+            do
+            $i_ota_size=0
+            com_$i_size=${{ env.com_$i_size }}
+            com_$i_ota_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})
+            echo $com_$i_ota_size
+            if [[ $(com_$i_oat_size) -lt $(com_$i_size) ]];then
+              $i_ota_size=$(echo "$(com_$i_ota_size) - $(com_$i_size)" | bc)
+              echo 1.$($i_ota_size)
+            elif [[ $(com_$i_oat_size) -gt $(com_$i_size) ]];then
+              increase_size=$(echo "$(com_$i_oat_size) - $(com_$i_size)" | bc)
               if [[ $increase_size -le 52428800 ]];then
-                product_ota_size=$increase_size
-                echo 2.$product_ota_size
+                $i_ota_size=$increase_size
+                echo 2.$($i_ota_size)
               elif [[ $increase_size -le 104857600 ]];then
-                product_ota_size=$(echo "$increase_size + 5242880" | bc)
-                echo 3.$product_ota_size
+                $i_ota_size=$(echo "$increase_size + 5242880" | bc)
+                echo 3.$($i_ota_size)
               else
                 Variables_size=$(echo "$increase_size / 1048576" | bc)
                 Variables_size1=$(echo "$Variables_size + 1" | bc)
                 Variables_size2=$(echo "$Variables_size1 * 5242880" | bc)
-                product_ota_size=$Variables_size2
-                echo 4.$product_ota_size
+                $i_ota_size=$Variables_size2
+                echo 4.$($i_ota_size)
               fi
             fi
-            product_size=$(echo "${{ env.product_size }} + $product_ota_size" | bc)
+            $i_size=$(echo "${{ env.$i_size }} + $($i_ota_size)" | bc)
             echo $product_ota_size
             echo $product_size
-            product_size=$(echo "$product_size / 4096" | bc)
-            vendor_ota_size=$(echo "1048576 * 0 " | bc)
-            vendor_size=$(echo "${{ env.vendor_size }} + $vendor_ota_size" | bc)
-            vendor_size=$(echo "$vendor_size - ${{ env.vendor_decrease_size }}" | bc)
-            vendor_size=$(echo "$vendor_size / 4096" | bc)
-            system_ext_ota_size=$(echo "1048576 * 1 " | bc)
-            system_ext_size=$(echo "${{ env.system_ext_size }} + $system_ext_ota_size" | bc)
-            system_ext_size=$(echo "$system_ext_size / 4096" | bc)
-            system_ota_size=$(echo "1048576 * 50 " | bc)
-            system_size=$(echo "${{ env.system_size }} + $system_ota_size" | bc)
-            system_size=$(echo "$system_size + ${{ env.MiLink_size }}" | bc)
-            system_size=$(echo "$system_size - ${{ env.sizes }}" | bc)
-            system_size=$(echo "$system_size / 4096" | bc)
+            $i_size=$(echo "$($i_size) / 4096" | bc)
+            done
             UTC=$(date -u +%s)
             for i in product vendor system_ext system
             do
