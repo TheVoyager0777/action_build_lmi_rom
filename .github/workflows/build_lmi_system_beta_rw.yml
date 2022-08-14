@@ -141,10 +141,17 @@ jobs:
             URL=${{ env.ROM_URL }}
             DATE=${URL%/*}
             date=${DATE##*/}
+            com_product_size=${{ env.com_product_size }}
+            com_vendor_size=${{ env.com_vendor_size }}
+            com_system_ext_size=${{ env.com_system_ext_size }}
+            com_system_size=${{ env.com_system_size }}
+            product_size=${{ env.product_size }}
+            vendor_size=${{ env.vendor_size }}
+            system_ext_size=${{ env.system_ext_size }}
+            system_size=${{ env.system_size }}
             for i in product vendor system_ext system
             do
             $i_ota_size=0
-            com_$i_size=${{ env.com_$i_size }}
             com_$i_ota_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})
             echo $com_$i_ota_size
             if [[ $(com_$i_oat_size) -lt $(com_$i_size) ]];then
@@ -166,9 +173,9 @@ jobs:
                 echo 4.$($i_ota_size)
               fi
             fi
-            $i_size=$(echo "${{ env.$i_size }} + $($i_ota_size)" | bc)
-            echo $product_ota_size
-            echo $product_size
+            $i_size=$(echo "$($i_size) + $($i_ota_size)" | bc)
+            echo $($i_ota_size)
+            echo $($i_size)
             $i_size=$(echo "$($i_size) / 4096" | bc)
             done
             UTC=$(date -u +%s)
