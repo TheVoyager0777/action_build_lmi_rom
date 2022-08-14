@@ -95,11 +95,11 @@ jobs:
             sudo mkdir -p "$GITHUB_WORKSPACE"/images/system/cache
             sudo sed -i 's/ro.product.mod_device=[^*]*/ro.product.mod_device=lmi_pre/' "$GITHUB_WORKSPACE"/images/system/system/build.prop
             sudo sed -i 's/ro.miui.cust_device=[^*]*/ro.miui.cust_device=lmi/' "$GITHUB_WORKSPACE"/images/system/system/build.prop
-            echo "vendor_decrease_size=$(sudo du -sb "$GITHUB_WORKSPACE"/LMI/vendor/recovery-from-boot.p | awk {'print $1'})" >> $GITHUB_ENV
-            sudo rm -rf "$GITHUB_WORKSPACE"/LMI/vendor/recovery-from-boot.p
-            sudo rm -rf "$GITHUB_WORKSPACE"/LMI/vendor/bin/install-recovery.sh
-            sudo sed -i "/ro.vendor.audio.game.effect/d" "$GITHUB_WORKSPACE"/LMI/vendor/build.prop
-            sudo sed -i "/import/i ro.vendor.audio.support.sound.id=true\nro.vendor.audio.voip.assistant=true\nro.vendor.audio.aiasst.support=true\nro.vendor.media.video.frc.support=true\nro.vendor.audio.spk.stereo=true\nro.vendor.audio.vocal.support=true\nro.vendor.audio.surround.support=true\nro.vendor.audio.spk.clean=true\nro.vendor.video_box.version=2" "$GITHUB_WORKSPACE"/LMI/vendor/build.prop
+            echo "vendor_decrease_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/vendor/recovery-from-boot.p | awk {'print $1'})" >> $GITHUB_ENV
+            sudo rm -rf "$GITHUB_WORKSPACE"/images/vendor/recovery-from-boot.p
+            sudo rm -rf "$GITHUB_WORKSPACE"/images/vendor/bin/install-recovery.sh
+            sudo sed -i "/ro.vendor.audio.game.effect/d" "$GITHUB_WORKSPACE"/images/vendor/build.prop
+            sudo sed -i "/import/i ro.vendor.audio.support.sound.id=true\nro.vendor.audio.voip.assistant=true\nro.vendor.audio.aiasst.support=true\nro.vendor.media.video.frc.support=true\nro.vendor.audio.spk.stereo=true\nro.vendor.audio.vocal.support=true\nro.vendor.audio.surround.support=true\nro.vendor.audio.spk.clean=true\nro.vendor.video_box.version=2" "$GITHUB_WORKSPACE"/images/vendor/build.prop
             sudo unzip -o "$GITHUB_WORKSPACE"/nfc.zip -d "$GITHUB_WORKSPACE"/images/system_ext
             sudo unzip -o "$GITHUB_WORKSPACE"/etc.zip -d "$GITHUB_WORKSPACE"/images/system/system/etc/audio/
             sudo mkdir -p "$GITHUB_WORKSPACE"/MiLink/
@@ -127,14 +127,10 @@ jobs:
             done
             done
             echo "sizes=$sizes" >> $GITHUB_ENV
-            sudo mv -f "$GITHUB_WORKSPACE"/vbmeta.img "$GITHUB_WORKSPACE"/LMI/firmware-update
-            sudo mv -f "$GITHUB_WORKSPACE"/vbmeta_system.img "$GITHUB_WORKSPACE"/LMI/firmware-update
-            sudo cp -r "$GITHUB_WORKSPACE"/LMI/firmware-update "$GITHUB_WORKSPACE"/images
-            sudo cp -f "$GITHUB_WORKSPACE"/LMI/boot.img "$GITHUB_WORKSPACE"/images
+            sudo mv -f "$GITHUB_WORKSPACE"/vbmeta.img "$GITHUB_WORKSPACE"/images/firmware-update
+            sudo mv -f "$GITHUB_WORKSPACE"/vbmeta_system.img "$GITHUB_WORKSPACE"/images/firmware-update
             sudo cp -r "$GITHUB_WORKSPACE"/META-INF "$GITHUB_WORKSPACE"/images
             sudo cp -f "$GITHUB_WORKSPACE"/dynamic_partitions_op_list "$GITHUB_WORKSPACE"/images
-            sudo cp -r "$GITHUB_WORKSPACE"/LMI/* "$GITHUB_WORKSPACE"/images
-            sudo rm -rf "$GITHUB_WORKSPACE"/LMI
             sudo rm -rf "$GITHUB_WORKSPACE"/MiLink
        - name: 5.打包
          run: |
