@@ -153,15 +153,15 @@ jobs:
             for i in product vendor system_ext system
             do
             eval "$i"_org_ota_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})
-            echo $""$i"_org_ota_size"
+            eval echo $""$i"_org_ota_size"
             if [[ $""$i"_org_ota_size" -lt $""$i"_org_size" ]];then
               eval "$i"_ota_size=$(echo "$""$i"_org_ota_size" - $""$i"_org_size"" | bc)
-              echo 1.$""$i"_ota_size"
+              eval echo 1.$""$i"_ota_size"
             elif [[ $""$i"_org_ota_size" -gt $""$i"_org_size" ]];then
               increase_size=$(echo "$""$i"_org_ota_size" - $""$i"_org_size"" | bc)
               if [[ $increase_size -le 52428800 ]];then
                 eval "$i"_ota_size=$increase_size
-                echo 2.$""$i"_ota_size"
+                eval echo 2.$""$i"_ota_size"
               elif [[ $increase_size -le 104857600 ]];then
                 eval "$i"_ota_size=$(echo "$increase_size + 5242880" | bc)
                 echo 3.$""$i"_ota_size"
@@ -174,20 +174,20 @@ jobs:
               fi
             fi
             done
-            product_size=$(echo "$product_size + $product_org_ota_size" | bc)
-            echo "$product_org_ota_size"
+            product_size=$(echo "$product_size + $product_ota_size" | bc)
+            echo "$product_ota_size"
             echo "$product_size
             product_size=$(echo "$product_size / 4096" | bc)
-            vendor_size=$(echo "$vendor_size + $vendor_org_ota_size" | bc)
-            echo "$vendor_org_ota_size"
+            vendor_size=$(echo "$vendor_size + $vendor_ota_size" | bc)
+            echo "$vendor_ota_size"
             echo "$vendor_size
             vendor_size=$(echo "$vendor_size / 4096" | bc)
-            system_ext_size=$(echo "$system_ext_size + $system_ext_org_ota_size" | bc)
-            echo "$system_ext_org_ota_size"
+            system_ext_size=$(echo "$system_ext_size + $system_ext_ota_size" | bc)
+            echo "$system_ext_ota_size"
             echo "$system_ext_size
             system_ext_size=$(echo "$system_ext_size / 4096" | bc)
-            system_size=$(echo "$system_size + $system_org_ota_size" | bc)
-            echo "$system_org_ota_size"
+            system_size=$(echo "$system_size + $system_ota_size" | bc)
+            echo "$system_ota_size"
             echo "$system_size
             system_size=$(echo "$system_size / 4096" | bc)
             UTC=$(date -u +%s)
