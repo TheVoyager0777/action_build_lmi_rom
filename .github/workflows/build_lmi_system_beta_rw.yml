@@ -80,6 +80,7 @@ jobs:
             rm -rf "$GITHUB_WORKSPACE"/PSYCHE
        - name: 4.替换相关文件
          run: |
+            date -s "2009/01/01 00:00:00"
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/apktool.jar
             Apktool="java -jar "$GITHUB_WORKSPACE"/tools/apktool.jar"
             sudo mkdir -p "$GITHUB_WORKSPACE"/images/system/system/etc/audio
@@ -143,6 +144,7 @@ jobs:
             sudo rm -rf "$GITHUB_WORKSPACE"/MiLink
        - name: 5.打包
          run: |
+            date -s "2009/01/01 00:00:00"
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/mke2fs
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/e2fsdroid
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/img2simg
