@@ -176,20 +176,12 @@ jobs:
             fi
             done
             product_size=$(echo "$product_size + $product_ota_size" | bc)
-            echo product大小$product_ota_size
-            echo product大小$product_size
             product_size=$(echo "$product_size / 4096" | bc)
             vendor_size=$(echo "$vendor_size + $vendor_ota_size" | bc)
-            echo vendor大小$vendor_ota_size
-            echo vendor大小$vendor_size
             vendor_size=$(echo "$vendor_size / 4096" | bc)
             system_ext_size=$(echo "$system_ext_size + $system_ext_ota_size" | bc)
-            echo system_ext大小$system_ext_ota_size
-            echo system_ext大小$system_ext_size
             system_ext_size=$(echo "$system_ext_size / 4096" | bc)
             system_size=$(echo "$system_size + $system_ota_size" | bc)
-            echo system大小$system_ota_size
-            echo system大小$system_size
             system_size=$(echo "$system_size / 4096" | bc)
             UTC=$(date -u +%s)
             for i in system vendor product system_ext
