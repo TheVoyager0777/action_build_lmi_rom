@@ -233,6 +233,7 @@ jobs:
               fi
             fi
             system_size=$(echo "$system_size + $system_ota_size" | bc)
+            echo $system_size
             system_size=$(echo "$system_size / 4096" | bc)
             UTC=$(date -u +%s)
             for i in product vendor system_ext system
