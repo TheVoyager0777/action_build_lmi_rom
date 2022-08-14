@@ -160,6 +160,7 @@ jobs:
             system_size=${{ env.system_size }}
             for i in product vendor system_ext system
             do
+            eval "$i"_ota_size=0
             eval "$i"_org_ota_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})
             if [[ $(eval echo "$"$i"_org_ota_size") -lt $(eval echo "$"$i"_org_size") ]];then
               eval "$i"_ota_size=$(echo "$(eval echo "$"$i"_org_ota_size") - $(eval echo "$"$i"_org_size")" | bc)
@@ -178,20 +179,12 @@ jobs:
             fi
             done
             product_size=$(echo "$product_size + $product_ota_size" | bc)
-            echo "$product_ota_size"
-            echo "$product_size
             product_size=$(echo "$product_size / 4096" | bc)
             vendor_size=$(echo "$vendor_size + $vendor_ota_size" | bc)
-            echo "$vendor_ota_size"
-            echo "$vendor_size
             vendor_size=$(echo "$vendor_size / 4096" | bc)
             system_ext_size=$(echo "$system_ext_size + $system_ext_ota_size" | bc)
-            echo "$system_ext_ota_size"
-            echo "$system_ext_size
             system_ext_size=$(echo "$system_ext_size / 4096" | bc)
             system_size=$(echo "$system_size + $system_ota_size" | bc)
-            echo "$system_ota_size"
-            echo "$system_size
             system_size=$(echo "$system_size / 4096" | bc)
             UTC=$(date -u +%s)
             for i in product vendor system_ext system
