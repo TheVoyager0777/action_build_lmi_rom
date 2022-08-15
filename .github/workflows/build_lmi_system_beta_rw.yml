@@ -169,6 +169,7 @@ jobs:
             system_ext_size=$(echo "$system_ext_size + $system_ext_ota_size" | bc)
             system_ext_size=$(echo "$system_ext_size / 4096" | bc)
             system_size=$(echo "$system_size + $system_ota_size" | bc)
+            echo $system_size
             system_size=$(echo "$system_size / 4096" | bc)
             UTC=$(date -u +%s)
             for i in system vendor product system_ext
