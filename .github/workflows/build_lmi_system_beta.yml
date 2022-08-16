@@ -169,7 +169,7 @@ jobs:
             vendor_size=$(echo "${{ env.vendor_size }} + $vendor_ota_size" | bc)
             vendor_size=$(echo "$vendor_size - ${{ env.vendor_decrease_size }}" | bc)
             vendor_size=$(echo "$vendor_size / 4096" | bc)
-            system_ext_ota_size=$(echo "1048576 * 1 " | bc)
+            system_ext_ota_size=$(echo "1048576 * 30 " | bc)
             system_ext_size=$(echo "${{ env.system_ext_size }} + $system_ext_ota_size" | bc)
             system_ext_size=$(echo "$system_ext_size / 4096" | bc)
             system_ota_size=$(echo "1048576 * 50 " | bc)
