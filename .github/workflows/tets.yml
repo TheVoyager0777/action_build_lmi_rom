@@ -40,7 +40,7 @@ jobs:
             ZIP_NAME_PSYCHE=${URL##*/}
             7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE -r -o"$GITHUB_WORKSPACE"/PSYCHE
             rm -rf "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE
-            for i in system_ext
+            for i in system_ext product system
             do
                 "$GITHUB_WORKSPACE"/tools/payload-dumper-go -p $i "$GITHUB_WORKSPACE"/PSYCHE/payload.bin
                 mv "$GITHUB_WORKSPACE"/payload/$i.img "$GITHUB_WORKSPACE"/images/$i.img
@@ -67,6 +67,7 @@ jobs:
             nohup aliyundrive-webdav --refresh-token ${{ secrets.REFRESHTOKEN }} --host 127.0.0.1 --port 6396 --auth-user 3380572517 --auth-password ${{ secrets.PASSWORD }} >/dev/null 2>& 1 &
             rclone mkdir aliyun:/LMI_Package
             rclone sync -P ./zip/* aliyun:/LMI_Package
+            exit 0
        - name: 7.删除工作流运行
          uses: Mattraks/delete-workflow-runs@v2
          with:
