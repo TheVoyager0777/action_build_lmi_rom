@@ -206,7 +206,7 @@ jobs:
             sed -i "s/system_size/$system_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sed -i "s/system_ext_size/$system_ext_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sudo unzip -o "$GITHUB_WORKSPACE"/odm.zip -d "$GITHUB_WORKSPACE"/images/
-            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip "$GITHUB_WORKSPACE"/images/* -mx6
+            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip "$GITHUB_WORKSPACE"/images/*
             sudo rm -rf "$GITHUB_WORKSPACE"/images
             md5=$(md5sum "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip)
             zipmd5=${md5:0:10}
