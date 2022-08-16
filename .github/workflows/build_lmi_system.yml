@@ -92,6 +92,7 @@ jobs:
             sudo sed -i 's/ro.product.mod_device=[^*]*/ro.product.mod_device=lmi_pre/' "$GITHUB_WORKSPACE"/images/system/system/build.prop
             sudo sed -i 's/ro.miui.cust_device=[^*]*/ro.miui.cust_device=lmi/' "$GITHUB_WORKSPACE"/images/system/system/build.prop
             sudo sed -i 's/ro.build.user=[^*]*/ro.build.user=相见即是缘/' "$GITHUB_WORKSPACE"/images/system/system/build.prop
+            sudo sed -i 's/ro.build.version.base_os=[^*]*/ro.build.version.base_os=psyche/' "$GITHUB_WORKSPACE"/images/system/system/build.prop
             sudo rm -rf "$GITHUB_WORKSPACE"/images/vendor/recovery-from-boot.p
             sudo rm -rf "$GITHUB_WORKSPACE"/images/vendor/bin/install-recovery.sh
             sudo sed -i "/ro.vendor.audio.game.effect/d" "$GITHUB_WORKSPACE"/images/vendor/build.prop
