@@ -167,7 +167,7 @@ jobs:
               eval "$i"_ota_size=$Variables_size2
             elif [[ $""$i"_org_ota_size" -gt $""$i"_org_size" ]];then
               increase_size=$(echo "$(eval echo "$"$i"_org_ota_size") - $(eval echo "$"$i"_org_size")" | bc)
-              Variables_size=$(echo "$increase_size * 0.2" | bc)
+              Variables_size=$(echo "$increase_size * 0.5" | bc)
               Variables_size1=$(echo "$increase_size + $Variables_size" | bc)
               eval "$i"_ota_size=$Variables_size1
             fi
