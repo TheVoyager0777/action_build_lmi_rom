@@ -188,6 +188,10 @@ jobs:
             echo $system_ota_size
             echo $system_size
             system_size=$(echo "$system_size / 4096" | bc)
+            product_indoe=34480
+            system_ext_indoe=1408
+            vendor_indoe=
+            system_indoe=
             UTC=$(date -u +%s)
             for i in system vendor product system_ext
             do
