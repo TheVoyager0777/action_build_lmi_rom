@@ -158,6 +158,7 @@ jobs:
             do
             eval "$i"_ota_size=0
             eval "$i"_org_ota_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})
+            eval echo "$i"_org_ota_size
             if [[ $(eval echo "$"$i"_org_ota_size") -lt $(eval echo "$"$i"_org_size") ]];then
               increase_size=$(echo "$(eval echo "$"$i"_org_size") - $(eval echo "$"$i"_org_ota_size")" | bc)
               Variables_size=$(echo "$increase_size / 20" | bc)
