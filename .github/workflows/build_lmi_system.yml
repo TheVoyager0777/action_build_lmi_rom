@@ -167,7 +167,7 @@ jobs:
               eval "$i"_ota_size=$Variables_size2
             elif [[ $""$i"_org_ota_size" -gt $""$i"_org_size" ]];then
               increase_size=$(echo "$(eval echo "$"$i"_org_ota_size") - $(eval echo "$"$i"_org_size")" | bc)
-              Variables_size=$(echo "$increase_size * 3" | bc)
+              Variables_size=$(echo "$increase_size / 20" | bc)
               Variables_size1=$(echo "$increase_size + $Variables_size" | bc)
               eval "$i"_ota_size=$Variables_size1
             fi
@@ -191,12 +191,12 @@ jobs:
             product_indoe=34480
             system_ext_indoe=1408
             vendor_indoe=3952
-            system_indoe=
+            system_indoe=6048
             UTC=$(date -u +%s)
             for i in system vendor product system_ext
             do
                 sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/$i "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config
-                "$GITHUB_WORKSPACE"/tools/mke2fs -O ^has_journal -L $i -I 256 -M /$i -m 0 -t ext4 -b 4096 "$GITHUB_WORKSPACE"/images/$i.img $(eval echo "$"$i"_size")
+                "$GITHUB_WORKSPACE"/tools/mke2fs -O ^has_journal -L $i -I 256 -N $(eval echo "$"$i"_indoe") -M /$i -m 0 -t ext4 -b 4096 "$GITHUB_WORKSPACE"/images/$i.img $(eval echo "$"$i"_size")
                 sudo "$GITHUB_WORKSPACE"/tools/e2fsdroid -T 1230768000 -C "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config -S "$GITHUB_WORKSPACE"/images/TI_config/"$i"_file_contexts -f "$GITHUB_WORKSPACE"/images/$i -a /$i -e -s "$GITHUB_WORKSPACE"/images/$i.img
                 resize2fs -f -M "$GITHUB_WORKSPACE"/images/$i.img
                 eval "$i"_size=$(du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})
