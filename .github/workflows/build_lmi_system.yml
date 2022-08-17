@@ -101,6 +101,7 @@ jobs:
             sudo unzip -o -q "$GITHUB_WORKSPACE"/audio.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/audio/ui/
             sudo unzip -o -q "$GITHUB_WORKSPACE"/etc.zip -d "$GITHUB_WORKSPACE"/images/system/system/etc/audio/
             sudo unzip -o -q "$GITHUB_WORKSPACE"/popup.zip -d "$GITHUB_WORKSPACE"/images/system/system/framework/
+            sudo unzip -o -q "$GITHUB_WORKSPACE"/bootan.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/
             sudo mkdir -p "$GITHUB_WORKSPACE"/MiLink/
             $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MiLink/ "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk
             mod="$GITHUB_WORKSPACE"/MiLink/smali*/com/miui/circulate/world/permission/method/PermissionCheck\$BaseCheck.smali
