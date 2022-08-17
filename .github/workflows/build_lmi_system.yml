@@ -161,15 +161,11 @@ jobs:
             eval echo "$"$i"_org_ota_size"
             if [[ $(eval echo "$"$i"_org_ota_size") -lt $(eval echo "$"$i"_org_size") ]];then
               increase_size=$(echo "$(eval echo "$"$i"_org_size") - $(eval echo "$"$i"_org_ota_size")" | bc)
-              Variables_size=$(echo "$increase_size / 20" | bc)
-              Variables_size1=$(echo "$increase_size - $Variables_size" | bc)
-              Variables_size2=$(echo "0 - $Variables_size1" | bc)
+              Variables_size2=$(echo "0 - $increase_size" | bc)
               eval "$i"_ota_size=$Variables_size2
             elif [[ $""$i"_org_ota_size" -gt $""$i"_org_size" ]];then
               increase_size=$(echo "$(eval echo "$"$i"_org_ota_size") - $(eval echo "$"$i"_org_size")" | bc)
-              Variables_size=$(echo "$increase_size / 20" | bc)
-              Variables_size1=$(echo "$increase_size + $Variables_size" | bc)
-              eval "$i"_ota_size=$Variables_size1
+              eval "$i"_ota_size=$increase_size
             fi
             done
             product_size=$(echo "$product_size + $product_ota_size" | bc)
