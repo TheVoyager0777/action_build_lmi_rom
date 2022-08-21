@@ -27,6 +27,7 @@ jobs:
             pip3 install --ignore-installed pyyaml
        - name: 2.发送开始构建通知
          run: |
+            echo "date=$(echo ${{ env.ROM_URL }} | cut -d"/" -f4)" >> $GITHUB_ENV
             curl -i -X POST -H 'Content-type':'application/json' -d '{"appToken":"${{secrets.appToken}}","summary":"红米K30Pro ${{env.date}}开始构建","content":" **红米K30Pro ${{env.date}}开始构建** ","topicIds":[7125],"contentType":3}' http://wxpusher.zjiecode.com/api/send/message || true
        - name: 3.下载系统包
          run: |
@@ -42,8 +43,7 @@ jobs:
             mkdir -p "$GITHUB_WORKSPACE"/simages
             mkdir -p "$GITHUB_WORKSPACE"/zip
             mkdir -p "$GITHUB_WORKSPACE"/firmware
-            URL=${{ env.ROM_URL }}
-            ZIP_NAME_PSYCHE=${URL##*/}
+            ZIP_NAME_PSYCHE=$(echo ${{ env.ROM_URL }} | cut -d"/" -f5)
             7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE -r -o"$GITHUB_WORKSPACE"/PSYCHE
             rm -rf "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE
             ZIP_NAME_LMI=miui_LMIPRE_22.7.19_0c8ec819b7_12.0.zip
@@ -162,9 +162,6 @@ jobs:
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/e2fsdroid
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/img2simg
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/brotli
-            URL=${{ env.ROM_URL }}
-            DATE=${URL%/*}
-            date=${DATE##*/}
             product_ota_size=$(echo "1048576 * 0 " | bc)
             product_size=$(echo "${{ env.product_size }} + $product_ota_size" | bc)
             product_size=$(echo "$product_size / 4096" | bc)
@@ -180,7 +177,6 @@ jobs:
             system_size=$(echo "$system_size + ${{ env.camera_size }} + ${{ env.MiLink_size }}" | bc)
             system_size=$(echo "$system_size - ${{ env.sizes }}" | bc)
             system_size=$(echo "$system_size / 4096" | bc)
-            UTC=$(date -u +%s)
             for i in product vendor system_ext system
             do
                 sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/$i "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config
@@ -207,12 +203,12 @@ jobs:
             sed -i "s/system_size/$system_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sed -i "s/system_ext_size/$system_ext_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sudo unzip -o "$GITHUB_WORKSPACE"/odm.zip -d "$GITHUB_WORKSPACE"/images/
-            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip "$GITHUB_WORKSPACE"/images/*
+            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/images/*
             sudo rm -rf "$GITHUB_WORKSPACE"/images
-            md5=$(md5sum "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip)
+            md5=$(md5sum "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip)
             zipmd5=${md5:0:10}
             echo "MD5=${md5:0:32}" >> $GITHUB_ENV
-            mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"$date"_"$zipmd5"_12.0.zip
+            mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip
        - name: 7.上传到阿里云盘
          run: |
             curl https://rclone.org/install.sh | sudo bash
