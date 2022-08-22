@@ -25,15 +25,11 @@ jobs:
             pip3 install requests
             pip3 install beautifulsoup4
             pip3 install --ignore-installed pyyaml
-       - name: 2.发送开始构建通知
-         run: |
-            echo "date=$(echo ${{ env.ROM_URL }} | cut -d"/" -f4)" >> $GITHUB_ENV
-            curl -i -X POST -H 'Content-type':'application/json' -d '{"appToken":"${{secrets.appToken}}","summary":"红米K30Pro ${{env.date}}开始构建","content":" **红米K30Pro ${{env.date}}开始构建** ","topicIds":[7125],"contentType":3}' http://wxpusher.zjiecode.com/api/send/message || true
-       - name: 3.下载系统包
+       - name: 2.下载系统包
          run: |
             aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${{ env.ROM_URL }}
             aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" https://hugeota.d.miui.com/22.7.19/miui_LMIPRE_22.7.19_0c8ec819b7_12.0.zip
-       - name: 4.解包
+       - name: 3.解包
          run: |
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/payload-dumper-go
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/brotli
@@ -42,7 +38,8 @@ jobs:
             mkdir -p "$GITHUB_WORKSPACE"/simages
             mkdir -p "$GITHUB_WORKSPACE"/zip
             mkdir -p "$GITHUB_WORKSPACE"/firmware
-            ZIP_NAME_PSYCHE=$(echo ${{ env.ROM_URL }} | cut -d"/" -f5)
+            URL=${{ env.ROM_URL }}
+            ZIP_NAME_PSYCHE=${URL##*/}
             7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE -r -o"$GITHUB_WORKSPACE"/PSYCHE
             rm -rf "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE
             ZIP_NAME_LMI=miui_LMIPRE_22.7.19_0c8ec819b7_12.0.zip
@@ -77,7 +74,7 @@ jobs:
             done
             rm -rf "$GITHUB_WORKSPACE"/payload
             rm -rf "$GITHUB_WORKSPACE"/PSYCHE
-       - name: 5.替换相关文件
+       - name: 4.替换相关文件
          run: |
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/apktool.jar
             Apktool="java -jar "$GITHUB_WORKSPACE"/tools/apktool.jar"
@@ -143,12 +140,15 @@ jobs:
             sudo cp -f "$GITHUB_WORKSPACE"/dynamic_partitions_op_list "$GITHUB_WORKSPACE"/images
             sudo rm -rf "$GITHUB_WORKSPACE"/MiLink
             sudo rm -rf "$GITHUB_WORKSPACE"/MiuiCamera
-       - name: 6.打包
+       - name: 5.打包
          run: |
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/mke2fs
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/e2fsdroid
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/img2simg
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/brotli
+            URL=${{ env.ROM_URL }}
+            DATE=${URL%/*}
+            date=${DATE##*/}
             product_org_size=${{ env.com_product_size }}
             vendor_org_size=${{ env.com_vendor_size }}
             system_ext_org_size=${{ env.com_system_ext_size }}
@@ -191,6 +191,7 @@ jobs:
             system_ext_indoe=${{ env.system_ext_indoe }}
             vendor_indoe=${{ env.vendor_indoe }}
             system_indoe=${{ env.system_indoe }}
+            UTC=$(date -u +%s)
             for i in system vendor product system_ext
             do
                 sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/$i "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config
@@ -217,20 +218,12 @@ jobs:
             sed -i "s/system_size/$system_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sed -i "s/system_ext_size/$system_ext_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sudo unzip -o "$GITHUB_WORKSPACE"/odm.zip -d "$GITHUB_WORKSPACE"/images/
-            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/images/*
+            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip "$GITHUB_WORKSPACE"/images/*
             sudo rm -rf "$GITHUB_WORKSPACE"/images
-            md5=$(md5sum "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip)
+            md5=$(md5sum "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip)
             zipmd5=${md5:0:10}
-            echo "MD5=${md5:0:32}" >> $GITHUB_ENV
-            MD5=${md5:0:32}
-            mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip
-            echo "NEW_PACKAGE_NAME=miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip" >> $GITHUB_ENV
-            NEW_PACKAGE_NAME=miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip
-            mkdir "$GITHUB_WORKSPACE"/romdata && touch "$GITHUB_WORKSPACE"/romdata/lmi.ini
-            echo lmiPKG=$NEW_PACKAGE_NAME >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
-            echo lmiMD5=$MD5 >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
-            echo lmiTIME=\"$(TZ=':Asia/Shanghai' date '+%Y.%m.%d %H:%M')\" >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
-       - name: 7.上传到123云盘
+            mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"$date"_"$zipmd5"_12.0.zip
+       - name: 6.上传到123云盘
          run: |
             curl https://rclone.org/install.sh | sudo bash
             mkdir -p ~/.config/rclone/
@@ -241,21 +234,7 @@ jobs:
             sudo systemctl start alist
             rclone mkdir 123pan:/LMI_DEV
             rclone sync -P ./zip/* 123pan:/LMI_DEV
-       - name: 8.发送打包成功通知
-         run: |
-            curl -i -X POST -H 'Content-type':'application/json' -d '{"appToken":"${{secrets.appToken}}","summary":"红米K30Pro ${{env.date}}已构建完成","content":" **红米K30Pro ${{env.date}}已构成完成** \n \n **包名：${{env.NEW_PACKAGE_NAME}}** \n \n **MD5：${{env.MD5}}** \n \n 下载地址为：[https://www.123pan.com/s/vLXDVv-aZIp3](https://www.123pan.com/s/vLXDVv-aZIp3) ","topicIds":[7125],"contentType":3}' http://wxpusher.zjiecode.com/api/send/message
-       - name: 9.导出信息
-         uses: dmnemec/copy_file_to_another_repo_action@main
-         env:
-           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-         with:
-           source_file: 'romdata/lmi.ini'
-           destination_repo: 'zjw2017/sm8250-page'
-           destination_folder: 'device'
-           user_email: 'example@email.com'
-           user_name: 'zjw2017'
-           commit_message: 'Update from $GITHUB_REF'
-       - name: 10.删除工作流运行
+       - name: 7.删除工作流运行
          uses: Mattraks/delete-workflow-runs@v2
          with:
           token: ${{ github.token }}
