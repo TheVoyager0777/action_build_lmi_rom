@@ -209,15 +209,12 @@ jobs:
             zipmd5=${md5:0:10}
             echo "MD5=${md5:0:32}" >> $GITHUB_ENV
             mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip
-       - name: 7.上传到阿里云盘
-         run: |
-            curl https://rclone.org/install.sh | sudo bash
-            mkdir -p ~/.config/rclone/
-            unzip -P ${{ secrets.PASSWORD }} "$GITHUB_WORKSPACE"/tools/rclone.zip -d ~/.config/rclone/
-            nohup aliyundrive-webdav --refresh-token ${{ secrets.REFRESHTOKEN }} --host 127.0.0.1 --port 6396 --auth-user 3380572517 --auth-password ${{ secrets.PASSWORD }} >/dev/null 2>& 1 &
-            rclone mkdir aliyun:/LMI_Package
-            rclone sync -P ./zip/* aliyun:/LMI_Package
-       - name: 8.上传到123云盘
+            echo "NEW_PACKAGE_NAME=miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip" >> $GITHUB_ENV
+            mkdir "$GITHUB_WORKSPACE"/romdata && touch "$GITHUB_WORKSPACE"/romdata/lmi.ini
+            echo lmiPKG=${{env.NEW_PACKAGE_NAME}} >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
+            echo lmiMD5=${{env.MD5}} >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
+            echo lmiTIME="$(TZ=':Asia/Shanghai' date '+%Y.%m.%d %H:%M')" >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
+       - name: 7.上传到123云盘
          run: |
             curl -fsSL "https://nn.ci/alist.sh" | sudo bash -s install
             sudo systemctl stop alist
@@ -225,9 +222,20 @@ jobs:
             sudo systemctl start alist
             rclone mkdir 123pan:/LMI_DEV
             rclone sync -P ./zip/* 123pan:/LMI_DEV
-       - name: 9.发送打包成功通知
+       - name: 8.发送打包成功通知
          run: |
             curl -i -X POST -H 'Content-type':'application/json' -d '{"appToken":"${{secrets.appToken}}","summary":"红米K30Pro ${{env.date}}已构建完成","content":" **红米K30Pro ${{env.date}}已构成完成** \n \n **包名：${{env.NEW_PACKAGE_NAME}}** \n \n **MD5：${{env.MD5}}** \n \n 下载地址为：[https://www.123pan.com/s/vLXDVv-aZIp3](https://www.123pan.com/s/vLXDVv-aZIp3) ","topicIds":[7125],"contentType":3}' http://wxpusher.zjiecode.com/api/send/message
+       - name: 9.导出信息
+         uses: dmnemec/copy_file_to_another_repo_action@main
+         env:
+           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+         with:
+           source_file: 'romdata/lmi.ini'
+           destination_repo: 'zjw2017/sm8250-page'
+           destination_folder: 'device'
+           user_email: 'example@email.com'
+           user_name: 'zjw2017'
+           commit_message: 'Update from $GITHUB_REF'
        - name: 10.删除工作流运行
          uses: Mattraks/delete-workflow-runs@v2
          with:
