@@ -213,7 +213,7 @@ jobs:
             mkdir "$GITHUB_WORKSPACE"/romdata && touch "$GITHUB_WORKSPACE"/romdata/lmi.ini
             echo lmiPKG=${{env.NEW_PACKAGE_NAME}} >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
             echo lmiMD5=${{env.MD5}} >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
-            echo lmiTIME="$(TZ=':Asia/Shanghai' date '+%Y.%m.%d %H:%M')" >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
+            echo lmiTIME=\"$(TZ=':Asia/Shanghai' date '+%Y.%m.%d %H:%M')\" >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
        - name: 7.上传到123云盘
          run: |
             curl -fsSL "https://nn.ci/alist.sh" | sudo bash -s install
