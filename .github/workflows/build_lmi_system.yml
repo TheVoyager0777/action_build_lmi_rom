@@ -57,6 +57,7 @@ jobs:
                 rm -rf "$GITHUB_WORKSPACE"/images/$i.transfer.list
                 rm -rf "$GITHUB_WORKSPACE"/images/$i.new.dat
                 echo ""$i"_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})" >> $GITHUB_ENV
+                echo ""$i"_indoe=$(tune2fs -l "$GITHUB_WORKSPACE"/images/$i.img | grep 'Inode count' | awk '{print $3}')" >> $GITHUB_ENV
                 sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/$i.img "$GITHUB_WORKSPACE"/images
                 echo "com_"$i"_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})" >> $GITHUB_ENV
                 rm -rf "$GITHUB_WORKSPACE"/images/vendor.img
@@ -66,6 +67,7 @@ jobs:
                 "$GITHUB_WORKSPACE"/tools/payload-dumper-go -p $i "$GITHUB_WORKSPACE"/PSYCHE/payload.bin
                 mv "$GITHUB_WORKSPACE"/payload/$i.img "$GITHUB_WORKSPACE"/images/$i.img
                 echo ""$i"_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})" >> $GITHUB_ENV
+                echo ""$i"_indoe=$(tune2fs -l "$GITHUB_WORKSPACE"/images/$i.img | grep 'Inode count' | awk '{print $3}')" >> $GITHUB_ENV
                 sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/$i.img "$GITHUB_WORKSPACE"/images
                 echo "com_"$i"_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})" >> $GITHUB_ENV
                 rm -rf "$GITHUB_WORKSPACE"/images/$i.img
@@ -185,10 +187,10 @@ jobs:
             echo $system_ota_size
             echo $system_size
             system_size=$(echo "$system_size / 4096" | bc)
-            product_indoe=34480
-            system_ext_indoe=1408
-            vendor_indoe=3952
-            system_indoe=6048
+            product_indoe=${{ env.product_indoe }}
+            system_ext_indoe=${{ env.system_ext_indoe }}
+            vendor_indoe=${{ env.vendor_indoe }}
+            system_indoe=${{ env.system_indoe }}
             UTC=$(date -u +%s)
             for i in system vendor product system_ext
             do
