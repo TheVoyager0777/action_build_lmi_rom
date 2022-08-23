@@ -191,6 +191,7 @@ jobs:
                 size_free=$(tune2fs -l "$GITHUB_WORKSPACE"/images/$i.img | awk '/Free blocks:/ { print $3}')
                 eval "$i"_size=$(echo "$(eval echo "$"$i"_size") - $size_free" | bc)
                 eval echo "$"$i"_size"
+                sudo rm -rf "$GITHUB_WORKSPACE"/images/$i.img
             done
             for i in system vendor product system_ext
             do
