@@ -170,11 +170,11 @@ jobs:
             fi
             done
             product_size=$(echo "$product_size + $product_ota_size" | bc)
-            product_size=$(echo "$product_size / 4096" | bc)
+            product_size=$(echo "$product_size / 4096 * 4096 / 4096" | bc)
             vendor_size=$(echo "$vendor_size + $vendor_ota_size" | bc)
-            vendor_size=$(echo "$vendor_size / 4096" | bc)
+            vendor_size=$(echo "$vendor_size / 4096 * 4096 / 4096" | bc)
             system_ext_size=$(echo "$system_ext_size + $system_ext_ota_size" | bc)
-            system_ext_size=$(echo "$system_ext_size / 4096" | bc)
+            system_ext_size=$(echo "$system_ext_size / 4096 * 4096 / 4096" | bc)
             system_size=$(echo "$system_size + $system_ota_size" | bc)
             system_size=$(echo "$system_size / 4096" | bc)
             product_indoe=${{ env.product_indoe }}
@@ -184,24 +184,29 @@ jobs:
             UTC=$(date -u +%s)
             for i in system vendor product system_ext
             do
-                eval echo "$"$i"_size"
                 sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/$i "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config
                 "$GITHUB_WORKSPACE"/tools/mke2fs -O ^has_journal -L $i -I 256 -N $(eval echo "$"$i"_indoe") -M /$i -m 0 -t ext4 -b 4096 "$GITHUB_WORKSPACE"/images/$i.img $(eval echo "$"$i"_size")
                 sudo "$GITHUB_WORKSPACE"/tools/e2fsdroid -T 1230768000 -C "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config -S "$GITHUB_WORKSPACE"/images/TI_config/"$i"_file_contexts -f "$GITHUB_WORKSPACE"/images/$i -a /$i -e -s "$GITHUB_WORKSPACE"/images/$i.img 
                 resize2fs -f -M "$GITHUB_WORKSPACE"/images/$i.img
+                eval "$i"_size=$(du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})
                 size_free=$(tune2fs -l "$GITHUB_WORKSPACE"/images/$i.img | awk '/Free blocks:/ { print $3}')
+                size_free=$(echo "$size_free * 4096" | bc)
                 eval "$i"_size=$(echo "$(eval echo "$"$i"_size") - $size_free" | bc)
-                eval echo "$"$i"_size"
+                eval "$i"_size=$(echo "$(eval echo "$"$i"_size") / 4096" | bc)
                 sudo rm -rf "$GITHUB_WORKSPACE"/images/$i.img
-            done
-            for i in system vendor product system_ext
-            do
-                sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/$i "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config
                 "$GITHUB_WORKSPACE"/tools/mke2fs -O ^has_journal -L $i -I 256 -N $(eval echo "$"$i"_indoe") -M /$i -m 0 -t ext4 -b 4096 "$GITHUB_WORKSPACE"/images/$i.img $(eval echo "$"$i"_size")
                 sudo "$GITHUB_WORKSPACE"/tools/e2fsdroid -T 1230768000 -C "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config -S "$GITHUB_WORKSPACE"/images/TI_config/"$i"_file_contexts -f "$GITHUB_WORKSPACE"/images/$i -a /$i -e -s "$GITHUB_WORKSPACE"/images/$i.img
                 resize2fs -f -M "$GITHUB_WORKSPACE"/images/$i.img
+                size_free=$(tune2fs -l "$GITHUB_WORKSPACE"/images/$i.img | awk '/Free blocks:/ { print $3}')
                 eval "$i"_size=$(du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})
-                sudo rm -rf "$GITHUB_WORKSPACE"/images/$i
+                eval "$i"_size=$(echo "$(eval echo "$"$i"_size") / 4096" | bc)
+                if [[ $size_free = 0 ]];then
+                  eval "$i"_size=$(du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})
+                  sudo rm -rf "$GITHUB_WORKSPACE"/images/$i
+                  break
+                else
+                  sudo rm -rf "$GITHUB_WORKSPACE"/images/$i.img
+                fi
             done
             sudo rm -rf "$GITHUB_WORKSPACE"/images/TI_config
             for i in product system system_ext vendor
