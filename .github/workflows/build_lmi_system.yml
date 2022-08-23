@@ -19,7 +19,6 @@ jobs:
             sudo apt --fix-broken install
             sudo apt update --fix-missing
             pip3 install --upgrade pip
-            pip3 install aliyundrive-webdav
             pip3 install pycryptodome
             pip3 install docopt
             pip3 install requests
