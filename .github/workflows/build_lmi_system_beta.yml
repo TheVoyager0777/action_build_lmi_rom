@@ -11,6 +11,7 @@ jobs:
          run: |
             source "$GITHUB_WORKSPACE"/config.env
             echo "ROM_URL=$ROM_URL" >> $GITHUB_ENV
+            echo "date=$(echo $ROM_URL | cut -d"/" -f4)" >> $GITHUB_ENV
             echo "camera1=$camera1" >> $GITHUB_ENV
             echo "camera2=$camera2" >> $GITHUB_ENV
        - name: 1.安装依赖
@@ -27,7 +28,6 @@ jobs:
             pip3 install --ignore-installed pyyaml
        - name: 2.发送开始构建通知
          run: |
-            echo "date=$(echo ${{ env.ROM_URL }} | cut -d"/" -f4)" >> $GITHUB_ENV
             curl -i -X POST -H 'Content-type':'application/json' -d '{"appToken":"${{secrets.appToken}}","summary":"红米K30Pro ${{env.date}}开始构建","content":" **红米K30Pro ${{env.date}}开始构建** ","topicIds":[7125],"contentType":3}' http://wxpusher.zjiecode.com/api/send/message || true
        - name: 3.下载系统包
          run: |
