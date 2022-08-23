@@ -189,7 +189,6 @@ jobs:
                 "$GITHUB_WORKSPACE"/tools/mke2fs -O ^has_journal -L $i -I 256 -N $(eval echo "$"$i"_indoe") -M /$i -m 0 -t ext4 -b 4096 "$GITHUB_WORKSPACE"/images/$i.img $(eval echo "$"$i"_size")
                 sudo "$GITHUB_WORKSPACE"/tools/e2fsdroid -T 1230768000 -C "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config -S "$GITHUB_WORKSPACE"/images/TI_config/"$i"_file_contexts -f "$GITHUB_WORKSPACE"/images/$i -a /$i -e -s "$GITHUB_WORKSPACE"/images/$i.img 
                 size_free=$(tune2fs -l "$GITHUB_WORKSPACE"/images/$i.img | awk '/Free blocks:/ { print $3}')
-                size_free=$(echo "$size_free * 4096" | bc)
                 eval "$i"_size=$(echo "$(eval echo "$"$i"_size") - $size_free" | bc)
                 eval echo "$"$i"_size"
             done
