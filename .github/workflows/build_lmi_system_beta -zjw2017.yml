@@ -10,7 +10,7 @@ jobs:
        - name: 获取配置
          run: |
             source "$GITHUB_WORKSPACE"/config.env
-            echo "ROM_URL=$ROM_URL" >> $GITHUB_ENV
+            echo "ROM_URL=https://hugeota.d.miui.com/22.7.1/miui_PSYCHEPRE_22.7.1_9c2b7dd89c_12.0.zip" >> $GITHUB_ENV
             echo "camera1=$camera1" >> $GITHUB_ENV
             echo "camera2=$camera2" >> $GITHUB_ENV
        - name: 1.安装依赖
