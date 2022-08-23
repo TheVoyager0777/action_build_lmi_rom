@@ -208,8 +208,10 @@ jobs:
             md5=$(md5sum "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip)
             zipmd5=${md5:0:10}
             echo "MD5=${md5:0:32}" >> $GITHUB_ENV
+            MD5=${md5:0:32}
             mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip
             echo "NEW_PACKAGE_NAME=miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip" >> $GITHUB_ENV
+            NEW_PACKAGE_NAME=miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip
             mkdir "$GITHUB_WORKSPACE"/romdata && touch "$GITHUB_WORKSPACE"/romdata/lmi.ini
             echo lmiPKG=${{env.NEW_PACKAGE_NAME}} >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
             echo lmiMD5=${{env.MD5}} >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
