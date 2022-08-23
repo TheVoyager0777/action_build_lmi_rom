@@ -213,8 +213,8 @@ jobs:
             echo "NEW_PACKAGE_NAME=miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip" >> $GITHUB_ENV
             NEW_PACKAGE_NAME=miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip
             mkdir "$GITHUB_WORKSPACE"/romdata && touch "$GITHUB_WORKSPACE"/romdata/lmi.ini
-            echo lmiPKG=${{env.NEW_PACKAGE_NAME}} >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
-            echo lmiMD5=${{env.MD5}} >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
+            echo lmiPKG=$NEW_PACKAGE_NAME >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
+            echo lmiMD5=$MD5 >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
             echo lmiTIME=\"$(TZ=':Asia/Shanghai' date '+%Y.%m.%d %H:%M')\" >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
        - name: 7.上传到123云盘
          run: |
