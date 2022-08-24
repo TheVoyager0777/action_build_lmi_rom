@@ -58,7 +58,6 @@ jobs:
                 echo ""$i"_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})" >> $GITHUB_ENV
                 echo ""$i"_indoe=$(tune2fs -l "$GITHUB_WORKSPACE"/images/$i.img | grep 'Inode count' | awk '{print $3}')" >> $GITHUB_ENV
                 sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/$i.img "$GITHUB_WORKSPACE"/images
-                echo "com_"$i"_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})" >> $GITHUB_ENV
                 rm -rf "$GITHUB_WORKSPACE"/images/vendor.img
             done
             for i in system product system_ext
@@ -68,7 +67,6 @@ jobs:
                 echo ""$i"_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})" >> $GITHUB_ENV
                 echo ""$i"_indoe=$(tune2fs -l "$GITHUB_WORKSPACE"/images/$i.img | grep 'Inode count' | awk '{print $3}')" >> $GITHUB_ENV
                 sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/$i.img "$GITHUB_WORKSPACE"/images
-                echo "com_"$i"_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})" >> $GITHUB_ENV
                 rm -rf "$GITHUB_WORKSPACE"/images/$i.img
             done
             rm -rf "$GITHUB_WORKSPACE"/payload
@@ -148,35 +146,15 @@ jobs:
             URL=${{ env.ROM_URL }}
             DATE=${URL%/*}
             date=${DATE##*/}
-            product_org_size=${{ env.com_product_size }}
-            vendor_org_size=${{ env.com_vendor_size }}
-            system_ext_org_size=${{ env.com_system_ext_size }}
-            system_org_size=${{ env.com_system_size }}
-            product_size=${{ env.product_size }}
-            vendor_size=${{ env.vendor_size }}
-            system_ext_size=${{ env.system_ext_size }}
-            system_size=${{ env.system_size }}
-            for i in product vendor system_ext system
-            do
-            eval "$i"_ota_size=0
-            eval "$i"_org_ota_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})
-            if [[ $(eval echo "$"$i"_org_ota_size") -lt $(eval echo "$"$i"_org_size") ]];then
-              increase_size=$(echo "$(eval echo "$"$i"_org_size") - $(eval echo "$"$i"_org_ota_size")" | bc)
-              Variables_size2=$(echo "0 - $increase_size" | bc)
-              eval "$i"_ota_size=$Variables_size2
-            elif [[ $""$i"_org_ota_size" -gt $""$i"_org_size" ]];then
-              increase_size=$(echo "$(eval echo "$"$i"_org_ota_size") - $(eval echo "$"$i"_org_size")" | bc)
-              eval "$i"_ota_size=$increase_size
-            fi
-            done
-            product_size=$(echo "$product_size + $product_ota_size" | bc)
+            ota_size=104856700
+            product_size=$(echo "${{ env.product_size }} + $ota_size" | bc)
             product_size=$(echo "$product_size / 4096 * 4096 / 4096" | bc)
-            vendor_size=$(echo "$vendor_size + $vendor_ota_size" | bc)
+            vendor_size=$(echo "${{ env.vendor_size }} + $ota_size" | bc)
             vendor_size=$(echo "$vendor_size / 4096 * 4096 / 4096" | bc)
-            system_ext_size=$(echo "$system_ext_size + $system_ext_ota_size" | bc)
+            system_ext_size=$(echo "${{ env.system_ext_size }}+ $ota_size" | bc)
             system_ext_size=$(echo "$system_ext_size / 4096 * 4096 / 4096" | bc)
-            system_size=$(echo "$system_size + $system_ota_size" | bc)
-            system_size=$(echo "$system_size / 4096" | bc)
+            system_size=$(echo "${{ env.system_size }} + $ota_size" | bc)
+            system_size=$(echo "$system_size / 4096 * 4096 / 4096" | bc)
             product_indoe=${{ env.product_indoe }}
             system_ext_indoe=${{ env.system_ext_indoe }}
             vendor_indoe=${{ env.vendor_indoe }}
