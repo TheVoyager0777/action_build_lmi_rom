@@ -209,6 +209,8 @@ jobs:
             sed -i "s/product_size/$product_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sed -i "s/system_ext_size/$system_ext_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sudo unzip -o "$GITHUB_WORKSPACE"/odm.zip -d "$GITHUB_WORKSPACE"/images/
+            sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/firmware-update/*
+            sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/*
             sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip "$GITHUB_WORKSPACE"/images/*
             sudo rm -rf "$GITHUB_WORKSPACE"/images
             md5=$(md5sum "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip)
