@@ -213,7 +213,7 @@ jobs:
             sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/META-INF/*
             sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/META-INF/com/*
             sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/META-INF/com/google/*
-            sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/META-INF/com/google/andriod/*
+            sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/META-INF/com/google/android/*
             sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/*
             sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip "$GITHUB_WORKSPACE"/images/*
             sudo rm -rf "$GITHUB_WORKSPACE"/images
