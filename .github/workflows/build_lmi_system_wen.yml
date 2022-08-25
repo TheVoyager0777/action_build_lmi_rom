@@ -152,13 +152,13 @@ jobs:
             system_size=${{ env.system_size }}
             for i in system vendor product system_ext
             do
-            eavl "$i"_size_orig=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})
+            eval "$i"_size_orig=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})
             if [[ "$(eval echo "$"$i"_size_orig")" -le "10485760" ]]; then
-                size=$(echo "$(eval echo "$"$i"_size_orig") * 12 / 10 / 4096 * 4096" | bc)
+              size=$(echo "$(eval echo "$"$i"_size_orig") * 12 / 10 / 4096 * 4096" | bc)
             elif [[ "$(eval echo "$"$i"_size_orig")" -gt "2684354560" ]]; then
-                size=$(echo "$(eval echo "$"$i"_size_orig") * 109 / 105 / 4096 * 4096" | bc)
+              size=$(echo "$(eval echo "$"$i"_size_orig") * 109 / 105 / 4096 * 4096" | bc)
             else
-                size=$(echo "$(eval echo "$"$i"_size_orig") * 12 / 11 / 4096 * 4096" | bc)
+              size=$(echo "$(eval echo "$"$i"_size_orig") * 12 / 11 / 4096 * 4096" | bc)
             fi
             eval "$i"_size_orig=$size
             done
