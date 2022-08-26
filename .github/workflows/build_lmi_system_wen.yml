@@ -146,19 +146,30 @@ jobs:
             URL=${{ env.ROM_URL }}
             DATE=${URL%/*}
             date=${DATE##*/}
-            ota_size=104856700
-            product_size=$(echo "${{ env.product_size }} + $ota_size" | bc)
-            product_size=$(echo "$product_size / 4096 * 4096 / 4096" | bc)
-            vendor_size=$(echo "${{ env.vendor_size }} + $ota_size" | bc)
-            vendor_size=$(echo "$vendor_size / 4096 * 4096 / 4096" | bc)
-            system_ext_size=$(echo "${{ env.system_ext_size }}+ $ota_size" | bc)
-            system_ext_size=$(echo "$system_ext_size / 4096 * 4096 / 4096" | bc)
-            system_size=$(echo "${{ env.system_size }} + $ota_size" | bc)
-            system_size=$(echo "$system_size / 4096 * 4096 / 4096" | bc)
+            product_size=${{ env.product_size }}
+            vendor_size=${{ env.vendor_size }}
+            system_ext_size=${{ env.system_ext_size }}
+            system_size=${{ env.system_size }}
+            for i in system vendor product system_ext
+            do
+            eval "$i"_size_orig=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})
+            if [[ "$(eval echo "$"$i"_size_orig")" -le "10485760" ]]; then
+              size=$(echo "$(eval echo "$"$i"_size_orig") * 12 / 10 / 4096 * 4096" | bc)
+            elif [[ "$(eval echo "$"$i"_size_orig")" -gt "2684354560" ]]; then
+              size=$(echo "$(eval echo "$"$i"_size_orig") * 109 / 105 / 4096 * 4096" | bc)
+            else
+              size=$(echo "$(eval echo "$"$i"_size_orig") * 12 / 11 / 4096 * 4096" | bc)
+            fi
+            eval "$i"_size_orig=$size
+            done
+            system_size=$(echo "$system_size * 4096 / 4096 / 4096" | bc)
+            vendor_size=$(echo "$vendor_size * 4096 / 4096 / 4096" | bc)
+            product_size=$(echo "$product_size * 4096 / 4096 / 4096" | bc)
+            system_ext_size=$(echo "$system_ext_size * 4096 / 4096 / 4096" | bc)
+            system_indoe=${{ env.system_indoe }}
+            vendor_indoe=${{ env.vendor_indoe }}
             product_indoe=${{ env.product_indoe }}
             system_ext_indoe=${{ env.system_ext_indoe }}
-            vendor_indoe=${{ env.vendor_indoe }}
-            system_indoe=${{ env.system_indoe }}
             UTC=$(date -u +%s)
             for i in system vendor product system_ext
             do
@@ -182,7 +193,7 @@ jobs:
                 done
             done
             sudo rm -rf "$GITHUB_WORKSPACE"/images/TI_config
-            for i in product system system_ext vendor
+            for i in system vendor product system_ext
             do
                 "$GITHUB_WORKSPACE"/tools/img2simg "$GITHUB_WORKSPACE"/images/$i.img "$GITHUB_WORKSPACE"/simages/$i.img
                 rm -rf "$GITHUB_WORKSPACE"/images/$i.img
@@ -193,11 +204,17 @@ jobs:
                 rm -rf "$GITHUB_WORKSPACE"/simages/$i.new.dat
             done
             rm -rf "$GITHUB_WORKSPACE"/simages
-            sed -i "s/product_size/$product_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
-            sed -i "s/vendor_size/$vendor_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sed -i "s/system_size/$system_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
+            sed -i "s/vendor_size/$vendor_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
+            sed -i "s/product_size/$product_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sed -i "s/system_ext_size/$system_ext_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sudo unzip -o "$GITHUB_WORKSPACE"/odm.zip -d "$GITHUB_WORKSPACE"/images/
+            sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/firmware-update/*
+            sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/META-INF/*
+            sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/META-INF/com/*
+            sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/META-INF/com/google/*
+            sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/META-INF/com/google/android/*
+            sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/*
             sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip "$GITHUB_WORKSPACE"/images/*
             sudo rm -rf "$GITHUB_WORKSPACE"/images
             md5=$(md5sum "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_$date.zip)
