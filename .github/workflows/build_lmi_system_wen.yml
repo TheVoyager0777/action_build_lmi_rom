@@ -167,6 +167,10 @@ jobs:
             fi
             eval "$i"_size_orig=$size
             done
+            system_size=$(echo "$system_size + $system_size_orig" | bc)
+            vendor_size=$(echo "$vendor_size + $vendor_size_orig" | bc)
+            product_size=$(echo "$product_size +$product_size_orig" | bc)
+            system_ext_size=$(echo "$system_ext_size + $system_ext_size_orig" | bc)
             system_size=$(echo "$system_size * 4096 / 4096 / 4096" | bc)
             vendor_size=$(echo "$vendor_size * 4096 / 4096 / 4096" | bc)
             product_size=$(echo "$product_size * 4096 / 4096 / 4096" | bc)
