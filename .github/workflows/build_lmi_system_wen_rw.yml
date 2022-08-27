@@ -1,4 +1,4 @@
-name: build_lmi_system_wen
+name: build_lmi_system_wen_rw
 on: 
   workflow_dispatch:
 
