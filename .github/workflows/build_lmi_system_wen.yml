@@ -140,7 +140,7 @@ jobs:
             sudo rm -rf "$GITHUB_WORKSPACE"/MiuiCamera
             for i in system vendor product system_ext
             do
-            sudo tonch -t 200901010800.00 $GITHUB_WORKSPACE"/images/$i/lost+found
+            sudo tonch -t 200901010800.00 "$GITHUB_WORKSPACE"/images/$i/lost+found
             done
        - name: 5.打包
          run: |
