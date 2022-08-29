@@ -27,7 +27,6 @@ jobs:
        - name: 2.下载系统包
          run: |
             aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${{ env.ROM_URL }}
-            aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" https://hugeota.d.miui.com/22.7.19/miui_LMIPRE_22.7.19_0c8ec819b7_12.0.zip
        - name: 3.解包
          run: |
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/payload-dumper-go
@@ -38,17 +37,12 @@ jobs:
             mkdir -p "$GITHUB_WORKSPACE"/zip
             mkdir -p "$GITHUB_WORKSPACE"/firmware
             URL=${{ env.ROM_URL }}
-            ZIP_NAME_PSYCHE=${URL##*/}
-            7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE -r -o"$GITHUB_WORKSPACE"/PSYCHE
-            rm -rf "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE
-            ZIP_NAME_LMI=miui_LMIPRE_22.7.19_0c8ec819b7_12.0.zip
-            7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_LMI -r -o"$GITHUB_WORKSPACE"/images firmware-update
-            7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_LMI -r -o"$GITHUB_WORKSPACE"/images boot.img
+            ZIP_NAME=${URL##*/}
             for i in system
             do
-                7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_LMI -o"$GITHUB_WORKSPACE"/images $i.transfer.list
-                7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_LMI -o"$GITHUB_WORKSPACE"/images $i.patch.dat
-                7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_LMI -o"$GITHUB_WORKSPACE"/images $i.new.dat.br
+                7z x "$GITHUB_WORKSPACE"/$ZIP_NAME -o"$GITHUB_WORKSPACE"/images $i.transfer.list
+                7z x "$GITHUB_WORKSPACE"/$ZIP_NAME -o"$GITHUB_WORKSPACE"/images $i.patch.dat
+                7z x "$GITHUB_WORKSPACE"/$ZIP_NAME -o"$GITHUB_WORKSPACE"/images $i.new.dat.br
                 "$GITHUB_WORKSPACE"/tools/brotli -d "$GITHUB_WORKSPACE"/images/$i.new.dat.br
                 rm -rf "$GITHUB_WORKSPACE"/images/$i.new.dat.br
                 python3 "$GITHUB_WORKSPACE"/tools/sdat2img.py "$GITHUB_WORKSPACE"/images/$i.transfer.list "$GITHUB_WORKSPACE"/images/$i.new.dat "$GITHUB_WORKSPACE"/images/$i.img
