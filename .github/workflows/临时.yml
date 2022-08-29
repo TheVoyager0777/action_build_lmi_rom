@@ -52,7 +52,7 @@ jobs:
                 echo ""$i"_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})" >> $GITHUB_ENV
                 echo ""$i"_indoe=$(tune2fs -l "$GITHUB_WORKSPACE"/images/$i.img | grep 'Inode count' | awk '{print $3}')" >> $GITHUB_ENV
                 sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/$i.img "$GITHUB_WORKSPACE"/images
-                rm -rf $GITHUB_WORKSPACE"/images/$i.img
+                rm -rf "$GITHUB_WORKSPACE"/images/$i.img
             done
        - name: 5.打包
          run: |
