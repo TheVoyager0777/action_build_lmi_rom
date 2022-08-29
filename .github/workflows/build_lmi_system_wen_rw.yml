@@ -97,6 +97,23 @@ jobs:
             sudo sed -i "s/sustem/system/g" "$GITHUB_WORKSPACE"/images/vendor/etc/selinux/vendor_file_contexts
             sudo sed -i "/ro.vendor.audio.game.effect/d" "$GITHUB_WORKSPACE"/images/vendor/build.prop
             sudo sed -i "/import/i ro.vendor.audio.support.sound.id=true\nro.vendor.audio.voip.assistant=true\nro.vendor.audio.aiasst.support=true\nro.vendor.media.video.frc.support=true\nro.vendor.audio.spk.stereo=true\nro.vendor.audio.vocal.support=true\nro.vendor.audio.surround.support=true\nro.vendor.audio.spk.clean=true\nro.vendor.video_box.version=2" "$GITHUB_WORKSPACE"/images/vendor/build.prop
+            fstab=$(sudo find "$GITHUB_WORKSPACE"/images/vendor/ -name "fstab*")
+            if [[ $fstab == "" ]];then
+	         echo -e "\e[33m     ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ \e[0m"
+	         echo -e "\e[31m     >>>>>>>>找不到相关文件,也许没有加密呢>>>>>>>>>  \e[0m"
+	         echo -e "\e[33m     ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^\e[0m"
+	         echo ""
+	         sleep 5
+            else
+	         echo -e "\e[31m     >>>>>>  正在去除,请等待....  >>>>>>> \e[0m"
+	         for file in $fstab; do
+	         	cp $file $SHELL_DIR/$lin_dir
+		     sed -i 's/,avb.*system//g' $file
+		     sed -i 's/,avb,/,/g' $file
+		     sed -i 's/,avb_keys.*key//g' $file
+	       	sed -i 's/fileencryption=ice/encryptable=ice/g' $file
+          	done
+            fi
             sudo unzip -o -q "$GITHUB_WORKSPACE"/nfc.zip -d "$GITHUB_WORKSPACE"/images/system_ext            
             sudo unzip -o -q "$GITHUB_WORKSPACE"/audio.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/audio/ui/
             sudo unzip -o -q "$GITHUB_WORKSPACE"/etc.zip -d "$GITHUB_WORKSPACE"/images/system/system/etc/audio/
@@ -185,7 +202,7 @@ jobs:
                 while true;do
                 sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/$i "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config
                 "$GITHUB_WORKSPACE"/tools/mke2fs -O ^has_journal -L $i -I 256 -N $(eval echo "$"$i"_indoe") -M /$i -m 0 -t ext4 -b 4096 "$GITHUB_WORKSPACE"/images/$i.img $(eval echo "$"$i"_size")
-                sudo "$GITHUB_WORKSPACE"/tools/e2fsdroid -T 1230768000 -C "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config -S "$GITHUB_WORKSPACE"/images/TI_config/"$i"_file_contexts -f "$GITHUB_WORKSPACE"/images/$i -a /$i -e "$GITHUB_WORKSPACE"/images/$i.img 
+                sudo "$GITHUB_WORKSPACE"/tools/e2fsdroid -T 1230768000 -C "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config -S "$GITHUB_WORKSPACE"/images/TI_config/"$i"_file_contexts -f "$GITHUB_WORKSPACE"/images/$i -a /$i -e -s "$GITHUB_WORKSPACE"/images/$i.img 
                 resize2fs -f -M "$GITHUB_WORKSPACE"/images/$i.img
                 eval "$i"_size=$(du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})
                 size_free=$(tune2fs -l "$GITHUB_WORKSPACE"/images/$i.img | awk '/Free blocks:/ { print $3}')
