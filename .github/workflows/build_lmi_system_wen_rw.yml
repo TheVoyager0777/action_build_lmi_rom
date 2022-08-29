@@ -99,20 +99,19 @@ jobs:
             sudo sed -i "/import/i ro.vendor.audio.support.sound.id=true\nro.vendor.audio.voip.assistant=true\nro.vendor.audio.aiasst.support=true\nro.vendor.media.video.frc.support=true\nro.vendor.audio.spk.stereo=true\nro.vendor.audio.vocal.support=true\nro.vendor.audio.surround.support=true\nro.vendor.audio.spk.clean=true\nro.vendor.video_box.version=2" "$GITHUB_WORKSPACE"/images/vendor/build.prop
             fstab=$(sudo find "$GITHUB_WORKSPACE"/images/vendor/ -name "fstab*")
             if [[ $fstab == "" ]];then
-	         echo -e "\e[33m     ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ \e[0m"
-	         echo -e "\e[31m     >>>>>>>>找不到相关文件,也许没有加密呢>>>>>>>>>  \e[0m"
-	         echo -e "\e[33m     ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^\e[0m"
-	         echo ""
-	         sleep 5
+            echo -e "\e[33m     ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ \e[0m"
+            echo -e "\e[31m     >>>>>>>>找不到相关文件,也许没有加密呢>>>>>>>>>  \e[0m"
+            echo -e "\e[33m     ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^\e[0m"
+            echo ""
+            sleep 5
             else
-	         echo -e "\e[31m     >>>>>>  正在去除,请等待....  >>>>>>> \e[0m"
-	         for file in $fstab; do
-	         	cp $file $SHELL_DIR/$lin_dir
-		     sed -i 's/,avb.*system//g' $file
-		     sed -i 's/,avb,/,/g' $file
-		     sed -i 's/,avb_keys.*key//g' $file
-	       	sed -i 's/fileencryption=ice/encryptable=ice/g' $file
-          	done
+            echo -e "\e[31m     >>>>>>  正在去除,请等待....  >>>>>>> \e[0m"
+            for file in $fstab; do
+            sed -i 's/,avb.*system//g' $file
+            sed -i 's/,avb,/,/g' $file
+            sed -i 's/,avb_keys.*key//g' $file
+            sed -i 's/fileencryption=ice/encryptable=ice/g' $file
+            done
             fi
             sudo unzip -o -q "$GITHUB_WORKSPACE"/nfc.zip -d "$GITHUB_WORKSPACE"/images/system_ext            
             sudo unzip -o -q "$GITHUB_WORKSPACE"/audio.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/audio/ui/
