@@ -97,7 +97,7 @@ jobs:
             sudo rm -rf "$GITHUB_WORKSPACE"/images/vendor/bin/install-recovery.sh
             sudo sed -i "s/sustem/system/g" "$GITHUB_WORKSPACE"/images/vendor/etc/selinux/vendor_file_contexts
             sudo sed -i "/ro.vendor.audio.game.effect/d" "$GITHUB_WORKSPACE"/images/vendor/build.prop
-            sudo sed -i "/import/i ro.vendor.audio.support.sound.id=true\nro.vendor.audio.voip.assistant=true\nro.vendor.audio.aiasst.support=true\nro.vendor.media.video.frc.support=true\nro.vendor.audio.spk.stereo=true\nro.vendor.audio.vocal.support=true\nro.vendor.audio.surround.support=true\nro.vendor.audio.spk.clean=true\nro.vendor.video_box.version=2" "$GITHUB_WORKSPACE"/images/vendor/build.prop
+            sudo sed -i "/import/i ro.miui.region=CN\nro.miui.cust_variant=cn\nro.vendor.audio.support.sound.id=true\nro.vendor.audio.voip.assistant=true\nro.vendor.audio.aiasst.support=true\nro.vendor.media.video.frc.support=true\nro.vendor.audio.spk.stereo=true\nro.vendor.audio.vocal.support=true\nro.vendor.audio.surround.support=true\nro.vendor.audio.spk.clean=true\nro.vendor.video_box.version=2" "$GITHUB_WORKSPACE"/images/vendor/build.prop
             sudo unzip -o -q "$GITHUB_WORKSPACE"/nfc.zip -d "$GITHUB_WORKSPACE"/images/system_ext            
             sudo unzip -o -q "$GITHUB_WORKSPACE"/audio.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/audio/ui/
             sudo unzip -o -q "$GITHUB_WORKSPACE"/etc.zip -d "$GITHUB_WORKSPACE"/images/system/system/etc/audio/
@@ -141,7 +141,7 @@ jobs:
             sudo rm -rf "$GITHUB_WORKSPACE"/MiuiCamera
             for i in system vendor product system_ext
             do
-            sudo touch -t 200901010800.00 "$GITHUB_WORKSPACE"/images/$i/lost+found
+            sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/$i/lost+found
             done
        - name: 5.打包
          run: |
