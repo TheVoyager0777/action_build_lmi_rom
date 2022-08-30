@@ -62,8 +62,7 @@ jobs:
                 echo ""$i"_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})" >> $GITHUB_ENV
                 echo ""$i"_indoe=$(tune2fs -l "$GITHUB_WORKSPACE"/images/$i.img | grep 'Inode count' | awk '{print $3}')" >> $GITHUB_ENV
                 sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/$i.img "$GITHUB_WORKSPACE"/images
-                echo "com_"$i"_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})" >> $GITHUB_ENV
-                rm -rf "$GITHUB_WORKSPACE"/images/vendor.img
+                rm -rf "$GITHUB_WORKSPACE"/images/$i.img
             done
             for i in system product system_ext
             do
@@ -72,7 +71,6 @@ jobs:
                 echo ""$i"_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})" >> $GITHUB_ENV
                 echo ""$i"_indoe=$(tune2fs -l "$GITHUB_WORKSPACE"/images/$i.img | grep 'Inode count' | awk '{print $3}')" >> $GITHUB_ENV
                 sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/$i.img "$GITHUB_WORKSPACE"/images
-                echo "com_"$i"_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})" >> $GITHUB_ENV
                 rm -rf "$GITHUB_WORKSPACE"/images/$i.img
             done
             rm -rf "$GITHUB_WORKSPACE"/payload
@@ -89,6 +87,7 @@ jobs:
             sudo cp -f "$GITHUB_WORKSPACE"/DevicesAndroidOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
             sudo cp -f "$GITHUB_WORKSPACE"/DevicesOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
             sudo cp -f "$GITHUB_WORKSPACE"/MiuiFrameworkResOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
+            sudo cp -f "$GITHUB_WORKSPACE"/SettingResCommon_Sys.apk "$GITHUB_WORKSPACE"/images/product/overlay/
             sudo cp -f "$GITHUB_WORKSPACE"/lmi.xml "$GITHUB_WORKSPACE"/images/product/etc/device_features/
             sudo cp -f "$GITHUB_WORKSPACE"/lmipro.xml "$GITHUB_WORKSPACE"/images/product/etc/device_features/
             sudo sed -i "/ro.miui.notch/d" "$GITHUB_WORKSPACE"/images/product/etc/build.prop
@@ -143,62 +142,65 @@ jobs:
             sudo cp -f "$GITHUB_WORKSPACE"/dynamic_partitions_op_list "$GITHUB_WORKSPACE"/images
             sudo rm -rf "$GITHUB_WORKSPACE"/MiLink
             sudo rm -rf "$GITHUB_WORKSPACE"/MiuiCamera
+            for i in system vendor product system_ext
+            do
+            sudo touch -t 200901010800.00 "$GITHUB_WORKSPACE"/images/$i/lost+found
+            done
        - name: 6.打包
          run: |
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/mke2fs
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/e2fsdroid
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/img2simg
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/brotli
-            product_org_size=${{ env.com_product_size }}
-            vendor_org_size=${{ env.com_vendor_size }}
-            system_ext_org_size=${{ env.com_system_ext_size }}
-            system_org_size=${{ env.com_system_size }}
             product_size=${{ env.product_size }}
             vendor_size=${{ env.vendor_size }}
             system_ext_size=${{ env.system_ext_size }}
             system_size=${{ env.system_size }}
-            for i in product vendor system_ext system
-            do
-            eval "$i"_ota_size=0
-            eval "$i"_org_ota_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})
-            eval echo "$"$i"_org_ota_size"
-            if [[ $(eval echo "$"$i"_org_ota_size") -lt $(eval echo "$"$i"_org_size") ]];then
-              increase_size=$(echo "$(eval echo "$"$i"_org_size") - $(eval echo "$"$i"_org_ota_size")" | bc)
-              Variables_size2=$(echo "0 - $increase_size" | bc)
-              eval "$i"_ota_size=$Variables_size2
-            elif [[ $""$i"_org_ota_size" -gt $""$i"_org_size" ]];then
-              increase_size=$(echo "$(eval echo "$"$i"_org_ota_size") - $(eval echo "$"$i"_org_size")" | bc)
-              eval "$i"_ota_size=$increase_size
-            fi
-            done
-            product_size=$(echo "$product_size + $product_ota_size" | bc)
-            echo $product_ota_size
-            echo $product_size
-            product_size=$(echo "$product_size / 4096" | bc)
-            vendor_size=$(echo "$vendor_size + $vendor_ota_size" | bc)
-            echo $vendor_ota_size
-            echo $vendor_size
-            vendor_size=$(echo "$vendor_size / 4096" | bc)
-            system_ext_size=$(echo "$system_ext_size + $system_ext_ota_size" | bc)
-            echo $system_ext_ota_size
-            echo $system_ext_size
-            system_ext_size=$(echo "$system_ext_size / 4096" | bc)
-            system_size=$(echo "$system_size + $system_ota_size" | bc)
-            echo $system_ota_size
-            echo $system_size
-            system_size=$(echo "$system_size / 4096" | bc)
-            product_indoe=${{ env.product_indoe }}
-            system_ext_indoe=${{ env.system_ext_indoe }}
-            vendor_indoe=${{ env.vendor_indoe }}
-            system_indoe=${{ env.system_indoe }}
             for i in system vendor product system_ext
             do
+            eval "$i"_size_orig=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})
+            if [[ "$(eval echo "$"$i"_size_orig")" -le "10485760" ]]; then
+              size=$(echo "$(eval echo "$"$i"_size_orig") * 12 / 10 / 4096 * 4096" | bc)
+            elif [[ "$(eval echo "$"$i"_size_orig")" -gt "2684354560" ]]; then
+              size=$(echo "$(eval echo "$"$i"_size_orig") * 109 / 105 / 4096 * 4096" | bc)
+            else
+              size=$(echo "$(eval echo "$"$i"_size_orig") * 12 / 11 / 4096 * 4096" | bc)
+            fi
+            eval "$i"_size_orig=$size
+            done
+            system_size=$(echo "$system_size + $system_size_orig" | bc)
+            vendor_size=$(echo "$vendor_size + $vendor_size_orig" | bc)
+            product_size=$(echo "$product_size +$product_size_orig" | bc)
+            system_ext_size=$(echo "$system_ext_size + $system_ext_size_orig" | bc)
+            system_size=$(echo "$system_size * 4096 / 4096 / 4096" | bc)
+            vendor_size=$(echo "$vendor_size * 4096 / 4096 / 4096" | bc)
+            product_size=$(echo "$product_size * 4096 / 4096 / 4096" | bc)
+            system_ext_size=$(echo "$system_ext_size * 4096 / 4096 / 4096" | bc)
+            system_indoe=${{ env.system_indoe }}
+            vendor_indoe=${{ env.vendor_indoe }}
+            product_indoe=${{ env.product_indoe }}
+            system_ext_indoe=${{ env.system_ext_indoe }}
+            UTC=$(date -u +%s)
+            for i in system vendor product system_ext
+            do
+                while true;do
                 sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/$i "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config
                 "$GITHUB_WORKSPACE"/tools/mke2fs -O ^has_journal -L $i -I 256 -N $(eval echo "$"$i"_indoe") -M /$i -m 0 -t ext4 -b 4096 "$GITHUB_WORKSPACE"/images/$i.img $(eval echo "$"$i"_size")
-                sudo "$GITHUB_WORKSPACE"/tools/e2fsdroid -T 1230768000 -C "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config -S "$GITHUB_WORKSPACE"/images/TI_config/"$i"_file_contexts -f "$GITHUB_WORKSPACE"/images/$i -a /$i -e -s "$GITHUB_WORKSPACE"/images/$i.img
+                sudo "$GITHUB_WORKSPACE"/tools/e2fsdroid -T 1230768000 -C "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config -S "$GITHUB_WORKSPACE"/images/TI_config/"$i"_file_contexts -f "$GITHUB_WORKSPACE"/images/$i -a /$i -e -s "$GITHUB_WORKSPACE"/images/$i.img 
                 resize2fs -f -M "$GITHUB_WORKSPACE"/images/$i.img
                 eval "$i"_size=$(du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})
-                sudo rm -rf "$GITHUB_WORKSPACE"/images/$i
+                size_free=$(tune2fs -l "$GITHUB_WORKSPACE"/images/$i.img | awk '/Free blocks:/ { print $3}')
+                size_free=$(echo "$size_free * 4096" | bc)
+                eval "$i"_size=$(echo "$(eval echo "$"$i"_size") - $size_free" | bc)
+                eval "$i"_size=$(echo "$(eval echo "$"$i"_size") / 4096" | bc)
+                if [[ $size_free = 0 ]];then
+                  eval "$i"_size=$(du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})
+                  sudo rm -rf "$GITHUB_WORKSPACE"/images/$i
+                  break
+                else
+                  sudo rm -rf "$GITHUB_WORKSPACE"/images/$i.img
+                fi
+                done
             done
             sudo rm -rf "$GITHUB_WORKSPACE"/images/TI_config
             for i in product system system_ext vendor
@@ -217,6 +219,12 @@ jobs:
             sed -i "s/system_size/$system_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sed -i "s/system_ext_size/$system_ext_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sudo unzip -o "$GITHUB_WORKSPACE"/odm.zip -d "$GITHUB_WORKSPACE"/images/
+            sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/firmware-update/*
+            sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/META-INF/*
+            sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/META-INF/com/*
+            sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/META-INF/com/google/*
+            sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/META-INF/com/google/android/*
+            sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/*
             sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/images/*
             sudo rm -rf "$GITHUB_WORKSPACE"/images
             md5=$(md5sum "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip)

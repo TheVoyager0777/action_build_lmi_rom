@@ -83,6 +83,7 @@ jobs:
             sudo cp -f "$GITHUB_WORKSPACE"/DevicesAndroidOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
             sudo cp -f "$GITHUB_WORKSPACE"/DevicesOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
             sudo cp -f "$GITHUB_WORKSPACE"/MiuiFrameworkResOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
+            sudo cp -f "$GITHUB_WORKSPACE"/SettingResCommon_Sys.apk "$GITHUB_WORKSPACE"/images/product/overlay/
             sudo cp -f "$GITHUB_WORKSPACE"/lmi.xml "$GITHUB_WORKSPACE"/images/product/etc/device_features/
             sudo cp -f "$GITHUB_WORKSPACE"/lmipro.xml "$GITHUB_WORKSPACE"/images/product/etc/device_features/
             sudo sed -i "/ro.miui.notch/d" "$GITHUB_WORKSPACE"/images/product/etc/build.prop
@@ -156,7 +157,7 @@ jobs:
             sudo rm -rf "$GITHUB_WORKSPACE"/MiuiCamera
             for i in system vendor product system_ext
             do
-            sudo touch -t 200901010800.00 "$GITHUB_WORKSPACE"/images/$i/lost+found
+            sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/$i/lost+found
             done
        - name: 5.打包
          run: |
