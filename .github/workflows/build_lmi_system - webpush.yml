@@ -9,7 +9,7 @@ jobs:
        - uses: actions/checkout@master
        - name: 获取配置
          run: |
-            source "$GITHUB_WORKSPACE"/config.env
+            source "$GITHUB_WORKSPACE"/resource/config.env
             echo "ROM_URL=$ROM_URL" >> $GITHUB_ENV
             echo "date=$(echo $ROM_URL | cut -d"/" -f4)" >> $GITHUB_ENV
             echo "camera1=$camera1" >> $GITHUB_ENV
@@ -83,13 +83,13 @@ jobs:
             sudo rm -rf "$GITHUB_WORKSPACE"/images/product/etc/device_features/*
             sudo rm -rf "$GITHUB_WORKSPACE"/images/product/overlay/DeviceAndroidConfig.apk
             sudo rm -rf "$GITHUB_WORKSPACE"/images/product/overlay/DeviceConfig.apk
-            sudo cp -f "$GITHUB_WORKSPACE"/AospFrameworkResOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
-            sudo cp -f "$GITHUB_WORKSPACE"/DevicesAndroidOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
-            sudo cp -f "$GITHUB_WORKSPACE"/DevicesOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
-            sudo cp -f "$GITHUB_WORKSPACE"/MiuiFrameworkResOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
-            sudo cp -f "$GITHUB_WORKSPACE"/SettingsResCommon_Sys.apk "$GITHUB_WORKSPACE"/images/product/overlay/
-            sudo cp -f "$GITHUB_WORKSPACE"/lmi.xml "$GITHUB_WORKSPACE"/images/product/etc/device_features/
-            sudo cp -f "$GITHUB_WORKSPACE"/lmipro.xml "$GITHUB_WORKSPACE"/images/product/etc/device_features/
+            sudo cp -f "$GITHUB_WORKSPACE"/resource/AospFrameworkResOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
+            sudo cp -f "$GITHUB_WORKSPACE"/resource/DevicesAndroidOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
+            sudo cp -f "$GITHUB_WORKSPACE"/resource/DevicesOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
+            sudo cp -f "$GITHUB_WORKSPACE"/resource/MiuiFrameworkResOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
+            sudo cp -f "$GITHUB_WORKSPACE"/resource/SettingsResCommon_Sys.apk "$GITHUB_WORKSPACE"/images/product/overlay/
+            sudo cp -f "$GITHUB_WORKSPACE"/resource/lmi.xml "$GITHUB_WORKSPACE"/images/product/etc/device_features/
+            sudo cp -f "$GITHUB_WORKSPACE"/resource/lmipro.xml "$GITHUB_WORKSPACE"/images/product/etc/device_features/
             sudo sed -i "/ro.miui.notch/d" "$GITHUB_WORKSPACE"/images/product/etc/build.prop
             sudo rm -rf "$GITHUB_WORKSPACE"/images/system/cache
             sudo mkdir -p "$GITHUB_WORKSPACE"/images/system/cache
@@ -101,11 +101,11 @@ jobs:
             sudo rm -rf "$GITHUB_WORKSPACE"/images/vendor/bin/install-recovery.sh
             sudo sed -i "/ro.vendor.audio.game.effect/d" "$GITHUB_WORKSPACE"/images/vendor/build.prop
             sudo sed -i "/import/i ro.miui.region=CN\nro.miui.cust_variant=cn\nro.vendor.audio.support.sound.id=true\nro.vendor.audio.voip.assistant=true\nro.vendor.audio.aiasst.support=true\nro.vendor.media.video.frc.support=true\nro.vendor.audio.spk.stereo=true\nro.vendor.audio.vocal.support=true\nro.vendor.audio.surround.support=true\nro.vendor.audio.spk.clean=true\nro.vendor.video_box.version=2" "$GITHUB_WORKSPACE"/images/vendor/build.prop
-            sudo unzip -o -q "$GITHUB_WORKSPACE"/nfc.zip -d "$GITHUB_WORKSPACE"/images/system_ext            
-            sudo unzip -o -q "$GITHUB_WORKSPACE"/audio.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/audio/ui/
-            sudo unzip -o -q "$GITHUB_WORKSPACE"/etc.zip -d "$GITHUB_WORKSPACE"/images/system/system/etc/audio/
-            sudo unzip -o -q "$GITHUB_WORKSPACE"/popup.zip -d "$GITHUB_WORKSPACE"/images/system/system/framework/
-            sudo unzip -o -q "$GITHUB_WORKSPACE"/bootan.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/
+            sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/nfc.zip -d "$GITHUB_WORKSPACE"/images/system_ext            
+            sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/audio.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/audio/ui/
+            sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/etc.zip -d "$GITHUB_WORKSPACE"/images/system/system/etc/audio/
+            sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/popup.zip -d "$GITHUB_WORKSPACE"/images/system/system/framework/
+            sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/bootan.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/
             sudo mkdir -p "$GITHUB_WORKSPACE"/MiLink/
             $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MiLink/ "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk
             mod="$GITHUB_WORKSPACE"/MiLink/smali*/com/miui/circulate/world/permission/method/PermissionCheck\$BaseCheck.smali
@@ -136,10 +136,10 @@ jobs:
             device=$(find "$GITHUB_WORKSPACE"/images/system/system/data-app/ -name $files)
             sudo rm -rf $device
             done
-            sudo mv -f "$GITHUB_WORKSPACE"/vbmeta.img "$GITHUB_WORKSPACE"/images/firmware-update
-            sudo mv -f "$GITHUB_WORKSPACE"/vbmeta_system.img "$GITHUB_WORKSPACE"/images/firmware-update
+            sudo mv -f "$GITHUB_WORKSPACE"/resource/vbmeta.img "$GITHUB_WORKSPACE"/images/firmware-update
+            sudo mv -f "$GITHUB_WORKSPACE"/resource/vbmeta_system.img "$GITHUB_WORKSPACE"/images/firmware-update
             sudo cp -r "$GITHUB_WORKSPACE"/META-INF "$GITHUB_WORKSPACE"/images
-            sudo cp -f "$GITHUB_WORKSPACE"/dynamic_partitions_op_list "$GITHUB_WORKSPACE"/images
+            sudo cp -f "$GITHUB_WORKSPACE"/resource/dynamic_partitions_op_list "$GITHUB_WORKSPACE"/images
             sudo rm -rf "$GITHUB_WORKSPACE"/MiLink
             sudo rm -rf "$GITHUB_WORKSPACE"/MiuiCamera
             for i in system vendor product system_ext
@@ -218,7 +218,7 @@ jobs:
             sed -i "s/vendor_size/$vendor_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sed -i "s/system_size/$system_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sed -i "s/system_ext_size/$system_ext_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
-            sudo unzip -o "$GITHUB_WORKSPACE"/odm.zip -d "$GITHUB_WORKSPACE"/images/
+            sudo unzip -o "$GITHUB_WORKSPACE"/resource/odm.zip -d "$GITHUB_WORKSPACE"/images/
             sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/firmware-update/*
             sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/META-INF/*
             sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/META-INF/com/*
