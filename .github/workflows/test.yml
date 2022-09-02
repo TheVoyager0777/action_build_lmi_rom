@@ -181,7 +181,8 @@ jobs:
           vendor_size=${{ env.vendor_size }}
           system_ext_size=${{ env.system_ext_size }}
           system_size=${{ env.system_size }}
-          for i in system vendor product system_ext
+          odm_size=${{ env.odm_size }}
+          for i in system vendor product odm system_ext
           do
             eval "$i"_size_orig=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})
             if [[ "$(eval echo "$"$i"_size_orig")" -le "10485760" ]]; then
@@ -196,17 +197,20 @@ jobs:
           system_size=$(echo "$system_size + $system_size_orig" | bc)
           vendor_size=$(echo "$vendor_size + $vendor_size_orig" | bc)
           product_size=$(echo "$product_size +$product_size_orig" | bc)
+          odm_size=$(echo "$odm_size +$odm_size_orig" | bc)
           system_ext_size=$(echo "$system_ext_size + $system_ext_size_orig" | bc)
           system_size=$(echo "$system_size * 4096 / 4096 / 4096" | bc)
           vendor_size=$(echo "$vendor_size * 4096 / 4096 / 4096" | bc)
           product_size=$(echo "$product_size * 4096 / 4096 / 4096" | bc)
+          odm_size=$(echo "$odm_size * 4096 / 4096 / 4096" | bc)
           system_ext_size=$(echo "$system_ext_size * 4096 / 4096 / 4096" | bc)
           system_indoe=${{ env.system_indoe }}
           vendor_indoe=${{ env.vendor_indoe }}
           product_indoe=${{ env.product_indoe }}
+          odm_indoe=${{ env.odm_indoe }}
           system_ext_indoe=${{ env.system_ext_indoe }}
           UTC=$(date -u +%s)
-          for i in system vendor product system_ext
+          for i in system vendor product odm system_ext
           do
               while true;do
               sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/$i "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config
