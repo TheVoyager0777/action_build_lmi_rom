@@ -7,12 +7,12 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@master
-       - name: 获取配置
-         run: |
-            source "$GITHUB_WORKSPACE"/resource/config.env
-            echo "ROM_URL=$ROM_URL" >> $GITHUB_ENV
-            echo "camera1=$camera1" >> $GITHUB_ENV
-            echo "camera2=$camera2" >> $GITHUB_ENV
+      - name: 获取配置
+        run: |
+         source "$GITHUB_WORKSPACE"/resource/config.env
+         echo "ROM_URL=$ROM_URL" >> $GITHUB_ENV
+         echo "camera1=$camera1" >> $GITHUB_ENV
+         echo "camera2=$camera2" >> $GITHUB_ENV
       - name: 1.准备环境
         run: |
           sudo apt install python3 python3-pip aria2 zip p7zip-full tar zipalign zstd
