@@ -9,7 +9,7 @@ jobs:
        - uses: actions/checkout@master
        - name: 获取配置
          run: |
-            source "$GITHUB_WORKSPACE"/config.env
+            source "$GITHUB_WORKSPACE"/resource/config.env
             echo "ROM_URL=$ROM_URL" >> $GITHUB_ENV
             echo "camera1=$camera1" >> $GITHUB_ENV
             echo "camera2=$camera2" >> $GITHUB_ENV
@@ -58,7 +58,7 @@ jobs:
                 echo ""$i"_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})" >> $GITHUB_ENV
                 echo ""$i"_indoe=$(tune2fs -l "$GITHUB_WORKSPACE"/images/$i.img | grep 'Inode count' | awk '{print $3}')" >> $GITHUB_ENV
                 sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/$i.img "$GITHUB_WORKSPACE"/images
-                rm -rf "$GITHUB_WORKSPACE"/images/vendor.img
+                rm -rf "$GITHUB_WORKSPACE"/images/$i.img
             done
             for i in system product system_ext
             do
@@ -79,13 +79,13 @@ jobs:
             sudo rm -rf "$GITHUB_WORKSPACE"/images/product/etc/device_features/*
             sudo rm -rf "$GITHUB_WORKSPACE"/images/product/overlay/DeviceAndroidConfig.apk
             sudo rm -rf "$GITHUB_WORKSPACE"/images/product/overlay/DeviceConfig.apk
-            sudo cp -f "$GITHUB_WORKSPACE"/AospFrameworkResOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
-            sudo cp -f "$GITHUB_WORKSPACE"/DevicesAndroidOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
-            sudo cp -f "$GITHUB_WORKSPACE"/DevicesOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
-            sudo cp -f "$GITHUB_WORKSPACE"/MiuiFrameworkResOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
-            sudo cp -f "$GITHUB_WORKSPACE"/SettingsResCommon_Sys.apk "$GITHUB_WORKSPACE"/images/product/overlay/
-            sudo cp -f "$GITHUB_WORKSPACE"/lmi.xml "$GITHUB_WORKSPACE"/images/product/etc/device_features/
-            sudo cp -f "$GITHUB_WORKSPACE"/lmipro.xml "$GITHUB_WORKSPACE"/images/product/etc/device_features/
+            sudo cp -f "$GITHUB_WORKSPACE"/resource/AospFrameworkResOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
+            sudo cp -f "$GITHUB_WORKSPACE"/resource/DevicesAndroidOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
+            sudo cp -f "$GITHUB_WORKSPACE"/resource/DevicesOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
+            sudo cp -f "$GITHUB_WORKSPACE"/resource/MiuiFrameworkResOverlay.apk "$GITHUB_WORKSPACE"/images/product/overlay/
+            sudo cp -f "$GITHUB_WORKSPACE"/resource/SettingsResCommon_Sys.apk "$GITHUB_WORKSPACE"/images/product/overlay/
+            sudo cp -f "$GITHUB_WORKSPACE"/resource/lmi.xml "$GITHUB_WORKSPACE"/images/product/etc/device_features/
+            sudo cp -f "$GITHUB_WORKSPACE"/resource/lmipro.xml "$GITHUB_WORKSPACE"/images/product/etc/device_features/
             sudo sed -i "/ro.miui.notch/d" "$GITHUB_WORKSPACE"/images/product/etc/build.prop
             sudo rm -rf "$GITHUB_WORKSPACE"/images/system/cache
             sudo mkdir -p "$GITHUB_WORKSPACE"/images/system/cache
@@ -114,11 +114,11 @@ jobs:
             sudo sed -i 's/fileencryption=ice/encryptable=ice/g' $file
             done
             fi
-            sudo unzip -o -q "$GITHUB_WORKSPACE"/nfc.zip -d "$GITHUB_WORKSPACE"/images/system_ext            
-            sudo unzip -o -q "$GITHUB_WORKSPACE"/audio.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/audio/ui/
-            sudo unzip -o -q "$GITHUB_WORKSPACE"/etc.zip -d "$GITHUB_WORKSPACE"/images/system/system/etc/audio/
-            sudo unzip -o -q "$GITHUB_WORKSPACE"/popup.zip -d "$GITHUB_WORKSPACE"/images/system/system/framework/
-            sudo unzip -o -q "$GITHUB_WORKSPACE"/bootan.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/
+            sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/nfc.zip -d "$GITHUB_WORKSPACE"/images/system_ext            
+            sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/audio.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/audio/ui/
+            sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/etc.zip -d "$GITHUB_WORKSPACE"/images/system/system/etc/audio/
+            sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/popup.zip -d "$GITHUB_WORKSPACE"/images/system/system/framework/
+            sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/bootan.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/
             sudo mkdir -p "$GITHUB_WORKSPACE"/MiLink/
             $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MiLink/ "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk
             mod="$GITHUB_WORKSPACE"/MiLink/smali*/com/miui/circulate/world/permission/method/PermissionCheck\$BaseCheck.smali
