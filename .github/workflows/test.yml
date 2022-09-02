@@ -4,12 +4,12 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@master
        - name: 获取配置
          run: |
-            source "$GITHUB_WORKSPACE"/config.env
+            source "$GITHUB_WORKSPACE"/resource/config.env
             echo "ROM_URL=$ROM_URL" >> $GITHUB_ENV
             echo "camera1=$camera1" >> $GITHUB_ENV
             echo "camera2=$camera2" >> $GITHUB_ENV
@@ -158,10 +158,9 @@ jobs:
             device=$(find "$GITHUB_WORKSPACE"/images/system/system/data-app/ -name $files)
             sudo rm -rf $device
           done
-          sudo mv -f "$GITHUB_WORKSPACE"/vbmeta.img "$GITHUB_WORKSPACE"/images/firmware-update
-          sudo mv -f "$GITHUB_WORKSPACE"/vbmeta_system.img "$GITHUB_WORKSPACE"/images/firmware-update
-          sudo cp -r "$GITHUB_WORKSPACE"/META-INF "$GITHUB_WORKSPACE"/images
-          sudo cp -f "$GITHUB_WORKSPACE"/dynamic_partitions_op_list "$GITHUB_WORKSPACE"/images
+          sudo mv -f "$GITHUB_WORKSPACE"/resource/vbmeta.img "$GITHUB_WORKSPACE"/images/firmware-update
+          sudo mv -f "$GITHUB_WORKSPACE"/resource/vbmeta_system.img "$GITHUB_WORKSPACE"/images/firmware-update
+          sudo cp -r "$GITHUB_WORKSPACE"/zstd-test/* "$GITHUB_WORKSPACE"/images
           sudo rm -rf "$GITHUB_WORKSPACE"/MiLink
           sudo rm -rf "$GITHUB_WORKSPACE"/MiuiCamera
           for i in system vendor product system_ext
