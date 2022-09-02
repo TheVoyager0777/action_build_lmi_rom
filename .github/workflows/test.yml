@@ -173,7 +173,7 @@ jobs:
           sudo chmod 777 "$GITHUB_WORKSPACE"/tools/mke2fs
           sudo chmod 777 "$GITHUB_WORKSPACE"/tools/e2fsdroid
           sudo chmod 777 "$GITHUB_WORKSPACE"/tools/img2simg
-          sudo chmod 777 "$GITHUB_WORKSPACE"/tools/brotli
+          sudo chmod 777 "$GITHUB_WORKSPACE"/tools/lpmake
           URL=${{ env.ROM_URL }}
           DATE=${URL%/*}
           date=${DATE##*/}
