@@ -27,7 +27,6 @@ jobs:
             pip3 install --ignore-installed pyyaml
        - name: 2.发送开始构建通知
          run: |
-            curl -i -X POST -H 'Content-type':'application/json' -d '{"appToken":"${{ secrets.appToken }}","summary":"红米K30Pro ${{ env.date }}开始构建","content":" **红米K30Pro ${{ env.date }}开始构建** ","topicIds":[7125],"contentType":3}' http://wxpusher.zjiecode.com/api/send/message || true
             curl -i -X POST -H 'Content-type':'application/json' -d '{"token":"${{ secrets.appToken2 }}","title":"红米K30Pro ${{ env.date }}开始构建","content":" **红米K30Pro ${{ env.date }}开始构建** ","topic":"lmi","template":"markdown"}' http://www.pushplus.plus/send || true
        - name: 3.下载系统包
          run: |
