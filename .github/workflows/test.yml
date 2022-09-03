@@ -207,7 +207,7 @@ jobs:
           system_indoe=${{ env.system_indoe }}
           vendor_indoe=${{ env.vendor_indoe }}
           product_indoe=${{ env.product_indoe }}
-          odm_indoe=${{ env.odm_indoe }}
+          odm_indoe=192
           system_ext_indoe=${{ env.system_ext_indoe }}
           UTC=$(date -u +%s)
           for i in system vendor product odm system_ext
