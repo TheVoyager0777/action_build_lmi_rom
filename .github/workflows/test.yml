@@ -237,6 +237,10 @@ jobs:
               rm -rf "$GITHUB_WORKSPACE"/images/$i.img
           done
           zstd "$GITHUB_WORKSPACE"/images/super.img -o "$GITHUB_WORKSPACE"/images/super.zst --rm
+          sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/*
+          sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/*/*
+          sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/*/*/*
+          sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/*/*/*/*
           sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/images/*
           sudo rm -rf "$GITHUB_WORKSPACE"/images
           md5=$(md5sum "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip)
