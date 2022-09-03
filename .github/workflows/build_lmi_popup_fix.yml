@@ -9,7 +9,7 @@ jobs:
        - uses: actions/checkout@master  
        - name: 获取配置
          run: |
-            source "$GITHUB_WORKSPACE"/config.env
+            source "$GITHUB_WORKSPACE"/resource/config.env
             echo "ROM_URL=$ROM_URL" >> $GITHUB_ENV
             echo "camera1=$camera1" >> $GITHUB_ENV
             echo "camera2=$camera2" >> $GITHUB_ENV

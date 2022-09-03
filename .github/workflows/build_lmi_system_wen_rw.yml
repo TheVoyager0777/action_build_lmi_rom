@@ -149,10 +149,10 @@ jobs:
             device=$(find "$GITHUB_WORKSPACE"/images/system/system/data-app/ -name $files)
             sudo rm -rf $device
             done
-            sudo mv -f "$GITHUB_WORKSPACE"/vbmeta.img "$GITHUB_WORKSPACE"/images/firmware-update
-            sudo mv -f "$GITHUB_WORKSPACE"/vbmeta_system.img "$GITHUB_WORKSPACE"/images/firmware-update
-            sudo cp -r "$GITHUB_WORKSPACE"/META-INF "$GITHUB_WORKSPACE"/images
-            sudo cp -f "$GITHUB_WORKSPACE"/dynamic_partitions_op_list "$GITHUB_WORKSPACE"/images
+            sudo mv -f "$GITHUB_WORKSPACE"/resource/vbmeta.img "$GITHUB_WORKSPACE"/images/firmware-update
+            sudo mv -f "$GITHUB_WORKSPACE"/resource/vbmeta_system.img "$GITHUB_WORKSPACE"/images/firmware-update
+            sudo cp -r "$GITHUB_WORKSPACE"/resource/META-INF "$GITHUB_WORKSPACE"/images
+            sudo cp -f "$GITHUB_WORKSPACE"/resource/dynamic_partitions_op_list "$GITHUB_WORKSPACE"/images
             sudo rm -rf "$GITHUB_WORKSPACE"/MiLink
             sudo rm -rf "$GITHUB_WORKSPACE"/MiuiCamera
             for i in system vendor product system_ext
@@ -234,7 +234,7 @@ jobs:
             sed -i "s/vendor_size/$vendor_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sed -i "s/product_size/$product_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
             sed -i "s/system_ext_size/$system_ext_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
-            sudo unzip -o "$GITHUB_WORKSPACE"/odm.zip -d "$GITHUB_WORKSPACE"/images/
+            sudo unzip -o "$GITHUB_WORKSPACE"/resource/odm.zip -d "$GITHUB_WORKSPACE"/images/
             sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/firmware-update/*
             sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/META-INF/*
             sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/META-INF/com/*
