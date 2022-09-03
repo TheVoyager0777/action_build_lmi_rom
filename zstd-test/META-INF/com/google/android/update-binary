@@ -52,8 +52,6 @@ ui_print " "
 #boot
 package_extract_file "boot.img" "/dev/block/bootdevice/by-name/boot"
 
-
-
 #firmware
 package_extract_file "firmware-update/vbmeta_system.img" "/dev/block/bootdevice/by-name/vbmeta_system"
 package_extract_file "firmware-update/vbmeta.img" "/dev/block/bootdevice/by-name/vbmeta"

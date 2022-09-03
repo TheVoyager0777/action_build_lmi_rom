@@ -26,42 +26,7 @@ if exist super.zst (
       exit
    )
 )
-echo.
-echo.^<1^> 开始刷机并刷入Root
-echo.^<2^> 开始刷机但不刷入Root
-echo.
-set /p CHOICE="请选择："
-if "%CHOICE%" equ "1" goto FLASH_ROOT
-if "%CHOICE%" equ "2" goto REMOVE_ROOT
-goto MENU
-:FLASH_ROOT
-if not exist boot_magisk.img (
-   echo.
-   echo.没有Root文件
-   echo.
-   pause
-   exit
-) else (
-   echo.
-   bin\Windows\fastboot flash boot boot_magisk.img
-   echo.
-   goto FLASH
-)
 
-:REMOVE_ROOT
-if not exist boot_official.img (
-   echo.
-   echo.没有官方Boot文件
-   echo.
-   pause
-   exit
-) else (
-   echo.
-   bin\Windows\fastboot flash boot boot_official.img
-   echo.
-   goto FLASH
-)
-:FLASH
 echo.
 set /p WIPE="是否需要清除数据？(y/n) "
 echo.
@@ -102,6 +67,7 @@ bin\Windows\fastboot flash "xbl_4" "firmware-update/xbl_4.elf"
 bin\Windows\fastboot flash "xbl_5" "firmware-update/xbl_5.elf"
 bin\Windows\fastboot flash "xbl_config_4" "firmware-update/xbl_config_4.elf"
 bin\Windows\fastboot flash "xbl_config_5" "firmware-update/xbl_config_5.elf"
+bin\Windows\fastboot flash "boot" "boot.img"
 
 if exist super.img bin\Windows\fastboot flash super super.img
 echo.刷完super可能会卡一会，请耐心等待！！！
