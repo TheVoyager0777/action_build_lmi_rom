@@ -17,6 +17,17 @@ if not exist *boot* (
    pause
    exit
 )
+
+if exist super_none.zst (
+   echo.正在转换 super_none.zst
+   bin\Windows\zstd.exe --rm -d super_none.zst -o super_none.img
+   if "%ERRORLEVEL%" neq "0" (
+      echo.转换失败！
+      pause
+      exit
+   )
+)
+
 if exist super.zst (
    echo.正在转换 super.zst
    bin\Windows\zstd.exe --rm -d super.zst -o super.img
@@ -68,6 +79,8 @@ bin\Windows\fastboot flash "xbl_5" "firmware-update/xbl_5.elf"
 bin\Windows\fastboot flash "xbl_config_4" "firmware-update/xbl_config_4.elf"
 bin\Windows\fastboot flash "xbl_config_5" "firmware-update/xbl_config_5.elf"
 bin\Windows\fastboot flash "boot" "boot.img"
+
+bin\Windows\fastboot flash "super" "super_none.img"
 
 if exist super.img bin\Windows\fastboot flash super super.img
 echo.刷完super可能会卡一会，请耐心等待！！！
