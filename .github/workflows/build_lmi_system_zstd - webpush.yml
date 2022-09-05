@@ -1,4 +1,4 @@
-name: test - zstd
+name: build_lmi_system_zstd - webpush
 on:
   workflow_dispatch:
 
