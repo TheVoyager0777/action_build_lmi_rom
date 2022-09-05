@@ -62,7 +62,7 @@ jobs:
             echo 编译完成
             mod1="$GITHUB_WORKSPACE"/Settings/one/Settings/smali*/com/android/settings/SettingsActivity.smali
             echo $mod1
-            sudo sed -i '/sget\-boolean\ v1\,\ Lmiui\/os\/Build\;\-\>IS_INTERNATIONAL_BUILD\:Z\/a\ const\/4\ v1\,\ 0\x1' $mod1
+            sudo sed -i '/sget\-boolean\ v1\,\ Lmiui\/os\/Build\;\-\>IS_INTERNATIONAL_BUILD\:Z/a const\/4\ v1\,\ 0\x1' $mod1
             echo 修改完成
             Mod1=${mod1#"$GITHUB_WORKSPACE"/Settings/one/Settings/smali*/}
             Mod1=${Mod1%/*.smali}
