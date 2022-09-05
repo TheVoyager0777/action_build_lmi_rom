@@ -68,7 +68,7 @@ jobs:
             sudo mkdir -p "$GITHUB_WORKSPACE"/Settings/two/Settings/smali/$Mod1
             sudo cp -rf $mod1 "$GITHUB_WORKSPACE"/Settings/two/Settings/smali/$Mod1
             mod2="$GITHUB_WORKSPACE"/Settings/one/Settings/smali*/com/android/settings/special/ColorLampEntryController.smali
-            sudo cat ".method public static isNeedShowColorLamp()Z\n    .registers 1\n\n    const/4 v0, 0x0\n\n    return v0\n.end method" >> $mod2
+            sudo sed -i -e '/^.method public bridge synthetic isSliceable()Z/i\ .method public static isNeedShowColorLamp()Z\n    .registers 1\n\n    const/4 v0, 0x0\n\n    return v0\n.end method' $mod2
             sudo sed -i 's/Lcom\/android\/settings\/utils\/SettingsFeatures\;->isNeedShowColorLamp()Z/Lcom\/android\/settings\/special\/ColorLampEntryController\;->isNeedShowColorLamp()Z/g' $mod2
             echo 修改完成
             Mod2=${mod2#"$GITHUB_WORKSPACE"/Settings/one/Settings/smali*/}
