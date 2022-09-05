@@ -60,7 +60,7 @@ jobs:
             sudo 7z a -tzip "$GITHUB_WORKSPACE"/Settings/one/Settings.apk ./*
             sudo $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/Settings/one/Settings/ "$GITHUB_WORKSPACE"/Settings/one/Settings.apk
             echo 编译完成
-            mod1=$(find "$GITHUB_WORKSPACE"/Settings/one/Settings/smali*/ -type f -name 'SettingsActivity.smali' 2>/dev/null | xargs grep -rl 'Lmiui/os/Build;->IS_INTERNATIONAL_BUILD:Z' | sed 's/^\.\///' | sort)
+            mod1="$GITHUB_WORKSPACE"/Settings/one/Settings/smali*/com/android/settings/SettingsActivity.smali
             sudo sed -i '/sget\-boolean\ v1\,\ Lmiui\/os\/Build\;\-\>IS_INTERNATIONAL_BUILD\:Z\/a\ const\/4\ v1\,\ 0\x1' $mod1
             echo 修改完成
             Mod1=${mod1#"$GITHUB_WORKSPACE"/Settings/one/Settings/smali*/}
