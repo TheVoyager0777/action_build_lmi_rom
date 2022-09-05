@@ -61,12 +61,22 @@ jobs:
             sudo $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/Settings/one/Settings/ "$GITHUB_WORKSPACE"/Settings/one/Settings.apk
             echo 编译完成
             mod1="$GITHUB_WORKSPACE"/Settings/one/Settings/smali*/com/android/settings/SettingsActivity.smali
+            echo $mod1
             sudo sed -i '/sget\-boolean\ v1\,\ Lmiui\/os\/Build\;\-\>IS_INTERNATIONAL_BUILD\:Z\/a\ const\/4\ v1\,\ 0\x1' $mod1
             echo 修改完成
             Mod1=${mod1#"$GITHUB_WORKSPACE"/Settings/one/Settings/smali*/}
             Mod1=${Mod1%/*.smali}
             sudo mkdir -p "$GITHUB_WORKSPACE"/Settings/two/Settings/smali/$Mod1
             sudo cp -rf $mod1 "$GITHUB_WORKSPACE"/Settings/two/Settings/smali/$Mod1
+            mod2="$GITHUB_WORKSPACE"/Settings/one/Settings/smali*/com/android/settings/special/ColorLampEntryController.smali
+            echo $mod2
+            sudo sed -i '/^.method public bridge synthetic isSliceable()Z/,/^.end method/{//!d}' $mod2
+            sudo sed -i -e '/^.method public bridge synthetic isSliceable()Z/a\    .registers 1\n\n    const/4 p0, 0x0\n\n   return p0' $mod2
+            echo 修改完成
+            Mod2=${mod2#"$GITHUB_WORKSPACE"/Settings/one/Settings/smali*/}
+            Mod2=${Mod2%/*.smali}
+            sudo mkdir -p "$GITHUB_WORKSPACE"/Settings/two/Settings/smali/$Mod2
+            sudo cp -rf $mod2 "$GITHUB_WORKSPACE"/Settings/two/Settings/smali/$Mod2
             sudo cp -rf "$GITHUB_WORKSPACE"/Settings/one/Settings/apktool.yml "$GITHUB_WORKSPACE"/Settings/two/Settings/
             echo 开始反编译
             sudo $Apktool b -q -f -o "$GITHUB_WORKSPACE"/Settings/two/Settings.apk "$GITHUB_WORKSPACE"/Settings/two/Settings/
