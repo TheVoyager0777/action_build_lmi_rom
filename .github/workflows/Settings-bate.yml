@@ -1,0 +1,114 @@
+name: Settings-bate
+on: 
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+       - uses: actions/checkout@master  
+       - name: 获取配置
+         run: |
+            source "$GITHUB_WORKSPACE"/resource/config.env
+            echo "ROM_URL=$ROM_URL" >> $GITHUB_ENV
+            echo "camera1=$camera1" >> $GITHUB_ENV
+            echo "camera2=$camera2" >> $GITHUB_ENV
+       - name: 1.安装依赖
+         run: |
+            sudo apt install python3 python3-pip aria2 zip p7zip-full zipalign
+            sudo apt --fix-broken install
+            sudo apt update --fix-missing
+            pip3 install --upgrade pip
+            pip3 install aliyundrive-webdav
+            pip3 install pycryptodome
+            pip3 install docopt
+            pip3 install requests
+            pip3 install beautifulsoup4
+            pip3 install --ignore-installed pyyaml
+       - name: 2.下载系统包
+         run: |
+            aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${{ env.ROM_URL }}
+       - name: 3.解包
+         run: |
+            sudo chmod 777 "$GITHUB_WORKSPACE"/tools/payload-dumper-go
+            sudo chmod 777 "$GITHUB_WORKSPACE"/tools/brotli
+            mkdir -p "$GITHUB_WORKSPACE"/PSYCHE
+            mkdir -p "$GITHUB_WORKSPACE"/LMI
+            mkdir -p "$GITHUB_WORKSPACE"/images
+            mkdir -p "$GITHUB_WORKSPACE"/simages
+            mkdir -p "$GITHUB_WORKSPACE"/zip
+            mkdir -p "$GITHUB_WORKSPACE"/firmware
+            URL=${{ env.ROM_URL }}
+            ZIP_NAME=${URL##*/}
+            7z x "$GITHUB_WORKSPACE"/$ZIP_NAME -r -o"$GITHUB_WORKSPACE"/PSYCHE
+            for i in system_ext
+            do
+                "$GITHUB_WORKSPACE"/tools/payload-dumper-go -p $i "$GITHUB_WORKSPACE"/PSYCHE/payload.bin
+                mv "$GITHUB_WORKSPACE"/payload/$i.img "$GITHUB_WORKSPACE"/LMI/$i.img
+                sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/LMI/$i.img "$GITHUB_WORKSPACE"/images
+                rm -rf "$GITHUB_WORKSPACE"/LMI/$i.img
+            done
+       - name: 4.替换相关文件
+         run: |
+            sudo chmod 777 "$GITHUB_WORKSPACE"/tools/apktool.jar
+            Apktool="java -jar "$GITHUB_WORKSPACE"/tools/apktool.jar"
+            sudo mkdir -p "$GITHUB_WORKSPACE"/Settings/one/Settings/
+            sudo mkdir -p "$GITHUB_WORKSPACE"/Settings/two/
+            sudo mkdir -p "$GITHUB_WORKSPACE"/Settings/three/
+            sudo unzip -o "$GITHUB_WORKSPACE"/images/system_ext/priv-app/Settings/Settings.apk 'classes*.dex' -d "$GITHUB_WORKSPACE"/Settings/one/
+            cd "$GITHUB_WORKSPACE"/Settings/one/
+            sudo 7z a -tzip "$GITHUB_WORKSPACE"/Settings/one/Settings.apk ./*
+            sudo $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/Settings/one/Settings/ "$GITHUB_WORKSPACE"/Settings/one/Settings.apk
+            echo 编译完成
+            mod1=$(find "$GITHUB_WORKSPACE"/Settings/one/Settings/smali*/ -type f -name 'SettingsActivity.smali' 2>/dev/null | xargs grep -rl 'Lmiui/os/Build;->IS_INTERNATIONAL_BUILD:Z' | sed 's/^\.\///' | sort)
+            sudo sed -i '/sget-boolean v1, Lmiui/os/Build;->IS_INTERNATIONAL_BUILD:Z/a const/4 v1, 0x1' $mod1
+            echo 修改完成
+            Mod1=${mod1#"$GITHUB_WORKSPACE"/Settings/one/Settings/smali*/}
+            Mod1=${Mod1%/*.smali}
+            sudo mkdir -p "$GITHUB_WORKSPACE"/Settings/two/Settings/smali/$Mod1
+            sudo cp -rf $mod1 "$GITHUB_WORKSPACE"/Settings/two/Settings/smali/$Mod1
+            sudo cp -rf "$GITHUB_WORKSPACE"/Settings/one/Settings/apktool.yml "$GITHUB_WORKSPACE"/Settings/two/Settings/
+            echo 开始反编译
+            sudo $Apktool b -q -f -o "$GITHUB_WORKSPACE"/Settings/two/Settings.apk "$GITHUB_WORKSPACE"/Settings/two/Settings/
+            echo 反编译完成
+            filepath="$GITHUB_WORKSPACE"/Settings/one/
+            for file in `ls -a $filepath`
+            do
+              if [ "${file##*.}"x = "dex"x ];then
+                old=$(echo $file | tr -d "a-zA-Z" | tr -d ".")
+                if [ -Z $old ];then
+                   old=1
+                fi
+                new=$(echo $old|awk '{for(i=1;i<=NF;i++){$i+=1}}1')
+                sudo cp -rf "$GITHUB_WORKSPACE"/Settings/one/$file "$GITHUB_WORKSPACE"/Settings/three/classes$new.dex
+              fi
+            done
+            echo 移动文件完成
+            sudo unzip -o "$GITHUB_WORKSPACE"/Settings/two/Settings.apk -d "$GITHUB_WORKSPACE"/Settings/three/
+            cd "$GITHUB_WORKSPACE"/Settings/three/
+            sudo 7z a "$GITHUB_WORKSPACE"/images/system_ext/priv-app/Settings/Settings.apk ./*.dex -mx0
+            sudo rm -rf "$GITHUB_WORKSPACE"/images/system_ext/priv-app/Settings/oat
+            sudo mv "$GITHUB_WORKSPACE"/images/system_ext/priv-app/Settings/Settings.apk "$GITHUB_WORKSPACE"/Settings/Settings.apk
+            sudo zipalign -v 4 "$GITHUB_WORKSPACE"/Settings/Settings.apk "$GITHUB_WORKSPACE"/images/system_ext/priv-app/Settings/Settings.apk >/dev/null
+       - name: 5.打包
+         run: |
+            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_.zip "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/
+            echo "artifact_name=miui_LMIPRE_" >> $GITHUB_ENV
+       - name: 6.上传到123云盘
+         run: |
+            curl https://rclone.org/install.sh | sudo bash
+            mkdir -p ~/.config/rclone/
+            unzip -P ${{ secrets.PASSWORD }} "$GITHUB_WORKSPACE"/tools/rclone.zip -d ~/.config/rclone/
+            curl -fsSL "https://nn.ci/alist.sh" | sudo bash -s install
+            sudo systemctl stop alist
+            sudo mv -f /home/runner/.config/rclone/data.db /opt/alist/data
+            sudo systemctl start alist
+            rclone mkdir 123pan:/LMI_DEV
+            rclone sync -P ./zip/* 123pan:/LMI_DEV
+       - name: 7.删除工作流运行
+         uses: Mattraks/delete-workflow-runs@v2
+         with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: 0
+          keep_minimum_runs: 0
