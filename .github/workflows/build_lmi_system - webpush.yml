@@ -300,7 +300,7 @@ jobs:
             echo lmiPKG=${{ env.NEW_PACKAGE_NAME }} >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
             echo lmiMD5=${{ env.MD5 }} >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
             echo lmiTIME=\"$(TZ=':Asia/Shanghai' date '+%Y.%m.%d %H:%M')\" >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
-            echo lmiURL=https://alist.zjw.js.cn/d/123pan_xiaosi/LMI_Packages/${{ env.NEW_PACKAGE_NAME }} >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
+            echo lmiURL=https://alist.zjw.js.cn/d/123pan_xiaosi/LMI_DEV/${{ env.NEW_PACKAGE_NAME }} >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
        - name: 9.导出信息
          uses: dmnemec/copy_file_to_another_repo_action@main
          env:
