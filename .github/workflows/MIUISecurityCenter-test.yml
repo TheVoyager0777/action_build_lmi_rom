@@ -95,8 +95,8 @@ jobs:
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod3
             sudo cp -rf $mod3 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod3
             echo 开始第一次回编译
-            cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
-            sudo $Apktool b -q -f "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -o MIUISecurityCenter.apk
+            cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
+            sudo $Apktool b -q -f "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/MIUISecurityCenter/ -o MIUISecurityCenter.apk
             sudo cp -rf "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/apktool.yml "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/
             echo 开始第二次回编译
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/
@@ -116,7 +116,7 @@ jobs:
             done
             echo 移动文件完成
             sudo unzip -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter.apk -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
-            sudo unzip -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk 'res/xml/pc_power_settings.xml' 'res/xml/pc_power_settings_v12.xml' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
+            sudo unzip -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/MIUISecurityCenter.apk 'res/xml/pc_power_settings.xml' 'res/xml/pc_power_settings_v12.xml' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
             sudo 7z a "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk ./*.dex -mx0
             sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/oat
