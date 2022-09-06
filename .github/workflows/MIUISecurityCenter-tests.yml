@@ -51,10 +51,10 @@ jobs:
        - name: 4.替换相关文件
          run: |
             echo 导入必备框架
-            apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miui/miui.apk
-            apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miuisystem/miuisystem.apk
-            apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-res.apk
-            apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-ext-res/framework-ext-res.apk
+            sudo apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miui/miui.apk
+            sudo apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miuisystem/miuisystem.apk
+            sudo apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-res.apk
+            sudo apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-ext-res/framework-ext-res.apk
             cd "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/
             sudo apktool d -q -b -f -m "$GITHUB_WORKSPACE""$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk
             echo 开始第一次回编译
