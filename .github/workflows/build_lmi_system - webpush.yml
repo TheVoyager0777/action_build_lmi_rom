@@ -190,6 +190,7 @@ jobs:
             sudo zipalign -v 4 "$GITHUB_WORKSPACE"/MIUISecurityCenter/MIUISecurityCenter.apk "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk >/dev/null
             sudo mkdir -p "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/lib/arm64/
             sudo unzip -o -q "$GITHUB_WORKSPACE"/MIUISecurityCenter/MIUISecurityCenter.apk 'lib/arm64-v8a/*' -d "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/lib/arm64/
+
             for files in MIGalleryLockscreen MIUIDriveMode MIUIDuokanReader MIUIGameCenter MIUINewHome MIUIYoupin
             do
             device=$(find "$GITHUB_WORKSPACE"/images/system/system/data-app/ -name $files)
