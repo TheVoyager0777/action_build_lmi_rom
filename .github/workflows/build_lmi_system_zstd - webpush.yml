@@ -197,6 +197,54 @@ jobs:
           sudo rm -rf "$GITHUB_WORKSPACE"/images/system_ext/priv-app/Settings/oat
           sudo mv "$GITHUB_WORKSPACE"/images/system_ext/priv-app/Settings/Settings.apk "$GITHUB_WORKSPACE"/Settings/Settings.apk
           sudo zipalign -v 4 "$GITHUB_WORKSPACE"/Settings/Settings.apk "$GITHUB_WORKSPACE"/images/system_ext/priv-app/Settings/Settings.apk >/dev/null
+          #气泡通知修复，去除10秒等待
+          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
+          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/
+          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
+          sudo unzip -o "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk 'classes*.dex' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
+          cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
+          sudo 7z a -tzip "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk ./*
+          sudo $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
+          mod1="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/com/miui/bubbles/utils/MiuiFreeFormManagerWrapper.smali
+          sudo sed -i '/^.method public static isSupportPin()Z/,/^.end method/{//!d}' $mod1
+          sudo sed -i -e '/^.method public static isSupportPin()Z/a\    .registers 3\n\n    const/4 v0, 0x1\n\n   return v0' $mod1
+          Mod1=${mod1#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
+          Mod1=${Mod1%/*.smali}
+          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod1
+          sudo cp -rf $mod1 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod1
+          mod2="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/com/miui/permcenter/privacymanager/InterceptBaseFragment.smali
+          sudo sed -i 's/0x5/0x0/g' $mod2
+          mod3="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/com/miui/permcenter/privacymanager/InterceptPermissionFragment.smali
+          sudo sed -i 's/0xa/0x0/g' $mod3
+          Mod2=${mod2#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
+          Mod2=${Mod2%/*.smali}
+          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod2
+          sudo cp -rf $mod2 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod2
+          Mod3=${mod3#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
+          Mod3=${Mod3%/*.smali}
+          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod3
+          sudo cp -rf $mod3 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod3
+          sudo cp -rf "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/apktool.yml "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/
+          sudo $Apktool b -q -f -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter.apk "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/
+          filepath="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
+          for file in `ls -a $filepath`
+          do
+            if [ "${file##*.}"x = "dex"x ];then
+              old=$(echo $file | tr -d "a-zA-Z" | tr -d ".")
+              if [ -Z $old ];then
+                 old=1
+              fi
+              new=$(echo $old|awk '{for(i=1;i<=NF;i++){$i+=1}}1')
+              sudo cp -rf "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/$file "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/classes$new.dex
+            fi
+          done
+          sudo unzip -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter.apk -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
+          cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
+          sudo 7z a "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk ./*.dex -mx0
+          sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/oat
+          sudo mv "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk "$GITHUB_WORKSPACE"/MIUISecurityCenter/MIUISecurityCenter.apk
+          sudo zipalign -v 4 "$GITHUB_WORKSPACE"/MIUISecurityCenter/MIUISecurityCenter.apk "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk >/dev/null
+          #部分精简
           for files in MIGalleryLockscreen MIUIDriveMode MIUIDuokanReader MIUIGameCenter MIUINewHome MIUIYoupin
           do
             device=$(find "$GITHUB_WORKSPACE"/images/system/system/data-app/ -name $files)
