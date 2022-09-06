@@ -50,21 +50,22 @@ jobs:
             done
        - name: 4.替换相关文件
          run: |
-            sudo chmod 777 "$GITHUB_WORKSPACE"/tools/apktool.jar
-            Apktool="java -jar "$GITHUB_WORKSPACE"/tools/apktool.jar"
+            sudo chmod 777 "$GITHUB_WORKSPACE"/tools/apktool-2.4.2.jar
+            Apktool="java -jar "$GITHUB_WORKSPACE"/tools/apktool-2.4.2.jar"
             echo 导入必备框架
             $Apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miui/miui.apk
             $Apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miuisystem/miuisystem.apk
             $Apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-res.apk
             $Apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-ext-res/framework-ext-res.apk
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
+            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
             sudo unzip -o "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk 'classes*.dex' 'resources.arsc' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             sudo unzip -o "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk 'res/xml/*' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             sudo 7z a -tzip "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk ./*
-            sudo $Apktool d -q -b -f -m -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
+            cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
+            sudo $Apktool d -q -b -f -m "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
             ls -a "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/res/xml
             echo 编译完成
             for files in pc_power_settings.xml pc_power_settings_v12.xml
@@ -93,10 +94,12 @@ jobs:
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod3
             sudo cp -rf $mod3 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod3
             echo 开始第一次回编译
-            sudo $Apktool b -q -f -c -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
+                        cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
+            sudo $Apktool b -q -f "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -o MIUISecurityCenter.apk
             sudo cp -rf "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/apktool.yml "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/
             echo 开始第二次回编译
-            sudo $Apktool b -q -f -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter.apk "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/
+                        cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/
+            sudo $Apktool b -q -f "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/ -o MIUISecurityCenter.apk
             echo 反编译完成
             filepath="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             for file in `ls -a $filepath`
