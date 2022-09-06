@@ -66,6 +66,8 @@ jobs:
             sudo 7z a -tzip "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk ./*
             sudo $Apktool d -q -b -f -m -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
             ls -a "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
+            ls -a "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/res
+            ls -a "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/res/xml
             echo 编译完成
             for files in pc_power_settings.xml pc_power_settings_v12.xml
             do
