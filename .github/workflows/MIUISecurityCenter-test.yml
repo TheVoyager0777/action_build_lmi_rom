@@ -63,6 +63,7 @@ jobs:
             sudo unzip -o "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk 'classes*.dex' 'resources.arsc' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             sudo unzip -o "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk 'res/xml/*' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             ls -a "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
+            ls -a "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             sudo 7z a -tzip "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk ./*
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
