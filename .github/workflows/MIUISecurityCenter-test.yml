@@ -54,7 +54,7 @@ jobs:
             Apktool="java -jar "$GITHUB_WORKSPACE"/tools/apktool.jar"
             echo 导入必备框架
             $Apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miui/miui.apk
-            $Apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miuisystem/miuisyetem.apk
+            $Apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miuisystem/miuisystem.apk
             $Apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-res.apk
             $Apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-ext-res/framework-ext-res.apk
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
