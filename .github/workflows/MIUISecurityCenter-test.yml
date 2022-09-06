@@ -57,7 +57,7 @@ jobs:
             $Apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miuisystem/miuisystem.apk
             $Apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-res.apk
             $Apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-ext-res/framework-ext-res.apk
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/res/xml/
+            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/xml
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
             sudo unzip -o "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk 'classes*.dex' 'resources.arsc' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
