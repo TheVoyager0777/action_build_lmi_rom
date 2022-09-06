@@ -65,6 +65,7 @@ jobs:
             ls -a "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             ls -a "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res
             ls -a "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/xml
+            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             sudo 7z a -tzip "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk ./*
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
