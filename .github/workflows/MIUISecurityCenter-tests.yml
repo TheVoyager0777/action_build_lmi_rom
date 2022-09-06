@@ -56,7 +56,7 @@ jobs:
             sudo apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-res.apk
             sudo apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-ext-res/framework-ext-res.apk
             cd "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/
-            sudo apktool d -q -b -f -m "$GITHUB_WORKSPACE""$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk
+            sudo apktool d -q -b -f -m "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk
             echo 开始第一次回编译
             cd "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/
             sudo apktool b -q -f "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter/ -o MIUISecurityCenter.apk
