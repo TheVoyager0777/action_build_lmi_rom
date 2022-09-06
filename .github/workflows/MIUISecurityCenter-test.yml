@@ -61,10 +61,10 @@ jobs:
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
             sudo unzip -o "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk 'classes*.dex' 'resources.arsc' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
-            sudo unzip -o "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk 'res/xml/pc_power_settings*.xml' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/xml/
+            sudo unzip -o "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk 'res/xml/*.xml' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/xml/
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             sudo 7z a -tzip "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk ./*
-            sudo $Apktool d -q -f -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
+            sudo $Apktool d -q -b -f -m -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
             echo 编译完成
             mod1="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/com/miui/bubbles/utils/MiuiFreeFormManagerWrapper.smali
             sudo sed -i '/^.method public static isSupportPin()Z/,/^.end method/{//!d}' $mod1
@@ -89,7 +89,7 @@ jobs:
             sudo sed -i '/xmlns:android=\"http:\/\/schemas.android.com\/apk\/res\/android\"\>/a\    \<PreferenceCategory\>\n        \<PreferenceScreen android:title\=\"高级电量统计\"\>\n            \<intent android:targetPackage\=\"com.miui.powerkeeper\" android:targetClass\=\"com.miui.powerkeeper.ui.powertools.module.batterylife.BatteryStatusActivity\" \/\>\n        \<\/PreferenceScreen\>\n    \<\/PreferenceCategory\>/' "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/res/xml/pc_power_settings.xml
             sudo sed -i '/xmlns:android=\"http:\/\/schemas.android.com\/apk\/res\/android\"\>/a\    \<PreferenceCategory\>\n        \<PreferenceScreen android:title\=\"高级电量统计\"\>\n            \<intent android:targetPackage\=\"com.miui.powerkeeper\" android:targetClass\=\"com.miui.powerkeeper.ui.powertools.module.batterylife.BatteryStatusActivity\" \/\>\n        \<\/PreferenceScreen\>\n    \<\/PreferenceCategory\>/' "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/res/xml/pc_power_settings_v12.xml
             echo 开始第一次回编译
-            sudo $Apktool b -q -f -c -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
+            sudo $Apktool b -q -f -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
             sudo cp -rf "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/apktool.yml "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/
             echo 开始第二次回编译
             sudo $Apktool b -q -f -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter.apk "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/
