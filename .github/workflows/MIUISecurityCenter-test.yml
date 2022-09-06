@@ -62,9 +62,10 @@ jobs:
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
             sudo unzip -o -q "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk 'classes*.dex' 'resources.arsc' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             sudo unzip -o -q "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk 'res/xml/*' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             sudo 7z a -tzip "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk ./*
+            ls -a "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
+            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
             sudo $Apktool d -q -b -f -m "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
             echo 编译完成
