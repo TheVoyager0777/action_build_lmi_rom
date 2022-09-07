@@ -56,7 +56,6 @@ jobs:
             $Apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miui/miui.apk
             $Apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miuisystem/miuisystem.apk
             $Apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-res.apk -t new
-            $Apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-res.apk
             $Apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-ext-res/framework-ext-res.apk
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/
@@ -68,6 +67,8 @@ jobs:
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             sudo $Apktool d -b -f -m -api 23 "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk -t new
+            ls -a /home/runner/.local/share/apktool/framework/
+            ls -a /root/.local/share/apktool/framework/
             echo 编译完成
             for files in pc_power_settings.xml pc_power_settings_v12.xml
             do
