@@ -66,16 +66,27 @@ jobs:
             sudo mv /home/runner/.local/share/apktool/framework/* /root/.local/share/apktool/framework/
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             sudo 7z a -tzip "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk ./*
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
-            cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
-            sudo $Apktool d -b -f -m "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
+            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res
+            cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res
+            sudo $Apktool d -b -r -f -m "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
             echo 编译完成
             for files in pc_power_settings.xml pc_power_settings_v12.xml
             do
-              device=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -name $files)
+              device=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/ -name $files)
               echo $device
               sudo sed -i '/xmlns:android=\"http:\/\/schemas.android.com\/apk\/res\/android\"\>/a\    \<PreferenceCategory\>\n        \<PreferenceScreen android:title\=\"高级电量统计\"\>\n            \<intent android:targetPackage\=\"com.miui.powerkeeper\" android:targetClass\=\"com.miui.powerkeeper.ui.powertools.module.batterylife.BatteryStatusActivity\" \/\>\n        \<\/PreferenceScreen\>\n    \<\/PreferenceCategory\>/' $device
             done
+            modii=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/rees/MIUISecurityCenter/ -type f -name '*.xml' 2>/dev/null | xargs grep -rl 'APKTOOL_DUMMY_' | sed 's/^\.\///' | sort)
+            for a in $modii
+            do
+              sudo sed -i '/APKTOOL_DUMMY_/d' $a
+            done
+            echo 开始第一次回编译
+            cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/
+            sudo $Apktool b "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -o MIUISecurityCenter.apk
+            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
+            cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
+            sudo $Apktool d -b -r -f -m "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
             mod1="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/com/miui/bubbles/utils/MiuiFreeFormManagerWrapper.smali
             sudo sed -i '/^.method public static isSupportPin()Z/,/^.end method/{//!d}' $mod1
             sudo sed -i -e '/^.method public static isSupportPin()Z/a\    .registers 3\n\n    const/4 v0, 0x1\n\n   return v0' $mod1
@@ -96,14 +107,6 @@ jobs:
             Mod3=${Mod3%/*.smali}
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod3
             sudo cp -rf $mod3 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod3
-            modii=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -type f -name '*.xml' 2>/dev/null | xargs grep -rl 'APKTOOL_DUMMY_' | sed 's/^\.\///' | sort)
-            for a in $modii
-            do
-              sudo sed -i '/APKTOOL_DUMMY_/d' $a
-            done
-            echo 开始第一次回编译
-            cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
-            sudo $Apktool b "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -o MIUISecurityCenter.apk
             sudo cp -rf "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/apktool.yml "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/
             echo 开始第二次回编译
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/
@@ -123,7 +126,7 @@ jobs:
             done
             echo 移动文件完成
             sudo unzip -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter.apk -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
-            sudo unzip -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/MIUISecurityCenter.apk 'res/xml/pc_power_settings.xml' 'res/xml/pc_power_settings_v12.xml' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
+            sudo unzip -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter.apk 'res/xml/pc_power_settings.xml' 'res/xml/pc_power_settings_v12.xml' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
             sudo 7z a "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk ./*.dex -mx0
             sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/oat
