@@ -87,7 +87,7 @@ jobs:
               sudo sed -i 's/android:isAccessibilityTool\=\"true\"//g' $b
             done
             echo 开始第一次回编译
-            cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/
+            cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter
             sudo $Apktool b -f "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/ -o MIUISecurityCenter.apk
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
