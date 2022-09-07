@@ -244,8 +244,8 @@ jobs:
           sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/oat
           sudo mv "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk "$GITHUB_WORKSPACE"/MIUISecurityCenter/MIUISecurityCenter.apk
           sudo zipalign -v 4 "$GITHUB_WORKSPACE"/MIUISecurityCenter/MIUISecurityCenter.apk "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk >/dev/null
-          sudo mkdir -p "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/lib/arm64/
-          sudo unzip -o -q "$GITHUB_WORKSPACE"/MIUISecurityCenter/MIUISecurityCenter.apk 'lib/arm64-v8a/*' -d "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/lib/arm64/
+          sudo unzip -o -q "$GITHUB_WORKSPACE"/MIUISecurityCenter/MIUISecurityCenter.apk 'lib/arm64-v8a/*' -d "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/
+          sudo mv "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/lib/arm64-v8a "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/lib/arm64
           #部分精简
           for files in MIGalleryLockscreen MIUIDriveMode MIUIDuokanReader MIUIGameCenter MIUINewHome MIUIYoupin
           do
