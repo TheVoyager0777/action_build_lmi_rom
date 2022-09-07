@@ -96,7 +96,7 @@ jobs:
             sudo cp -rf $mod3 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod3
             echo 开始第一次回编译
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
-            sudo $Apktool b -q -f -api 23 "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -o MIUISecurityCenter.apk
+            sudo $Apktool b "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -o MIUISecurityCenter.apk
             sudo cp -rf "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/apktool.yml "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/
             echo 开始第二次回编译
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/
