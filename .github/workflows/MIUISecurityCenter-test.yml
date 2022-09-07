@@ -15,7 +15,7 @@ jobs:
             echo "camera2=$camera2" >> $GITHUB_ENV
        - name: 1.安装依赖
          run: |
-            sudo apt install python3 python3-pip aria2 zip p7zip-full zipalign apktool
+            sudo apt install python3 python3-pip aria2 zip p7zip-full zipalign
             sudo apt --fix-broken install
             sudo apt update --fix-missing
             pip3 install --upgrade pip
@@ -50,8 +50,8 @@ jobs:
             done
        - name: 4.替换相关文件
          run: |
-            sudo chmod 777 "$GITHUB_WORKSPACE"/tools/apktool-2.4.2.jar
-            Apktool="java -jar "$GITHUB_WORKSPACE"/tools/apktool-2.4.2.jar"
+            sudo chmod 777 "$GITHUB_WORKSPACE"/tools/apktool-2.6.2.jar
+            Apktool="java -jar "$GITHUB_WORKSPACE"/tools/apktool-2.6.2.jar"
             echo 导入必备框架
             $Apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miui/miui.apk
             $Apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miuisystem/miuisystem.apk
@@ -64,7 +64,6 @@ jobs:
             sudo unzip -o -q "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk 'res/xml/*' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             sudo 7z a -tzip "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk ./*
-            ls -a "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             sudo $Apktool d -q -b -f -m "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
