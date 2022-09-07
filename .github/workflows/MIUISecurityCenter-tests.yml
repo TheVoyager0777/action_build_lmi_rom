@@ -27,6 +27,7 @@ jobs:
             pip3 install --ignore-installed pyyaml
        - name: 2.下载系统包
          run: |
+            sudo apktool -vension
             aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${{ env.ROM_URL }}
        - name: 3.解包
          run: |
@@ -50,7 +51,6 @@ jobs:
             done
        - name: 4.替换相关文件
          run: |
-            sudo apktool -vension
             echo 导入必备框架
             sudo apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miui/miui.apk
             sudo apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miuisystem/miuisystem.apk
