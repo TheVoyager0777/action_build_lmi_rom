@@ -50,6 +50,7 @@ jobs:
             done
        - name: 4.替换相关文件
          run: |
+            sudo apktool -vension
             echo 导入必备框架
             sudo apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miui/miui.apk
             sudo apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miuisystem/miuisystem.apk
