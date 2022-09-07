@@ -102,7 +102,7 @@ jobs:
             modiii=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -type f -name '*.xml' 2>/dev/null | xargs grep -rl 'isAccessibilityTool' | sed 's/^\.\///' | sort)
             for b in $modiii
             do
-              sudo rm -rf $b
+              sudo sed -i 's/android:isAccessibilityTool\=\"true\"//g' $b
             done
             echo 开始第一次回编译
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
