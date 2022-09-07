@@ -68,7 +68,7 @@ jobs:
             sudo 7z a -tzip "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk ./*
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res
-            sudo $Apktool d -b -r -f -m "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
+            sudo $Apktool d -p -b -f -m "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
             echo 编译完成
             for files in pc_power_settings.xml pc_power_settings_v12.xml
             do
@@ -86,7 +86,7 @@ jobs:
             sudo $Apktool b "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -o MIUISecurityCenter.apk
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
-            sudo $Apktool d -b -r -f -m "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
+            sudo $Apktool d -p -b -r -f -m "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
             mod1="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/com/miui/bubbles/utils/MiuiFreeFormManagerWrapper.smali
             sudo sed -i '/^.method public static isSupportPin()Z/,/^.end method/{//!d}' $mod1
             sudo sed -i -e '/^.method public static isSupportPin()Z/a\    .registers 3\n\n    const/4 v0, 0x1\n\n   return v0' $mod1
@@ -110,7 +110,7 @@ jobs:
             sudo cp -rf "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/apktool.yml "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/
             echo 开始第二次回编译
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/
-            sudo $Apktool b "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/ -o MIUISecurityCenter.apk
+            sudo $Apktool b -p -f "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/ -o MIUISecurityCenter.apk
             echo 反编译完成
             filepath="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             for file in `ls -a $filepath`
