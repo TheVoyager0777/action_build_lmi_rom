@@ -83,7 +83,7 @@ jobs:
             done
             echo 开始第一次回编译
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/
-            sudo $Apktool b "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -o MIUISecurityCenter.apk
+            sudo $Apktool b "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/ -o MIUISecurityCenter.apk
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             sudo $Apktool d -q -b -r -f -m "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
