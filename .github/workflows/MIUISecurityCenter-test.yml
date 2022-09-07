@@ -55,18 +55,20 @@ jobs:
             echo 导入必备框架
             $Apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miui/miui.apk
             $Apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miuisystem/miuisystem.apk
-            $Apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-res.apk -t new
+            $Apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-res.apk
             $Apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-ext-res/framework-ext-res.apk
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
             sudo unzip -o -q "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk 'classes*.dex' 'resources.arsc' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             sudo unzip -o -q "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk 'res/xml/*' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
+            sudo mkdir -p /root/.local/share/apktool/framework/
+            sudo mv /home/runner/.local/share/apktool/framework/* /root/.local/share/apktool/framework/
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             sudo 7z a -tzip "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk ./*
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
-            sudo $Apktool d -b -f -m -api 23 "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk -t new
+            sudo $Apktool d -b -f -m "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk
             sudo ls -a /home/runner/.local/share/apktool/framework/
             sudo ls -a /root/.local/share/apktool/framework/
             echo 编译完成
@@ -108,7 +110,7 @@ jobs:
             done
             echo 开始第一次回编译
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
-            sudo $Apktool b "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -o MIUISecurityCenter.apk -t new
+            sudo $Apktool b "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -o MIUISecurityCenter.apk
             sudo cp -rf "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/apktool.yml "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/
             echo 开始第二次回编译
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/
