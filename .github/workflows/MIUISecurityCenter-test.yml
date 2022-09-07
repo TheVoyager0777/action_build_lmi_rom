@@ -67,8 +67,8 @@ jobs:
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
             sudo $Apktool d -b -f -m -api 23 "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk -t new
-            ls -a /home/runner/.local/share/apktool/framework/
-            ls -a /root/.local/share/apktool/framework/
+            sudo ls -a /home/runner/.local/share/apktool/framework/
+            sudo ls -a /root/.local/share/apktool/framework/
             echo 编译完成
             for files in pc_power_settings.xml pc_power_settings_v12.xml
             do
