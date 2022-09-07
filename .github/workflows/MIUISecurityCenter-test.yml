@@ -133,7 +133,7 @@ jobs:
             done
             echo 移动文件完成
             sudo unzip -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter.apk -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
-            sudo unzip -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter.apk 'res/xml/pc_power_settings.xml' 'res/xml/pc_power_settings_v12.xml' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
+            sudo unzip -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/MIUISecurityCenter.apk 'res/xml/pc_power_settings.xml' 'res/xml/pc_power_settings_v12.xml' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
             sudo 7z a "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk ./*.dex -mx0
             sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/oat
