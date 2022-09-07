@@ -57,6 +57,12 @@ jobs:
             sudo apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-ext-res/framework-ext-res.apk
             cd "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/
             sudo apktool d -q -b -f "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk
+            for files in AndroidManifest.xml
+            do
+              device=$(find "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/ -name $files)
+              echo $device
+              sudo rm -rf $device
+            done
             echo 开始第一次回编译
             cd "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/
             sudo apktool b -q -c -f "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter/ -o MIUISecurityCenter.apk
