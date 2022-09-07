@@ -76,12 +76,12 @@ jobs:
               echo $device
               sudo sed -i '/xmlns:android=\"http:\/\/schemas.android.com\/apk\/res\/android\"\>/a\    \<PreferenceCategory\>\n        \<PreferenceScreen android:title\=\"高级电量统计\"\>\n            \<intent android:targetPackage\=\"com.miui.powerkeeper\" android:targetClass\=\"com.miui.powerkeeper.ui.powertools.module.batterylife.BatteryStatusActivity\" \/\>\n        \<\/PreferenceScreen\>\n    \<\/PreferenceCategory\>/' $device
             done
-            modii=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/rees/MIUISecurityCenter/ -type f -name '*.xml' 2>/dev/null | xargs grep -rl 'APKTOOL_DUMMY_' | sed 's/^\.\///' | sort)
+            modii=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/ -type f -name '*.xml' 2>/dev/null | xargs grep -rl 'APKTOOL_DUMMY_' | sed 's/^\.\///' | sort)
             for a in $modii
             do
               sudo sed -i '/APKTOOL_DUMMY_/d' $a
             done
-            modiii=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -type f -name '*.xml' 2>/dev/null | xargs grep -rl 'isAccessibilityTool' | sed 's/^\.\///' | sort)
+            modiii=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/ -type f -name '*.xml' 2>/dev/null | xargs grep -rl 'isAccessibilityTool' | sed 's/^\.\///' | sort)
             for b in $modiii
             do
               sudo sed -i 's/android:isAccessibilityTool\=\"true\"//g' $b
