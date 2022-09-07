@@ -155,7 +155,7 @@ jobs:
             sudo mv "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/lib/arm64-v8a "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/lib/arm64
        - name: 5.打包
          run: |
-            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_TEST.zip "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/
+            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_TEST.zip "$GITHUB_WORKSPACE"/MIUISecurityCenter/
             echo "artifact_name=miui_LMIPRE_TEST" >> $GITHUB_ENV
        - name: 6.上传到123云盘
          run: |
