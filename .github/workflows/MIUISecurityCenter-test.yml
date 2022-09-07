@@ -80,8 +80,7 @@ jobs:
             for files in pc_power_settings.xml pc_power_settings_v12.xml
             do
               device=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/ -name $files)
-              echo $device
-              sudo sed -i '/xmlns:android=\"http:\/\/schemas.android.com\/apk\/res\/android\"\>/a\    \<PreferenceCategory\>\n        \<PreferenceScreen android:title\=\"高级电量统计\"\>\n            \<intent android:targetPackage\=\"com.miui.powerkeeper\" android:targetClass\=\"com.miui.powerkeeper.ui.powertools.module.batterylife.BatteryStatusActivity\" \/\>\n        \<\/PreferenceScreen\>\n    \<\/PreferenceCategory\>/' $device
+              sudo sed -i -e '/xmlns:android=\"http:\/\/schemas.android.com\/apk\/res\/android\"\>/a\    \<PreferenceCategory\>\n        \<PreferenceScreen android:title\=\"高级电量统计\"\>\n            \<intent android:targetPackage\=\"com.miui.powerkeeper\" android:targetClass\=\"com.miui.powerkeeper.ui.powertools.module.batterylife.BatteryStatusActivity\" \/\>\n        \<\/PreferenceScreen\>\n    \<\/PreferenceCategory\>' $device
             done
             modii=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/ -type f -name '*.xml' 2>/dev/null | xargs grep -rl 'APKTOOL_DUMMY_' | sed 's/^\.\///' | sort)
             for a in $modii
