@@ -99,6 +99,11 @@ jobs:
             do
               sudo sed -i '/APKTOOL_DUMMY_/d' $a
             done
+            modiii=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -type f -name '*.xml' 2>/dev/null | xargs grep -rl 'isAccessibilityTool' | sed 's/^\.\///' | sort)
+            for b in $modiii
+            do
+              sudo rm -rf $b
+            done
             echo 开始第一次回编译
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
             sudo $Apktool b "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -o MIUISecurityCenter.apk
