@@ -66,7 +66,7 @@ jobs:
             sudo 7z a -tzip "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk ./*
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
-            sudo $Apktool d -q -b -f -m "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
+            sudo $Apktool d -q -b -f -m -api 23 "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
             echo 编译完成
             for files in pc_power_settings.xml pc_power_settings_v12.xml
             do
@@ -96,7 +96,7 @@ jobs:
             sudo cp -rf $mod3 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod3
             echo 开始第一次回编译
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
-            sudo $Apktool b -q -f "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -o MIUISecurityCenter.apk
+            sudo $Apktool b -q -f -api 23 "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -o MIUISecurityCenter.apk
             sudo cp -rf "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/apktool.yml "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/
             echo 开始第二次回编译
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/
