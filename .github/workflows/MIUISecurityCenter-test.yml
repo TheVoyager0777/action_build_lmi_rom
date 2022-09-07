@@ -50,8 +50,8 @@ jobs:
             done
        - name: 4.替换相关文件
          run: |
-            sudo chmod 777 "$GITHUB_WORKSPACE"/tools/apktool-2.6.2.jar
-            Apktool="java -jar "$GITHUB_WORKSPACE"/tools/apktool-2.6.2.jar"
+            sudo chmod 777 "$GITHUB_WORKSPACE"/tools/apktool.jar
+            Apktool="java -jar "$GITHUB_WORKSPACE"/tools/apktool.jar"
             echo 导入必备框架
             $Apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miui/miui.apk
             $Apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miuisystem/miuisystem.apk
@@ -94,6 +94,11 @@ jobs:
             Mod3=${Mod3%/*.smali}
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod3
             sudo cp -rf $mod3 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod3
+            modii=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -type f -name '*.xml' 2>/dev/null | xargs grep -rl 'APKTOOL_DUMMY_' | sed 's/^\.\///' | sort)
+            for a in $modii
+            do
+              sudo sed -i '/APKTOOL_DUMMY_/d' $a
+            done
             echo 开始第一次回编译
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
             sudo $Apktool b "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -o MIUISecurityCenter.apk
