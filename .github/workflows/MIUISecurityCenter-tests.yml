@@ -56,16 +56,10 @@ jobs:
             sudo apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-res.apk
             sudo apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-ext-res/framework-ext-res.apk
             cd "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/
-            sudo apktool d -q -b -f -api 23 "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk
-            for files in AndroidManifest.xml
-            do
-              device=$(find "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/ -name $files)
-              echo $device
-              sudo rm -rf $device
-            done
+            sudo apktool d -q -b -f -m -api 23 "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk
             echo 开始第一次回编译
             cd "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/
-            sudo apktool b -q -c -f -api 23 "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter/ -o MIUISecurityCenter.apk
+            sudo apktool b -q -c -f -m -api 23 "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter/ -o MIUISecurityCenter.apk
        - name: 5.打包
          run: |
             sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_TEST.zip "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/
