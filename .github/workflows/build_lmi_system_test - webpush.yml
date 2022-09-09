@@ -290,7 +290,6 @@ jobs:
             echo "NEW_PACKAGE_NAME=miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip" >> $GITHUB_ENV
        - name: 7.上传到123云盘
          run: |
-
             rclone mkdir 123pan:/LMI_testDEV
             rclone sync -P ./zip/* 123pan:/LMI_testDEV
        - name: 8.发送打包成功通知
