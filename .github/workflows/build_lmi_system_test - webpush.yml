@@ -311,8 +311,6 @@ jobs:
            name: "${{ env.date }}"
            tag: "${{ env.date }}"
            bodyFile: "${{ github.workspace }}/file.log"
-           allowUpdates: true
-           artifactErrorsFailBuild: true
            token: ${{ secrets.GITHUB_TOKEN }}
        - name: 7.上传到123云盘
          run: |
