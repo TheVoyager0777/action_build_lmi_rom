@@ -106,6 +106,21 @@ jobs:
           sudo sed -i "s/sustem/system/g" "$GITHUB_WORKSPACE"/images/vendor/etc/selinux/vendor_file_contexts
           sudo sed -i "/ro.vendor.audio.game.effect/d" "$GITHUB_WORKSPACE"/images/vendor/build.prop
           sudo sed -i "/import/i ro.miui.region=CN\nro.miui.cust_variant=cn\nro.vendor.audio.support.sound.id=true\nro.vendor.audio.voip.assistant=true\nro.vendor.audio.aiasst.support=true\nro.vendor.media.video.frc.support=true\nro.vendor.audio.spk.stereo=true\nro.vendor.audio.vocal.support=true\nro.vendor.audio.surround.support=true\nro.vendor.audio.spk.clean=true\nro.vendor.video_box.version=2" "$GITHUB_WORKSPACE"/images/vendor/build.prop
+          #取消强制加密
+          fstab=$(sudo find "$GITHUB_WORKSPACE"/images/vendor/ -name "fstab*")
+          if [[ $fstab == "" ]];then
+          echo -e "\e[31m     >>>>>>>>找不到相关文件,也许没有加密呢>>>>>>>>>  \e[0m"
+          echo ""
+          sleep 5
+          else
+          echo -e "\e[31m     >>>>>>  正在去除,请等待....  >>>>>>> \e[0m"
+          for file in $fstab; do
+          sudo sed -i 's/,avb.*system//g' $file
+          sudo sed -i 's/,avb,/,/g' $file
+          sudo sed -i 's/,avb_keys.*key//g' $file
+          sudo sed -i 's/fileencryption=ice/encryptable=ice/g' $file
+          done
+          fi
           sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/nfc.zip -d "$GITHUB_WORKSPACE"/images/system_ext            
           sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/audio.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/audio/ui/
           sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/etc.zip -d "$GITHUB_WORKSPACE"/images/system/system/etc/audio/
