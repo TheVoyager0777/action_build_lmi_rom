@@ -352,6 +352,7 @@ jobs:
           cd "$GITHUB_WORKSPACE"/zip/
           split -b 1536m miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip -d -a 2 miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip
           sudo rm -rf "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip
+          cd "$GITHUB_WORKSPACE"
           touch file.log
           echo "miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip" > file.log
       - name: 7.上传到Github Release
