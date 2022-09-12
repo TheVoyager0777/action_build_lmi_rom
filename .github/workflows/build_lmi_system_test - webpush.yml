@@ -349,8 +349,8 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: 8.上传到123盘
         run: |
-          rclone mkdir 123pan:/RubbishBin
-          rclone sync -P ./zip/* 123pan:/RubbishBin
+          rclone mkdir 123pan:/testDEV
+          rclone sync -P ./zip/* 123pan:/testDEV
       - name: 9.删除工作流运行
         uses: Mattraks/delete-workflow-runs@v2
         with:
