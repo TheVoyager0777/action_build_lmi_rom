@@ -301,7 +301,7 @@ jobs:
               eval "$i"_size=$(echo "$(eval echo "$"$i"_size") / 4096" | bc)
               if [[ $size_free = 0 ]];then
                 eval "$i"_size=$(du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})
-                original_size=$(echo "$(eval echo "$"$i"_size") / 524000 * 377 * 4096" | bc)
+                original_size=$(echo "$(eval echo "$"$i"_size") / 524000 * 377" | bc)
                 eval "$i"_size=$(echo "$original_size + $(eval echo "$"$i"_size")" | bc)
                 eval "$i"_size=$(echo "$(eval echo "$"$i"_size") / 4096" | bc)
                 sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/$i "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config
