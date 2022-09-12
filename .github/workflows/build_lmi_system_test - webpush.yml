@@ -300,10 +300,10 @@ jobs:
             echo "MD5=${md5:0:32}" >> $GITHUB_ENV
             mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip
             echo "NEW_PACKAGE_NAME=miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip" >> $GITHUB_ENV
-            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"${{ env.date }}"_12.0_2in1_split.zip "$GITHUB_WORKSPACE"/zip/* -v1536m
+            sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"${{ env.date }}"_12.0_2in1.zip "$GITHUB_WORKSPACE"/zip/* -v1536m
             sudo rm -rf "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip
             touch file.log
-            echo "miui_CMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1_Root.zip" > file.log
+            echo "miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip" > file.log
        - name: 6.上传到Github Release
          uses: ncipollo/release-action@main
          with:
@@ -312,10 +312,6 @@ jobs:
            tag: "${{ env.date }}"
            bodyFile: "${{ github.workspace }}/file.log"
            token: ${{ secrets.GITHUB_TOKEN }}
-       - name: 7.上传到123云盘
-         run: |
-            rclone mkdir 123pan:/LMI_testDEV
-            rclone sync -P ./zip/* 123pan:/LMI_testDEV
        - name: 10.删除工作流运行
          uses: Mattraks/delete-workflow-runs@v2
          with:
