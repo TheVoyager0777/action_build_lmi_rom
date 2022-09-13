@@ -327,7 +327,7 @@ jobs:
           mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip
           echo "NEW_PACKAGE_NAME=miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip" >> $GITHUB_ENV
           cd "$GITHUB_WORKSPACE"/zip/
-          split -b 1536m miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip -d -a 2 /miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip
+          sudo split -b 1536m miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip -d -a 2 /miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip
           sudo rm -rf "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip
           cd "$GITHUB_WORKSPACE"
           touch file.log
@@ -340,7 +340,7 @@ jobs:
            tag: "${{ env.date }}"
            bodyFile: "${{ github.workspace }}/file.log"
            allowUpdates: true
-           artifactErrorsFailBuild: true           
+           artifactErrorsFailBuild: true
            token: ${{ secrets.GITHUB_TOKEN }}
        - name: 10.删除工作流运行
          uses: Mattraks/delete-workflow-runs@v2
