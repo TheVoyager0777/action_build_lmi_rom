@@ -253,7 +253,7 @@ jobs:
             size=$(echo "$(eval echo "$"$i"_size_orig") * 12 / 11 / 4096 * 4096" | bc)
           fi
           echo $size
-          eval "$i"_size_=$size
+          eval "$i"_size=$size
           done
           system_size=$(echo "$system_size * 4096 / 4096 / 4096" | bc)
           vendor_size=$(echo "$vendor_size * 4096 / 4096 / 4096" | bc)
