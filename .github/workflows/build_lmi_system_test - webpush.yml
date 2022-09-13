@@ -252,6 +252,7 @@ jobs:
           else
             size=$(echo "$(eval echo "$"$i"_size_orig") * 12 / 11 / 4096 * 4096" | bc)
           fi
+          echo $size
           eval "$i"_size_=$size
           done
           system_size=$(echo "$system_size * 4096 / 4096 / 4096" | bc)
@@ -285,6 +286,7 @@ jobs:
                 odm_indoe=192
                 system_ext_indoe=${{ env.system_ext_indoe }}
                 eval "$i"_size=$(du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})
+                sudo rm -rf "$GITHUB_WORKSPACE"/images/$i.img
                 original_size=$(echo "$(eval echo "$"$i"_size") / 524000 * 377 * 4096" | bc)
                 eval "$i"_size=$(echo "$original_size + $(eval echo "$"$i"_size")" | bc)
                 eval echo "$"$i"_size"
