@@ -11,6 +11,7 @@ jobs:
          run: |
             source "$GITHUB_WORKSPACE"/resource/config.env
             echo "ROM_URL=$ROM_URL" >> $GITHUB_ENV
+            echo "date=$(echo $ROM_URL | cut -d"/" -f4)" >> $GITHUB_ENV
             echo "camera1=$camera1" >> $GITHUB_ENV
             echo "camera2=$camera2" >> $GITHUB_ENV
        - name: 1.安装依赖
