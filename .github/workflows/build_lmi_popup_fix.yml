@@ -66,7 +66,7 @@ jobs:
          run: |
             sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_popup.zip "$GITHUB_WORKSPACE"/framework/*
             sudo rm -rf "$GITHUB_WORKSPACE"/framework
-            mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_popup.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_popup_fix.zip
+            mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_popup.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"${{ env.date }}"_popup_fix.zip
             echo "artifact_name=miui_LMIPRE_popup_fix" >> $GITHUB_ENV
             cd "$GITHUB_WORKSPACE"
             touch file.log
