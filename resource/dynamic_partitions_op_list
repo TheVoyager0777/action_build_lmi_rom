@@ -19,6 +19,6 @@ resize vendor vendor_size
 # Grow partition product
 resize product product_size
 # Grow partition odm
-resize odm 1302528
+resize odm 
 # Grow partition system_ext
 resize system_ext system_ext_size
