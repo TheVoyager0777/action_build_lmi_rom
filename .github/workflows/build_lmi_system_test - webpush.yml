@@ -229,7 +229,8 @@ jobs:
           done
           sudo mv -f "$GITHUB_WORKSPACE"/resource/vbmeta.img "$GITHUB_WORKSPACE"/images/firmware-update
           sudo mv -f "$GITHUB_WORKSPACE"/resource/vbmeta_system.img "$GITHUB_WORKSPACE"/images/firmware-update
-          sudo cp -r "$GITHUB_WORKSPACE"/zstd-test/* "$GITHUB_WORKSPACE"/images
+          sudo cp -f "$GITHUB_WORKSPACE"/resource/dynamic_partitions_op_list "$GITHUB_WORKSPACE"/images
+          sudo cp -r "$GITHUB_WORKSPACE"/resource/META-INF "$GITHUB_WORKSPACE"/images
           sudo rm -rf "$GITHUB_WORKSPACE"/MiLink
           sudo rm -rf "$GITHUB_WORKSPACE"/MiuiCamera
           sudo rm -rf "$GITHUB_WORKSPACE"/Settings
