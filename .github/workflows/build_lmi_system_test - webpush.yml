@@ -287,7 +287,7 @@ jobs:
                 system_ext_indoe=${{ env.system_ext_indoe }}
                 eval "$i"_size=$(du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})
                 sudo rm -rf "$GITHUB_WORKSPACE"/images/$i.img
-                original_size=$(echo "$(eval echo "$"$i"_size") / 524000 * 377 * 4096" | bc)
+                original_size=$(echo "$(eval echo "$"$i"_size") / 524288000 * 377 * 4096" | bc)
                 eval "$i"_size=$(echo "$original_size + $(eval echo "$"$i"_size")" | bc)
                 eval echo "$"$i"_size"
                 eval "$i"_size=$(echo "$(eval echo "$"$i"_size") / 4096" | bc)
