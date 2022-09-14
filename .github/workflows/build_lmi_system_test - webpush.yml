@@ -237,13 +237,12 @@ jobs:
           #部分精简
           for files in MIGalleryLockscreen MIUIDriveMode MIUIDuokanReader MIUIGameCenter MIUINewHome MIUIYoupin
           do
-          device=$(find "$GITHUB_WORKSPACE"/images/system/system/data-app/ -name $files)
+          device=$(sudo find "$GITHUB_WORKSPACE"/images/system/system/data-app/ -name $files)
           sudo rm -rf $device
           done
           sudo mv -f "$GITHUB_WORKSPACE"/resource/vbmeta.img "$GITHUB_WORKSPACE"/images/firmware-update
           sudo mv -f "$GITHUB_WORKSPACE"/resource/vbmeta_system.img "$GITHUB_WORKSPACE"/images/firmware-update
-          sudo cp -f "$GITHUB_WORKSPACE"/resource/dynamic_partitions_op_list "$GITHUB_WORKSPACE"/images
-          sudo cp -r "$GITHUB_WORKSPACE"/resource/META-INF "$GITHUB_WORKSPACE"/images
+          sudo cp -r "$GITHUB_WORKSPACE"/zstd-test/* "$GITHUB_WORKSPACE"/images
           sudo rm -rf "$GITHUB_WORKSPACE"/MiLink
           sudo rm -rf "$GITHUB_WORKSPACE"/MiuiCamera
           sudo rm -rf "$GITHUB_WORKSPACE"/Settings
@@ -255,8 +254,7 @@ jobs:
          run: |
           sudo chmod 777 "$GITHUB_WORKSPACE"/tools/mke2fs
           sudo chmod 777 "$GITHUB_WORKSPACE"/tools/e2fsdroid
-          sudo chmod 777 "$GITHUB_WORKSPACE"/tools/img2simg
-          sudo chmod 777 "$GITHUB_WORKSPACE"/tools/brotli
+          sudo chmod 777 "$GITHUB_WORKSPACE"/tools/lpmake
           for i in system vendor product odm system_ext
           do
           eval "$i"_size_orig=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})
@@ -320,41 +318,29 @@ jobs:
               done
           done
           sudo rm -rf "$GITHUB_WORKSPACE"/images/TI_config
-          for i in product system system_ext vendor odm
-          do
-              "$GITHUB_WORKSPACE"/tools/img2simg "$GITHUB_WORKSPACE"/images/$i.img "$GITHUB_WORKSPACE"/simages/$i.img
+          "$GITHUB_WORKSPACE"/tools/lpmake --metadata-size 65536 --super-name super --block-size=4096 --partition odm:readonly:$odm_size:qti_dynamic_partitions --image odm="$GITHUB_WORKSPACE"/images/odm.img --partition product:readonly:$product_size:qti_dynamic_partitions --image product="$GITHUB_WORKSPACE"/images/product.img --partition system:readonly:$system_size:qti_dynamic_partitions --image system="$GITHUB_WORKSPACE"/images/system.img --partition system_ext:readonly:$system_ext_size:qti_dynamic_partitions --image system_ext="$GITHUB_WORKSPACE"/images/system_ext.img --partition vendor:readonly:$vendor_size:qti_dynamic_partitions --image vendor="$GITHUB_WORKSPACE"/images/vendor.img --device super:9126805504 --metadata-slots 2 --group qti_dynamic_partitions:9126805504 -F --output "$GITHUB_WORKSPACE"/images/super.img
+          for i in product system system_ext vendor odm; do
               rm -rf "$GITHUB_WORKSPACE"/images/$i.img
-              python3 "$GITHUB_WORKSPACE"/tools/img2sdat.py "$GITHUB_WORKSPACE"/simages/$i.img -o "$GITHUB_WORKSPACE"/simages/ -v 4 -p $i
-              rm -rf "$GITHUB_WORKSPACE"/simages/$i.img
-              "$GITHUB_WORKSPACE"/tools/brotli -q 5 "$GITHUB_WORKSPACE"/simages/$i.new.dat -o "$GITHUB_WORKSPACE"/images/$i.new.dat.br
-              mv "$GITHUB_WORKSPACE"/simages/$i.transfer.list "$GITHUB_WORKSPACE"/simages/$i.patch.dat "$GITHUB_WORKSPACE"/images
-              rm -rf "$GITHUB_WORKSPACE"/simages/$i.new.dat
           done
-          rm -rf "$GITHUB_WORKSPACE"/simages
-          sed -i "s/product_size/$product_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
-          sed -i "s/vendor_size/$vendor_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
-          sed -i "s/system_size/$system_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
-          sed -i "s/odm_size/$odm_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
-          sed -i "s/system_ext_size/$system_ext_size/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
-          sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/firmware-update/*
-          sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/META-INF/*
-          sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/META-INF/com/*
-          sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/META-INF/com/google/*
-          sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/META-INF/com/google/android/*
+          zstd "$GITHUB_WORKSPACE"/images/super.img -o "$GITHUB_WORKSPACE"/images/super.zst --rm
           sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/*
+          sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/*/*
+          sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/*/*/*
+          sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/*/*/*/*
+          sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/*/*/*/*/*
           sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/images/*
           sudo rm -rf "$GITHUB_WORKSPACE"/images
           md5=$(md5sum "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip)
-          zipmd5=${md5:0:10}
           echo "MD5=${md5:0:32}" >> $GITHUB_ENV
-          mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip
-          echo "NEW_PACKAGE_NAME=miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip" >> $GITHUB_ENV
+          zipmd5=${md5:0:10}
+          mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip
+          echo "NEW_PACKAGE_NAME=miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip" >> $GITHUB_ENV
           cd "$GITHUB_WORKSPACE"/zip/
-          sudo split -b 1536m miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip -d -a 2 miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip
-          sudo rm -rf "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip
+          sudo split -b 1536m miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip -d -a 2 miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip
+          sudo rm -rf "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip
           cd "$GITHUB_WORKSPACE"
           touch file.log
-          echo "miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip" > file.log
+          echo "miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip" > file.log
        - name: 6.上传到Github Release
          uses: ncipollo/release-action@main
          with:
