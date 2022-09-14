@@ -102,6 +102,21 @@ jobs:
           sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/etc.zip -d "$GITHUB_WORKSPACE"/images/system/system/etc/audio/
           sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/popup.zip -d "$GITHUB_WORKSPACE"/images/system/system/framework/
           sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/bootan.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/
+          #取消强制加密
+          fstab=$(sudo find "$GITHUB_WORKSPACE"/images/vendor/ -name "fstab*")
+          if [[ $fstab == "" ]];then
+          echo -e "\e[31m     >>>>>>>>找不到相关文件,也许没有加密呢>>>>>>>>>  \e[0m"
+          echo ""
+          sleep 5
+          else
+          echo -e "\e[31m     >>>>>>  正在去除,请等待....  >>>>>>> \e[0m"
+          for file in $fstab; do
+          sudo sed -i 's/,avb.*system//g' $file
+          sudo sed -i 's/,avb,/,/g' $file
+          sudo sed -i 's/,avb_keys.*key//g' $file
+          sudo sed -i 's/fileencryption=ice/encryptable=ice/g' $file
+          done
+          fi
           #妙享白名单破解
           sudo mkdir -p "$GITHUB_WORKSPACE"/MiLink/
           $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MiLink/ "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk
