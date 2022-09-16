@@ -122,10 +122,10 @@ jobs:
             Mod4=${Mod4%/*.smali}
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod4
             sudo cp -rf $mod4 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod4
-            mod5=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name 'BatteryFragment*.smali' 2>/dev/null | xargs grep -rl '\"stable\"' | sed 's/^\.\///' | sort)
+            mod5=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name 'BatteryFragment*.smali' 2>/dev/null | xargs grep -rl 'stable' | sed 's/^\.\///' | sort)
             for i in $mod5
             do
-              int=$(grep -n '\"stable\"' $i)
+              int=$(grep -n 'stable' $i)
               int=$(echo "$int + 4" | bc)
               sudo sed -i '"$int"s/$/\n const/4 v1, 0x1' $i
               echo 修改完成
