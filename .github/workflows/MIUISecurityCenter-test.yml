@@ -126,17 +126,40 @@ jobs:
             mod5=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name 'BatteryFragment*.smali' 2>/dev/null | xargs grep -rl 'stable' | sed 's/^\.\///' | sort)
             for i in $mod5
             do
-              echo $i
               int=$(cat $i | grep -n "stable" | cut -d ":" -f 1)
-              echo $int
               int=$(echo "$int + 4" | bc)
-              echo $int
               sudo sed -i -e "${int}a const/4 v1, 0x1" $i
               echo 修改完成
               I=${i#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
               I=${I%/*.smali}
               sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$I
               sudo cp -rf $i "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$I
+            done
+            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/miui/
+            sudo cp -rf "$GITHUB_WORKSPACE"/resource/czh.smali "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/miui/
+            mod6=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'mi_lab_ai_clipboard_enable' | sed 's/^\.\///' | sort)
+            sudo sed -i 's/Lmiui\/os\/Build;->IS_STABLE_VERSION\:Z/Lmiui\/czh;->TRUE\:Z/g' $mod6
+            echo 修改完成
+            Mod6=${mod6#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
+            Mod6=${Mod6%/*.smali}
+            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod6
+            sudo cp -rf $mod6 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod6
+            mod7=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'gb_game_content' | sed 's/^\.\///' | sort)
+            int=$(cat $mod7 | grep -n "gb_game_content" | cut -d ":" -f 1)
+            for i in $int
+            do
+              i=$(echo "$i - 3" | bc)
+              uu=$(sed -n "${i}p" $mod7 | sed 's/.method public static//g' | awk -F "(" '{print $2}')
+              if [ $uu = ")Z" ];then
+                moduu=$(sed -n "${i}p" $mod7)
+                sudo sed -i '/^$moduu/,/^.end method/{//!d}' $mod7
+                sudo sed -i -e '/^$moduu/a\    .registers 3\n\n    const/4 v0, 0x0\n\n   return v0' $mod7
+                echo 修改完成
+                Mod7=${mod7#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
+                Mod7=${Mod7%/*.smali}
+                sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod7
+                sudo cp -rf $mod7 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod7
+              fi
             done
             echo 开始第二次回编译
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/
