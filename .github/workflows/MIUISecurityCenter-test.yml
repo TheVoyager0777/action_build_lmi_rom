@@ -162,6 +162,15 @@ jobs:
                 sudo cp -rf $mod7 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod7
               fi
             done
+            mod8=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'key_check_item_root' | sed 's/^\.\///' | sort)
+            item=$(grep -B 10 key_check_item_root $mod8 | grep -n "()Z" | cut -d ":" -f 2)
+            sudo sed -i "/^$item/,/^.end method/{//!d}" $mod8
+            sudo sed -i -e "/^$item/a\    .registers 3\n\n    const/4 v0, 0x0\n\n   return v0" $mod8
+            echo 修改完成
+            Mod8=${mod8#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
+            Mod8=${Mod8%/*.smali}
+            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod8
+            sudo cp -rf $mod8 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod8
             echo 开始第二次回编译
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/
             sudo $Apktool b -q -f "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/ -o MIUISecurityCenter.apk
