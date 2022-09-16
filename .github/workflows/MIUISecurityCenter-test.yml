@@ -127,8 +127,8 @@ jobs:
             for i in $mod5
             do
               echo $i
-              touch "$GITHUB_WORKSPACE"/test.txt
-              int=$(grep -wn 'stable' $i > "$GITHUB_WORKSPACE"/test.txt | awk -F: '{print $1}' "$GITHUB_WORKSPACE"/test.txt)              echo $int
+              int=$(cat $i | grep -n "stable" | cut -d ":" -f 1)
+              echo $int
               int=$(echo "$int + 4" | bc)
               echo $int
               sudo sed -i '${int}s/$/\n const/4 v1, 0x1' $i
@@ -137,7 +137,6 @@ jobs:
               I=${I%/*.smali}
               sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$I
               sudo cp -rf $i "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$I
-              sudo rm -rf "$GITHUB_WORKSPACE"/test.txt
             done
             echo 开始第二次回编译
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/
