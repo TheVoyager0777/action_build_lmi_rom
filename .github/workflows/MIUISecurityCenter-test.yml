@@ -130,7 +130,8 @@ jobs:
               touch "$GITHUB_WORKSPACE"/test.txt
               int=$(grep -wn 'stable' $i > "$GITHUB_WORKSPACE"/test.txt | awk -F: '{print $1}' "$GITHUB_WORKSPACE"/test.txt)              echo $int
               int=$(echo "$int + 4" | bc)
-              sudo sed -i '"$int"s/$/\n const/4 v1, 0x1' $i
+              echo $int
+              sudo sed -i '${int}s/$/\n const/4 v1, 0x1' $i
               echo 修改完成
               I=${i#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
               I=${I%/*.smali}
