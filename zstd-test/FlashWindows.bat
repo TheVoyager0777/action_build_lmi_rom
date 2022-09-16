@@ -10,13 +10,6 @@ if not exist bin\Windows (
 )
 cls
 
-if not exist *boot* (
-   echo.
-   echo.Boot 文件丢失，终止刷机
-   echo.
-   pause
-   exit
-)
 
 if exist super_none.zst (
    echo.正在转换 super_none.zst
