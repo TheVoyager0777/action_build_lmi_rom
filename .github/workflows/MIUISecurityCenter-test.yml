@@ -98,31 +98,14 @@ jobs:
             sudo sed -i '/^.method public static isSupportPin()Z/,/^.end method/{//!d}' $mod1
             sudo sed -i -e '/^.method public static isSupportPin()Z/a\    .registers 3\n\n    const/4 v0, 0x1\n\n   return v0' $mod1
             echo 修改完成
-            Mod1=${mod1#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
-            Mod1=${Mod1%/*.smali}
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod1
-            sudo cp -rf $mod1 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod1
             mod2="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/com/miui/permcenter/privacymanager/InterceptBaseFragment.smali
             sudo sed -i 's/0x5/0x0/g' $mod2
             mod3="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/com/miui/permcenter/privacymanager/InterceptPermissionFragment.smali
             sudo sed -i 's/0xa/0x0/g' $mod3
-            Mod2=${mod2#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
-            Mod2=${Mod2%/*.smali}
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod2
-            sudo cp -rf $mod2 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod2
-            Mod3=${mod3#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
-            Mod3=${Mod3%/*.smali}
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod3
-            sudo cp -rf $mod3 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod3
-            sudo cp -rf "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/apktool.yml "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/
             mod4=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'refreshStats' | sed 's/^\.\///' | sort)
             echo $mod4
             sudo sed -i 's/0x1f/0x63/g' $mod4
             echo 修改完成
-            Mod4=${mod4#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
-            Mod4=${Mod4%/*.smali}
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod4
-            sudo cp -rf $mod4 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod4
             mod5=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name 'BatteryFragment*.smali' 2>/dev/null | xargs grep -rl 'stable' | sed 's/^\.\///' | sort)
             for i in $mod5
             do
@@ -130,20 +113,12 @@ jobs:
               int=$(echo "$int + 4" | bc)
               sudo sed -i -e "${int}a const/4 v1, 0x1" $i
               echo 修改完成
-              I=${i#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
-              I=${I%/*.smali}
-              sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$I
-              sudo cp -rf $i "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$I
             done
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/miui/
             sudo cp -rf "$GITHUB_WORKSPACE"/resource/czh.smali "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/miui/
             mod6=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'mi_lab_ai_clipboard_enable' | sed 's/^\.\///' | sort)
             sudo sed -i 's/Lmiui\/os\/Build;->IS_STABLE_VERSION\:Z/Lmiui\/czh;->TRUE\:Z/g' $mod6
             echo 修改完成
-            Mod6=${mod6#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
-            Mod6=${Mod6%/*.smali}
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod6
-            sudo cp -rf $mod6 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod6
             mod7=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'gb_game_content' | sed 's/^\.\///' | sort)
             int=$(cat $mod7 | grep -n "gb_game_content" | cut -d ":" -f 1)
             for i in $int
@@ -156,10 +131,6 @@ jobs:
                 sudo sed -i "/^$moduu/,/^.end method/{//!d}" $mod7
                 sudo sed -i -e "/^$moduu/a\    .registers 3\n\n    const/4 v0, 0x0\n\n   return v0" $mod7
                 echo 修改完成
-                Mod7=${mod7#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
-                Mod7=${Mod7%/*.smali}
-                sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod7
-                sudo cp -rf $mod7 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod7
               fi
             done
             mod8=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'key_check_item_root' | sed 's/^\.\///' | sort)
@@ -167,48 +138,25 @@ jobs:
             sudo sed -i "/^$item/,/^.end method/{//!d}" $mod8
             sudo sed -i -e "/^$item/a\    .registers 3\n\n    const/4 v0, 0x0\n\n   return v0" $mod8
             echo 修改完成
-            Mod8=${mod8#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
-            Mod8=${Mod8%/*.smali}
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod8
-            sudo cp -rf $mod8 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod8
             mod9=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'pref_gb_unsupport_macro_apps' | sed 's/^\.\///' | sort)
             sudo sed -i 's/const\/4 p0, 0x1/const\/4 p0, 0x0/g' $mod9
             echo 修改完成
-            Mod9=${mod9#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
-            Mod9=${Mod9%/*.smali}
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod9
-            sudo cp -rf $mod9 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod9
             mod10=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'nothing when close recommend' | sed 's/^\.\///' | sort)
             sudo sed -i 's/invoke-static {v2}, Lcom\/miui\/gamebooster\/globalgame\/util\/d;->a(Ljava\/util\/Collection;)Z/invoke-static {v2}, Lmiui\/czh;->Enable(Ljava\/util\/Collection;)Z/g' $mod10
             echo 修改完成
-            Mod10=${mod10#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
-            Mod10=${Mod10%/*.smali}
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod10
-            sudo cp -rf $mod10 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod10
+            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali/miui/
+            sudo cp -rf "$GITHUB_WORKSPACE"/resource/czh.smali "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali/miui/
             echo 开始第二次回编译
-            cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/
-            sudo $Apktool b -q -f "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/ -o MIUISecurityCenter.apk
+            cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
+            sudo $Apktool b -q -f "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -o MIUISecurityCenter.apk
             echo 反编译完成
-            filepath="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
-            for file in `ls -a $filepath`
-            do
-              if [ "${file##*.}"x = "dex"x ];then
-                old=$(echo $file | tr -d "a-zA-Z" | tr -d ".")
-                if [ -Z $old ];then
-                   old=1
-                fi
-                new=$(echo $old|awk '{for(i=1;i<=NF;i++){$i+=1}}1')
-                sudo cp -rf "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/$file "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/classes$new.dex
-              fi
-            done
-            echo 移动文件完成
-            sudo unzip -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter.apk -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/res/xml/
             for files in pc_power_settings.xml pc_power_settings_v12.xml
             do
               b=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/build/ -name $files)
               sudo cp -rf $b "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/res/xml/
             done
+            sudo unzip -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
             sudo 7z a "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk ./* -mx0
             sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/oat
