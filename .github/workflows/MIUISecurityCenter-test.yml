@@ -153,8 +153,8 @@ jobs:
               if [ $uu = ")Z" ];then
                 moduu=$(sed -n "${i}p" $mod7)
                 echo $mosuu
-                sudo sed -i '/^$moduu/,/^.end method/{//!d}' $mod7
-                sudo sed -i -e '/^$moduu/a\    .registers 3\n\n    const/4 v0, 0x0\n\n   return v0' $mod7
+                sudo sed -i "/^$moduu/,/^.end method/{//!d}" $mod7
+                sudo sed -i -e "/^$moduu/a\    .registers 3\n\n    const/4 v0, 0x0\n\n   return v0" $mod7
                 echo 修改完成
                 Mod7=${mod7#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
                 Mod7=${Mod7%/*.smali}
