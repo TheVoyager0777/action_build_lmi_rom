@@ -116,6 +116,7 @@ jobs:
             sudo cp -rf $mod3 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod3
             sudo cp -rf "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/apktool.yml "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/
             mod4=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'refreshStats' | sed 's/^\.\///' | sort)
+            echo $mod4
             sudo sed -i 's/0x1f/0x63/g' $mod4
             echo 修改完成
             Mod4=${mod4#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
@@ -125,7 +126,9 @@ jobs:
             mod5=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name 'BatteryFragment*.smali' 2>/dev/null | xargs grep -rl 'stable' | sed 's/^\.\///' | sort)
             for i in $mod5
             do
+              echo $i
               int=$(grep -n 'stable' $i)
+              echo $int
               int=$(echo "$int + 4" | bc)
               sudo sed -i '"$int"s/$/\n const/4 v1, 0x1' $i
               echo 修改完成
