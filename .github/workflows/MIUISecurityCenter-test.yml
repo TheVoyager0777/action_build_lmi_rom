@@ -172,7 +172,7 @@ jobs:
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod8
             sudo cp -rf $mod8 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod8
             mod9=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'pref_gb_unsupport_macro_apps' | sed 's/^\.\///' | sort)
-            sudo sed -i 's/const/4 p0, 0x1/const/4 p0, 0x0/g' $mod9
+            sudo sed -i 's/const\/4\ p0\,\ 0x1/const\/4\ p0\,\ \0x0/g' $mod9
             echo 修改完成
             Mod9=${mod9#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
             Mod9=${Mod9%/*.smali}
