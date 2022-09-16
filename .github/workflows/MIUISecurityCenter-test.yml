@@ -178,6 +178,13 @@ jobs:
             Mod9=${Mod9%/*.smali}
             sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod9
             sudo cp -rf $mod9 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod9
+            mod10=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'nothing when close recommend' | sed 's/^\.\///' | sort)
+            sudo sed -i 's/invoke-static \{v2\}, Lcom\/miui\/gamebooster\/globalgame\/util\/d;->a(Ljava\/util\/Collection;)Z/invoke-static {v2}, Lmiui\/czh;->Enable(Ljava\/util\/Collection;)Z/g' $mod10
+            echo 修改完成
+            Mod10=${mod10#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
+            Mod10=${Mod10%/*.smali}
+            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod10
+            sudo cp -rf $mod10 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod10
             echo 开始第二次回编译
             cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/
             sudo $Apktool b -q -f "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/ -o MIUISecurityCenter.apk
