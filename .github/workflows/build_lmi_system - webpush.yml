@@ -283,7 +283,7 @@ jobs:
             echo "NEW_PACKAGE_NAME=miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip" >> $GITHUB_ENV
             cd "$GITHUB_WORKSPACE"/zip/
             sudo split -b 1536m miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0.zip -d -a 2 miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0.zip
-            sudo rm -rf "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip
+            sudo rm -rf "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0.zip
             touch "$GITHUB_WORKSPACE"/file.log
             echo "${{ env.NEW_PACKAGE_NAME }}" > "$GITHUB_WORKSPACE"/file.log
        - name: 6.上传到Github Release
