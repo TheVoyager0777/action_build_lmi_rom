@@ -389,21 +389,13 @@ jobs:
           md5=$(md5sum "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip)
           echo "MD5=${md5:0:32}" >> $GITHUB_ENV
           zipmd5=${md5:0:10}
-          mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip
+          mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0_2in1.zip
           echo "NEW_PACKAGE_NAME=miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip" >> $GITHUB_ENV
           cd "$GITHUB_WORKSPACE"/zip/
           sudo split -b 1536m miui_LMIPRE_${{ env.date }}.zip -d -a 2 miui_LMIPRE_${{ env.date }}.zip
           sudo rm -rf "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip
           touch "$GITHUB_WORKSPACE"/file.log
           echo "md5: $md5" > "$GITHUB_WORKSPACE"/file.log
-          touch "$GITHUB_WORKSPACE"/zip/合并.sh
-          for i in $(ls miui_LMIPRE_"${{ env.date }}".zip)
-          do
-          md5=$(md5sum "$i")
-          echo "$i，md5：$md5" >> "$GITHUB_WORKSPACE"/file.log
-          echo "$i=$md5" >> "$GITHUB_WORKSPACE"/zip/合并.sh
-          do
-          echo "cat ${0%/*}/miui_LMIPRE_${{ env.date }}.zip* > ${0%/*}/miui_LMIPRE_${{ env.date }}_$zipmd5_12.0_2in1.zip" >> "$GITHUB_WORKSPACE"/zip/合并.sh
        - name: 6.上传到Github Release
          uses: ncipollo/release-action@main
          with:
