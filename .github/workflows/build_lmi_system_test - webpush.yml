@@ -1,4 +1,4 @@
-name: build_lmi_system - webpush
+name: build_lmi_system_encryptable
 on:
   workflow_dispatch:
 
@@ -74,6 +74,13 @@ jobs:
          run: |
           sudo chmod 777 "$GITHUB_WORKSPACE"/tools/apktool.jar
           Apktool="java -jar "$GITHUB_WORKSPACE"/tools/apktool.jar"
+          echo 导入框架
+          $Apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miui/miui.apk
+          $Apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miuisystem/miuisystem.apk
+          $Apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-res.apk
+          $Apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-ext-res/framework-ext-res.apk
+          sudo mkdir -p /root/.local/share/apktool/framework/
+          sudo mv /home/runner/.local/share/apktool/framework/* /root/.local/share/apktool/framework/
           sudo mkdir -p "$GITHUB_WORKSPACE"/images/system/system/etc/audio
           sudo rm -rf "$GITHUB_WORKSPACE"/images/product/etc/device_features/*
           sudo rm -rf "$GITHUB_WORKSPACE"/images/product/overlay/DeviceAndroidConfig.apk
@@ -111,10 +118,20 @@ jobs:
           else
           echo -e "\e[31m     >>>>>>  正在去除,请等待....  >>>>>>> \e[0m"
           for file in $fstab; do
-          sudo sed -i 's/,avb.*system//g' $file
-          sudo sed -i 's/,avb,/,/g' $file
-          sudo sed -i 's/,avb_keys.*key//g' $file
-          sudo sed -i 's/fileencryption=ice/encryptable=ice/g' $file
+          sudo sed -i "s/,verify\b//g" $file
+          sudo sed -i "s/\bverify,//g" "$file"
+          sudo sed -i "s/\bverify\b//g" "$file"
+          sudo sed -i "s/,verify,/,/g" "$file"
+          sudo sed -i "s/,support_scfs\b//g" "$file"
+          sudo sed -i "s/\bsupport_scfs,//g" "$file"
+          sudo sed -i "s/\bsupport_scfs\b//g" "$file"
+          sudo sed -i "s/,support_scfs,/,/g" "$file"
+          sudo sed -i "s/,avb\b//g" "$file"
+          sudo sed -i "s/\bavb,//g" "$file"
+          sudo sed -i "s/\bavb\b//g" "$file"
+          sudo sed -i "s/,avb,/,/g" "$file"
+          sudo sed -i "s/\b\(forceencrypt\|forcefdeorfbe\)=/encryptable=/g" "$file"
+          sudo sed -i "s/\bfileencryption/encryptable/g" "$file"
           done
           fi
           #妙享白名单破解
@@ -185,50 +202,89 @@ jobs:
           sudo rm -rf "$GITHUB_WORKSPACE"/images/system_ext/priv-app/Settings/oat
           sudo mv "$GITHUB_WORKSPACE"/images/system_ext/priv-app/Settings/Settings.apk "$GITHUB_WORKSPACE"/Settings/Settings.apk
           sudo zipalign -v 4 "$GITHUB_WORKSPACE"/Settings/Settings.apk "$GITHUB_WORKSPACE"/images/system_ext/priv-app/Settings/Settings.apk >/dev/null
-          #气泡通知修复，去除10秒等待
-          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
+          #手机管家各种修改
+          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
           sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/
           sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
-          sudo unzip -o "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk 'classes*.dex' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
+          sudo unzip -o -q "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk 'classes*.dex' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
           cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
           sudo 7z a -tzip "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk ./*
-          sudo $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
+          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res
+          cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res
+          sudo $Apktool d -b -f -m "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk
+          for files in pc_power_settings.xml pc_power_settings_v12.xml
+          do
+            device=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/ -name $files)
+            sudo sed -i -e '/http\:\/\/schemas.android.com\/apk\/res\/android/a\    \<PreferenceCategory\>\n        \<PreferenceScreen android:title\=\"高级电量统计\"\>\n            \<intent android:targetPackage\=\"com.miui.powerkeeper\" android:targetClass\=\"com.miui.powerkeeper.ui.powertools.module.batterylife.BatteryStatusActivity\" \/\>\n        \<\/PreferenceScreen\>\n    \<\/PreferenceCategory\>' $device
+          done
+          mod=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/ -type f -name '*.xml' 2>/dev/null | xargs grep -rl 'APKTOOL_DUMMY_' | sed 's/^\.\///' | sort)
+          for a in $mod
+          do
+            sudo sed -i '/APKTOOL_DUMMY_/d' $a
+          done
+          mod1=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/ -type f -name '*.xml' 2>/dev/null | xargs grep -rl 'isAccessibilityTool' | sed 's/^\.\///' | sort)
+          for b in $mod2
+          do
+            sudo sed -i 's/android:isAccessibilityTool\=\"true\"//g' $b
+          done
+          cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter
+          sudo $Apktool b -f "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/ -o MIUISecurityCenter.apk
+          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
+          cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
+          sudo $Apktool d -b -r -f -m "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
           mod1="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/com/miui/bubbles/utils/MiuiFreeFormManagerWrapper.smali
           sudo sed -i '/^.method public static isSupportPin()Z/,/^.end method/{//!d}' $mod1
           sudo sed -i -e '/^.method public static isSupportPin()Z/a\    .registers 3\n\n    const/4 v0, 0x1\n\n   return v0' $mod1
-          Mod1=${mod1#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
-          Mod1=${Mod1%/*.smali}
-          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod1
-          sudo cp -rf $mod1 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod1
           mod2="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/com/miui/permcenter/privacymanager/InterceptBaseFragment.smali
           sudo sed -i 's/0x5/0x0/g' $mod2
           mod3="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/com/miui/permcenter/privacymanager/InterceptPermissionFragment.smali
           sudo sed -i 's/0xa/0x0/g' $mod3
-          Mod2=${mod2#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
-          Mod2=${Mod2%/*.smali}
-          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod2
-          sudo cp -rf $mod2 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod2
-          Mod3=${mod3#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
-          Mod3=${Mod3%/*.smali}
-          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod3
-          sudo cp -rf $mod3 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod3
-          sudo cp -rf "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/apktool.yml "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/
-          sudo $Apktool b -q -f -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter.apk "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/
-          filepath="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
-          for file in `ls -a $filepath`
+          mod4=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'refreshStats' | sed 's/^\.\///' | sort)
+          sudo sed -i 's/0x1f/0x63/g' $mod4
+          mod5=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name 'BatteryFragment*.smali' 2>/dev/null | xargs grep -rl 'stable' | sed 's/^\.\///' | sort)
+          for i in $mod5
           do
-          if [ "${file##*.}"x = "dex"x ];then
-            old=$(echo $file | tr -d "a-zA-Z" | tr -d ".")
-            if [ -Z $old ];then
-             old=1
-            fi
-            new=$(echo $old|awk '{for(i=1;i<=NF;i++){$i+=1}}1')
-            sudo cp -rf "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/$file "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/classes$new.dex
-          fi
+            int=$(cat $i | grep -n "stable" | cut -d ":" -f 1)
+            int=$(echo "$int + 4" | bc)
+            sudo sed -i -e "${int}a const/4 v1, 0x1" $i
           done
-          sudo unzip -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter.apk -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
+          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/miui/
+          sudo cp -rf "$GITHUB_WORKSPACE"/resource/czh.smali "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/miui/
+          mod6=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'mi_lab_ai_clipboard_enable' | sed 's/^\.\///' | sort)
+          sudo sed -i 's/Lmiui\/os\/Build;->IS_STABLE_VERSION\:Z/Lmiui\/czh;->TRUE\:Z/g' $mod6
+          mod7=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'gb_game_content' | sed 's/^\.\///' | sort)
+          int=$(cat $mod7 | grep -n "gb_game_content" | cut -d ":" -f 1)
+          for i in $int
+          do
+            i=$(echo "$i - 3" | bc)
+            uu=$(sed -n "${i}p" $mod7 | sed 's/.method public static//g' | awk -F "(" '{print $2}')
+            if [ $uu = ")Z" ];then
+              moduu=$(sed -n "${i}p" $mod7)
+              sudo sed -i "/^$moduu/,/^.end method/{//!d}" $mod7
+              sudo sed -i -e "/^$moduu/a\    .registers 3\n\n    const/4 v0, 0x0\n\n   return v0" $mod7
+            fi
+          done
+          mod8=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'key_check_item_root' | sed 's/^\.\///' | sort)
+          item=$(grep -B 10 key_check_item_root $mod8 | grep -n "()Z" | cut -d ":" -f 2)
+          sudo sed -i "/^$item/,/^.end method/{//!d}" $mod8
+          sudo sed -i -e "/^$item/a\    .registers 3\n\n    const/4 v0, 0x0\n\n   return v0" $mod8
+          mod9=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'pref_gb_unsupport_macro_apps' | sed 's/^\.\///' | sort)
+          sudo sed -i 's/const\/4 p0, 0x1/const\/4 p0, 0x0/g' $mod9
+          mod10=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'nothing when close recommend' | sed 's/^\.\///' | sort)
+          sudo sed -i 's/invoke-static {v2}, Lcom\/miui\/gamebooster\/globalgame\/util\/d;->a(Ljava\/util\/Collection;)Z/invoke-static {v2}, Lmiui\/czh;->Enable(Ljava\/util\/Collection;)Z/g' $mod10
+          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali/miui/
+          sudo cp -rf "$GITHUB_WORKSPACE"/resource/czh.smali "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali/miui/
+          cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
+          sudo $Apktool b -q -f "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -o MIUISecurityCenter.apk
+          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/res/xml/
+          for files in pc_power_settings.xml pc_power_settings_v12.xml
+          do
+            b=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/build/ -name $files)
+            sudo cp -rf $b "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/res/xml/
+          done
+          sudo unzip -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
           cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
-          sudo 7z a "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk ./*.dex -mx0
+          sudo 7z a "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk ./* -mx0
           sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/oat
           sudo mv "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk "$GITHUB_WORKSPACE"/MIUISecurityCenter/MIUISecurityCenter.apk
           sudo zipalign -v 4 "$GITHUB_WORKSPACE"/MIUISecurityCenter/MIUISecurityCenter.apk "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk >/dev/null
@@ -333,14 +389,21 @@ jobs:
           md5=$(md5sum "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip)
           echo "MD5=${md5:0:32}" >> $GITHUB_ENV
           zipmd5=${md5:0:10}
-          mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip
+          mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip
           echo "NEW_PACKAGE_NAME=miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip" >> $GITHUB_ENV
           cd "$GITHUB_WORKSPACE"/zip/
-          sudo split -b 1536m miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip -d -a 2 miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip
-          sudo rm -rf "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip
-          cd "$GITHUB_WORKSPACE"
-          touch file.log
-          echo "miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip" > file.log
+          sudo split -b 1536m miui_LMIPRE_${{ env.date }}.zip -d -a 2 miui_LMIPRE_${{ env.date }}.zip
+          sudo rm -rf "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip
+          touch "$GITHUB_WORKSPACE"/file.log
+          echo "md5: $md5" > "$GITHUB_WORKSPACE"/file.log
+          touch "$GITHUB_WORKSPACE"/zip/合并.sh
+          for i in $(ls miui_LMIPRE_"${{ env.date }}".zip)
+          do
+          md5=$(md5sum "$i")
+          echo "$i，md5：$md5" >> "$GITHUB_WORKSPACE"/file.log
+          echo "$i=$md5" >> "$GITHUB_WORKSPACE"/zip/合并.sh
+          do
+          echo "cat ${0%/*}/miui_LMIPRE_${{ env.date }}.zip* > ${0%/*}/miui_LMIPRE_${{ env.date }}_$zipmd5_12.0_2in1.zip" >> "$GITHUB_WORKSPACE"/zip/合并.sh
        - name: 6.上传到Github Release
          uses: ncipollo/release-action@main
          with:
