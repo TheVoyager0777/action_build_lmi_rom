@@ -118,18 +118,9 @@ jobs:
           else
           echo -e "\e[31m     >>>>>>  正在去除,请等待....  >>>>>>> \e[0m"
           for file in $fstab; do
-          sudo sed -i "s/,verify\b//g" $file
-          sudo sed -i "s/\bverify,//g" "$file"
-          sudo sed -i "s/\bverify\b//g" "$file"
-          sudo sed -i "s/,verify,/,/g" "$file"
-          sudo sed -i "s/,support_scfs\b//g" "$file"
-          sudo sed -i "s/\bsupport_scfs,//g" "$file"
-          sudo sed -i "s/\bsupport_scfs\b//g" "$file"
-          sudo sed -i "s/,support_scfs,/,/g" "$file"
-          sudo sed -i "s/,avb\b//g" "$file"
-          sudo sed -i "s/\bavb,//g" "$file"
-          sudo sed -i "s/\bavb\b//g" "$file"
-          sudo sed -i "s/,avb,/,/g" "$file"
+          sudo sed -i 's/,avb.*system//g' $file
+          sudo sed -i 's/,avb,/,/g' $file
+          sudo sed -i 's/,avb_keys.*key//g' $file
           sudo sed -i "s/\b\(forceencrypt\|forcefdeorfbe\)=/encryptable=/g" "$file"
           sudo sed -i "s/\bfileencryption/encryptable/g" "$file"
           done
