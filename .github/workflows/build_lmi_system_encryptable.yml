@@ -395,7 +395,7 @@ jobs:
           sudo split -b 1536m miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0_2in1.zip -d -a 2 miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0_2in1.zip
           sudo rm -rf "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0_2in1.zip
           touch "$GITHUB_WORKSPACE"/file.log
-          echo "md5: $md5" > "$GITHUB_WORKSPACE"/file.log
+          echo "md5: ${{ env.MD5 }}" > "$GITHUB_WORKSPACE"/file.log
        - name: 6.上传到Github Release
          uses: ncipollo/release-action@main
          with:
