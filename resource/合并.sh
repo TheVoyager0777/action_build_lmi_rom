@@ -1,5 +1,5 @@
 MODDIR=${0%/*}
-ROM=miui_LMIPRE_22.9.16_abb7bc08dc_12.0_2in1.zip
+ROM=ROM_name
 cat $MODDIR/"${ROM}"* > $MODDIR/"${ROM}"
 RealMd5=$(echo $MODDIR/"${ROM}" | cut -d '_' -f 4)
 echo "- ROM正确的MD5值为: $RealMd5"
