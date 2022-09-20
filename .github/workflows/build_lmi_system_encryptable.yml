@@ -386,7 +386,7 @@ jobs:
           sudo split -b 1536m miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0_2in1.zip -d -a 2 miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0_2in1.zip
           sudo rm -rf "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0_2in1.zip
           sudo mv -f "$GITHUB_WORKSPACE"/resource/合并.sh "$GITHUB_WORKSPACE"/zip/
-          sudo sed -i "s/ROM_name/${{ env.NEW_PACKAGE_NAME }}/g" "$GITHUB_WORKSPACE"/images/dynamic_partitions_op_list
+          sudo sed -i "s/ROM_name/${{ env.NEW_PACKAGE_NAME }}/g" "$GITHUB_WORKSPACE"/zip/合并.sh
           touch "$GITHUB_WORKSPACE"/file.log
           echo "md5: ${{ env.MD5 }}" > "$GITHUB_WORKSPACE"/file.log
        - name: 6.上传到Github Release
