@@ -393,8 +393,8 @@ jobs:
          uses: ncipollo/release-action@main
          with:
            artifacts: ${{ github.workspace }}/zip/*
-           name: "${{ env.date }}"
-           tag: "${{ env.date }}"
+           name: "${{ env.date }}_encryptable"
+           tag: "${{ env.date }}_encryptable"
            bodyFile: "${{ github.workspace }}/file.log"
            allowUpdates: true
            artifactErrorsFailBuild: true
