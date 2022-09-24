@@ -71,18 +71,19 @@ jobs:
          run: |
             sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_.zip "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/
             echo "artifact_name=miui_LMIPRE_" >> $GITHUB_ENV
-       - name: 6.上传到123云盘
-         run: |
-            curl https://rclone.org/install.sh | sudo bash
-            mkdir -p ~/.config/rclone/
-            unzip -P ${{ secrets.PASSWORD }} "$GITHUB_WORKSPACE"/tools/rclone.zip -d ~/.config/rclone/
-            curl -fsSL "https://nn.ci/alist.sh" | sudo bash -s install
-            sudo systemctl stop alist
-            sudo mv -f /home/runner/.config/rclone/data.db /opt/alist/data
-            sudo systemctl start alist
-            rclone mkdir 123pan:/LMI_DEV
-            rclone sync -P ./zip/* 123pan:/LMI_DEV
-       - name: 7.删除工作流运行
+           touch "$GITHUB_WORKSPACE"/file.log
+          echo "测试" > "$GITHUB_WORKSPACE"/file.log
+        - name: 6.上传到Github Release
+          uses: ncipollo/release-action@main
+          with:
+            artifacts: ${{ github.workspace }}/zip/*
+            name: "${{ env.date }}"
+            tag: "${{ env.date }}"
+            bodyFile: "${{ github.workspace }}/file.log"
+            allowUpdates: true
+            artifactErrorsFailBuild: true
+            token: ${{ secrets.GITHUB_TOKEN }}
+      - name: 7.删除工作流运行
          uses: Mattraks/delete-workflow-runs@v2
          with:
           token: ${{ github.token }}
