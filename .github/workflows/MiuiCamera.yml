@@ -74,13 +74,13 @@ jobs:
        - name: 6.上传到Github Release
          uses: ncipollo/release-action@main
          with:
-          artifacts: ${{ github.workspace }}/zip/*
-          name: "${{ env.date }}"
-          tag: "${{ env.date }}"
-          bodyFile: "${{ github.workspace }}/file.log"
-          allowUpdates: true
-          artifactErrorsFailBuild: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+           artifacts: ${{ github.workspace }}/zip/*
+           name: "${{ env.date }}"
+           tag: "${{ env.date }}"
+           bodyFile: "${{ github.workspace }}/file.log"
+           allowUpdates: true
+           artifactErrorsFailBuild: true
+           token: ${{ secrets.GITHUB_TOKEN }}
        - name: 7.删除工作流运行
          uses: Mattraks/delete-workflow-runs@v2
          with:
