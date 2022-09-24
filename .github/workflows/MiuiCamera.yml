@@ -52,44 +52,21 @@ jobs:
          run: |
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/apktool.jar
             Apktool="java -jar "$GITHUB_WORKSPACE"/tools/apktool.jar"
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MiuiCamera/one/MiuiCamera/
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MiuiCamera/two/
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MiuiCamera/three/
-            sudo unzip -o "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk 'classes*.dex' -d "$GITHUB_WORKSPACE"/MiuiCamera/one/
-            cd "$GITHUB_WORKSPACE"/MiuiCamera/one/
-            sudo 7z a -tzip "$GITHUB_WORKSPACE"/MiuiCamera/one/MiuiCamera.apk ./*
-            sudo $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MiuiCamera/one/MiuiCamera/ "$GITHUB_WORKSPACE"/MiuiCamera/one/MiuiCamera.apk
-            echo 编译完成
-            mod="$GITHUB_WORKSPACE"/MiuiCamera/one/MiuiCamera/smali*/${{ env.camera1 }}
-            sudo sed -i '/^${{ env.camera2 }}/,/^.end method/{//!d}' $mod
-            sudo sed -i -e '/^${{ env.camera2 }}/a\    .registers 1\n\n    const/4 p0, 0x0\n\n   return p0' $mod
-            echo 修改完成
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MiuiCamera/two/MiuiCamera/smali/${{ env.camera1 }}
-            sudo cp -rf "$GITHUB_WORKSPACE"/MiuiCamera/one/MiuiCamera/smali*/${{ env.camera1 }} "$GITHUB_WORKSPACE"/MiuiCamera/two/MiuiCamera/smali/${{ env.camera1 }}
-            sudo cp -rf "$GITHUB_WORKSPACE"/MiuiCamera/one/MiuiCamera/apktool.yml "$GITHUB_WORKSPACE"/MiuiCamera/two/MiuiCamera/
-            echo 开始反编译
-            sudo $Apktool b -q -f -o "$GITHUB_WORKSPACE"/MiuiCamera/two/MiuiCamera.apk "$GITHUB_WORKSPACE"/MiuiCamera/two/MiuiCamera/
-            echo 反编译完成
-            filepath="$GITHUB_WORKSPACE"/MiuiCamera/one/
-            for file in `ls -a $filepath`
-            do
-              if [ "${file##*.}"x = "dex"x ];then
-                old=$(echo $file | tr -d "a-zA-Z" | tr -d ".")
-                if [ -Z $old ];then
-                   old=1
-                fi
-                new=$(echo $old|awk '{for(i=1;i<=NF;i++){$i+=1}}1')
-                sudo cp -rf "$GITHUB_WORKSPACE"/MiuiCamera/one/$file "$GITHUB_WORKSPACE"/MiuiCamera/three/classes$new.dex
-              fi
-            done
-            echo 移动文件完成
-            sudo unzip -o "$GITHUB_WORKSPACE"/MiuiCamera/two/MiuiCamera.apk -d "$GITHUB_WORKSPACE"/MiuiCamera/three/
-            ls -a "$GITHUB_WORKSPACE"/MiuiCamera/three/
-            cd "$GITHUB_WORKSPACE"/MiuiCamera/three/
+            sudo mkdir -p "$GITHUB_WORKSPACE"/MiuiCamera/
+            $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MiuiCamera/ "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk
+            mod=$(find "$GITHUB_WORKSPACE"/MiuiCamera/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl \"pref_popup_camera\" | sed 's/^\.\///' | sort)
+            item=$(grep -B 10 pref_popup_camera $mod | grep -n "()Z" | cut -d ":" -f 2 | cut -d "," -f 2 | sed 's/L//g' | sed 's/;-/.smali/g' | sed 's/>[^*]*//g')
+            item2=$(grep -B 10 \"pref_popup_camera\" $mod | grep -n "()Z" | cut -d ":" -f 2 | cut -d "," -f 2 | sed 's/L//g' | sed 's/;/.smali/g' | sed 's/[^*]*-//g' | sed 's/>/ /g')
+            ikk=$(cat "$GITHUB_WORKSPACE"/MiuiCamera/smali*/$item | grep -n "$item2" | cut -d ":" -f 2)
+            sudo sed -i '/^$ikk/,/^.end method/{//!d}' $mod
+            sudo sed -i -e '/^$ikk/a\    .registers 1\n\n    const/4 p0, 0x0\n\n   return p0' $mod
+            $Apktool b -q -f -o "$GITHUB_WORKSPACE"/MiuiCamera/MiuiCamera.apk "$GITHUB_WORKSPACE"/MiuiCamera/
+            cd "$GITHUB_WORKSPACE"/MiuiCamera/build/apk
             sudo 7z a "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk ./*.dex -mx0
             sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/oat
             sudo mv "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk "$GITHUB_WORKSPACE"/MiuiCamera/MiuiCamera.apk
             sudo zipalign -v 4 "$GITHUB_WORKSPACE"/MiuiCamera/MiuiCamera.apk "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk >/dev/null
+            sudo mv "$GITHUB_WORKSPACE"/MiuiCamera/lib/arm64-v8a/* "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/lib/arm64/
        - name: 5.打包
          run: |
             sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_.zip "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/
