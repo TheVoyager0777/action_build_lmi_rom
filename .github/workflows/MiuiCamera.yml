@@ -23,7 +23,7 @@ jobs:
             pip3 install requests
             pip3 install beautifulsoup4
             pip3 install --ignore-installed pyyaml
-      - name: 2.下载系统包
+       - name: 2.下载系统包
          run: |
             aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${{ env.ROM_URL }}
        - name: 3.解包
