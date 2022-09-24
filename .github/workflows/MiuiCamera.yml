@@ -71,8 +71,8 @@ jobs:
          run: |
             sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_.zip "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/
             echo "artifact_name=miui_LMIPRE_" >> $GITHUB_ENV
-           touch "$GITHUB_WORKSPACE"/file.log
-          echo "测试" > "$GITHUB_WORKSPACE"/file.log
+            touch "$GITHUB_WORKSPACE"/file.log
+            echo "测试" > "$GITHUB_WORKSPACE"/file.log
         - name: 6.上传到Github Release
           uses: ncipollo/release-action@main
           with:
