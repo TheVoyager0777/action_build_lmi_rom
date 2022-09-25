@@ -7,6 +7,11 @@ ui_print() {
 	echo -e "ui_print $1\nui_print" >>$OUTFD
 }
 
+abort() {
+  ui_print "$1"
+  exit 1
+}
+
 package_extract_file() {
 	ui_print "- 正在刷写分区 $(echo $2 | cut -d '/' -f6) "
 	unzip -p "$ZIPFILE" $1 >$2
@@ -24,6 +29,13 @@ chmod -R 0755 /tmp
 ui_print " "
 ui_print "       欢迎刷入 $ZIPFILE"
 ui_print " "
+if [[ $(getprop ro.product.device) == lmi* ]];then
+ ui_print "- 机型校验成功"
+ ui_print " "
+else
+ abort "- 机型校验失败"
+ ui_print " "
+fi
 AdbSideLoad=$(echo "$ZIPFILE" | grep sideload)
 if [ "$AdbSideLoad" = "" ]; then
 	ui_print "- 正在校验MD5"
