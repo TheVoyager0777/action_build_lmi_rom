@@ -389,7 +389,25 @@ jobs:
          run: |
           rclone mkdir OneDrive:/MI_Packages/LMI_Packages
           rclone sync -P ./zip/* OneDrive:/MI_Packages/LMI_Packages
-       - name: 7.删除工作流运行
+       - name: 7.更新rom信息
+         run: |
+          mkdir "$GITHUB_WORKSPACE"/romdata && touch "$GITHUB_WORKSPACE"/romdata/lmi.ini
+          echo lmiPKG=${{ env.NEW_PACKAGE_NAME }} >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
+          echo lmiMD5=${{ env.MD5 }} >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
+          echo lmiTIME=\"$(TZ=':Asia/Shanghai' date '+%Y.%m.%d %H:%M')\" >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
+          echo lmiURL=https://onedrive.zjw.js.cn/Direct/LMI_Packages/${{ env.NEW_PACKAGE_NAME }} >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
+       - name: 8.导出信息
+         uses: dmnemec/copy_file_to_another_repo_action@main
+         env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+         with:
+          source_file: 'romdata/lmi.ini'
+          destination_repo: 'zjw2017/sm8250-page'
+          destination_folder: 'device'
+          user_email: 'example@email.com'
+          user_name: 'zjw2017'
+          commit_message: 'Update from $GITHUB_REF'
+       - name: 9.删除工作流运行
          uses: Mattraks/delete-workflow-runs@v2
          with:
           token: ${{ github.token }}
