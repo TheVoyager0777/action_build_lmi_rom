@@ -1,4 +1,4 @@
-name: build_lmi_system_encryptable
+name: build_lmi_system_encryptable_github_release
 on:
   workflow_dispatch:
 
