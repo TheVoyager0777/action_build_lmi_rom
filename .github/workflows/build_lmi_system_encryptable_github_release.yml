@@ -1,22 +1,22 @@
-name: build_lmi_system_zstd - webpush
+name: build_lmi_system_encryptable
 on:
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - name: 获取配置
-        run: |
+       - uses: actions/checkout@master
+       - name: 获取配置
+         run: |
           source "$GITHUB_WORKSPACE"/resource/config.env
           echo "ROM_URL=$ROM_URL" >> $GITHUB_ENV
           echo "date=$(echo $ROM_URL | cut -d"/" -f4)" >> $GITHUB_ENV
           echo "camera1=$camera1" >> $GITHUB_ENV
           echo "camera2=$camera2" >> $GITHUB_ENV
-      - name: 1.准备环境
-        run: |
-          sudo apt install python3 python3-pip aria2 zip p7zip-full tar zipalign zstd
+       - name: 1.安装依赖
+         run: |
+          sudo apt install python3 python3-pip aria2 zip p7zip-full zipalign
           sudo apt --fix-broken install
           sudo apt update --fix-missing
           pip3 install --upgrade pip
@@ -26,19 +26,12 @@ jobs:
           pip3 install requests
           pip3 install beautifulsoup4
           pip3 install --ignore-installed pyyaml
-          curl https://rclone.org/install.sh | sudo bash
-          mkdir -p ~/.config/rclone/
-          unzip -P ${{ secrets.PASSWORD }} "$GITHUB_WORKSPACE"/tools/rclone.zip -d ~/.config/rclone/
-          curl -fsSL "https://nn.ci/alist.sh" | sudo bash -s install
-          sudo systemctl stop alist
-          sudo mv -f /home/runner/.config/rclone/data.db /opt/alist/data
-          sudo systemctl start alist
-      - name: 3.下载系统包
-        run: |
+       - name: 3.下载系统包
+         run: |
           aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${{ env.ROM_URL }}
-          aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" https://hugeota.d.miui.com/22.7.19/miui_LMIPRE_22.7.19_0c8ec819b7_12.0.zip
-      - name: 4.解包
-        run: |
+          aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" https://bigota.d.miui.com/22.7.19/miui_LMIPRE_22.7.19_0c8ec819b7_12.0.zip
+       - name: 4.解包
+         run: |
           sudo chmod 777 "$GITHUB_WORKSPACE"/tools/payload-dumper-go
           sudo chmod 777 "$GITHUB_WORKSPACE"/tools/brotli
           mkdir -p "$GITHUB_WORKSPACE"/PSYCHE
@@ -54,35 +47,40 @@ jobs:
           7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_LMI -r -o"$GITHUB_WORKSPACE"/images boot.img
           for i in vendor odm
           do
-              7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_LMI -o"$GITHUB_WORKSPACE"/images $i.transfer.list
-              7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_LMI -o"$GITHUB_WORKSPACE"/images $i.patch.dat
-              7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_LMI -o"$GITHUB_WORKSPACE"/images $i.new.dat.br
-              "$GITHUB_WORKSPACE"/tools/brotli -d "$GITHUB_WORKSPACE"/images/$i.new.dat.br
-              rm -rf "$GITHUB_WORKSPACE"/images/$i.new.dat.br
-              python3 "$GITHUB_WORKSPACE"/tools/sdat2img.py "$GITHUB_WORKSPACE"/images/$i.transfer.list "$GITHUB_WORKSPACE"/images/$i.new.dat "$GITHUB_WORKSPACE"/images/$i.img
-              rm -rf "$GITHUB_WORKSPACE"/images/$i.patch.dat
-              rm -rf "$GITHUB_WORKSPACE"/images/$i.transfer.list
-              rm -rf "$GITHUB_WORKSPACE"/images/$i.new.dat
-              echo ""$i"_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})" >> $GITHUB_ENV
-              echo ""$i"_indoe=$(tune2fs -l "$GITHUB_WORKSPACE"/images/$i.img | grep 'Inode count' | awk '{print $3}')" >> $GITHUB_ENV
-              sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/$i.img "$GITHUB_WORKSPACE"/images
-              rm -rf "$GITHUB_WORKSPACE"/images/$i.img
+            7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_LMI -o"$GITHUB_WORKSPACE"/images $i.transfer.list
+            7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_LMI -o"$GITHUB_WORKSPACE"/images $i.patch.dat
+            7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_LMI -o"$GITHUB_WORKSPACE"/images $i.new.dat.br
+            "$GITHUB_WORKSPACE"/tools/brotli -d "$GITHUB_WORKSPACE"/images/$i.new.dat.br
+            rm -rf "$GITHUB_WORKSPACE"/images/$i.new.dat.br
+            python3 "$GITHUB_WORKSPACE"/tools/sdat2img.py "$GITHUB_WORKSPACE"/images/$i.transfer.list "$GITHUB_WORKSPACE"/images/$i.new.dat "$GITHUB_WORKSPACE"/images/$i.img
+            rm -rf "$GITHUB_WORKSPACE"/images/$i.patch.dat
+            rm -rf "$GITHUB_WORKSPACE"/images/$i.transfer.list
+            rm -rf "$GITHUB_WORKSPACE"/images/$i.new.dat
+            echo ""$i"_indoe=$(tune2fs -l "$GITHUB_WORKSPACE"/images/$i.img | grep 'Inode count' | awk '{print $3}')" >> $GITHUB_ENV
+            sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/$i.img "$GITHUB_WORKSPACE"/images
+            rm -rf "$GITHUB_WORKSPACE"/images/$i.img
           done
           for i in system product system_ext
           do
-              "$GITHUB_WORKSPACE"/tools/payload-dumper-go -p $i "$GITHUB_WORKSPACE"/PSYCHE/payload.bin
-              mv "$GITHUB_WORKSPACE"/payload/$i.img "$GITHUB_WORKSPACE"/images/$i.img
-              echo ""$i"_size=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})" >> $GITHUB_ENV
-              echo ""$i"_indoe=$(tune2fs -l "$GITHUB_WORKSPACE"/images/$i.img | grep 'Inode count' | awk '{print $3}')" >> $GITHUB_ENV
-              sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/$i.img "$GITHUB_WORKSPACE"/images
-              rm -rf "$GITHUB_WORKSPACE"/images/$i.img
+            "$GITHUB_WORKSPACE"/tools/payload-dumper-go -p $i "$GITHUB_WORKSPACE"/PSYCHE/payload.bin
+            mv "$GITHUB_WORKSPACE"/payload/$i.img "$GITHUB_WORKSPACE"/images/$i.img
+            echo ""$i"_indoe=$(tune2fs -l "$GITHUB_WORKSPACE"/images/$i.img | grep 'Inode count' | awk '{print $3}')" >> $GITHUB_ENV
+            sudo python3 "$GITHUB_WORKSPACE"/tools/imgextractorLinux.py "$GITHUB_WORKSPACE"/images/$i.img "$GITHUB_WORKSPACE"/images
+            rm -rf "$GITHUB_WORKSPACE"/images/$i.img
           done
           rm -rf "$GITHUB_WORKSPACE"/payload
           rm -rf "$GITHUB_WORKSPACE"/PSYCHE
-      - name: 5.替换相关文件
-        run: |
+       - name: 5.替换相关文件
+         run: |
           sudo chmod 777 "$GITHUB_WORKSPACE"/tools/apktool.jar
           Apktool="java -jar "$GITHUB_WORKSPACE"/tools/apktool.jar"
+          echo 导入框架
+          $Apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miui/miui.apk
+          $Apktool if "$GITHUB_WORKSPACE"/images/system/system/app/miuisystem/miuisystem.apk
+          $Apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-res.apk
+          $Apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-ext-res/framework-ext-res.apk
+          sudo mkdir -p /root/.local/share/apktool/framework/
+          sudo mv /home/runner/.local/share/apktool/framework/* /root/.local/share/apktool/framework/
           sudo mkdir -p "$GITHUB_WORKSPACE"/images/system/system/etc/audio
           sudo rm -rf "$GITHUB_WORKSPACE"/images/product/etc/device_features/*
           sudo rm -rf "$GITHUB_WORKSPACE"/images/product/overlay/DeviceAndroidConfig.apk
@@ -106,6 +104,11 @@ jobs:
           sudo sed -i "s/sustem/system/g" "$GITHUB_WORKSPACE"/images/vendor/etc/selinux/vendor_file_contexts
           sudo sed -i "/ro.vendor.audio.game.effect/d" "$GITHUB_WORKSPACE"/images/vendor/build.prop
           sudo sed -i "/import/i ro.miui.region=CN\nro.miui.cust_variant=cn\nro.vendor.audio.support.sound.id=true\nro.vendor.audio.voip.assistant=true\nro.vendor.audio.aiasst.support=true\nro.vendor.media.video.frc.support=true\nro.vendor.audio.spk.stereo=true\nro.vendor.audio.vocal.support=true\nro.vendor.audio.surround.support=true\nro.vendor.audio.spk.clean=true\nro.vendor.video_box.version=2" "$GITHUB_WORKSPACE"/images/vendor/build.prop
+          sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/nfc.zip -d "$GITHUB_WORKSPACE"/images/system_ext
+          sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/audio.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/audio/ui/
+          sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/etc.zip -d "$GITHUB_WORKSPACE"/images/system/system/etc/audio/
+          sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/popup.zip -d "$GITHUB_WORKSPACE"/images/system/system/framework/
+          sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/bootan.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/
           #取消强制加密
           fstab=$(sudo find "$GITHUB_WORKSPACE"/images/vendor/ -name "fstab*")
           if [[ $fstab == "" ]];then
@@ -118,16 +121,12 @@ jobs:
           sudo sed -i 's/,avb.*system//g' $file
           sudo sed -i 's/,avb,/,/g' $file
           sudo sed -i 's/,avb_keys.*key//g' $file
-          sudo sed -i 's/fileencryption=ice/encryptable=ice/g' $file
+          sudo sed -i "s/\b\(forceencrypt\|forcefdeorfbe\)=/encryptable=/g" "$file"
+          sudo sed -i "s/\bfileencryption/encryptable/g" "$file"
           done
           fi
-          sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/nfc.zip -d "$GITHUB_WORKSPACE"/images/system_ext            
-          sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/audio.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/audio/ui/
-          sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/etc.zip -d "$GITHUB_WORKSPACE"/images/system/system/etc/audio/
-          sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/popup.zip -d "$GITHUB_WORKSPACE"/images/system/system/framework/
-          sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/bootan.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/
-          sudo mkdir -p "$GITHUB_WORKSPACE"/MiLink/
           #妙享白名单破解
+          sudo mkdir -p "$GITHUB_WORKSPACE"/MiLink/
           $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MiLink/ "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk
           mod="$GITHUB_WORKSPACE"/MiLink/smali*/com/miui/circulate/world/permission/method/PermissionCheck\$BaseCheck.smali
           sudo sed -i '/^.method public check()Z/,/^.end method/{//!d}' $mod
@@ -179,14 +178,14 @@ jobs:
           filepath="$GITHUB_WORKSPACE"/Settings/one/
           for file in `ls -a $filepath`
           do
-            if [ "${file##*.}"x = "dex"x ];then
-              old=$(echo $file | tr -d "a-zA-Z" | tr -d ".")
-              if [ -Z $old ];then
-                 old=1
-              fi
-              new=$(echo $old|awk '{for(i=1;i<=NF;i++){$i+=1}}1')
-              sudo cp -rf "$GITHUB_WORKSPACE"/Settings/one/$file "$GITHUB_WORKSPACE"/Settings/three/classes$new.dex
+          if [ "${file##*.}"x = "dex"x ];then
+            old=$(echo $file | tr -d "a-zA-Z" | tr -d ".")
+            if [ -Z $old ];then
+             old=1
             fi
+            new=$(echo $old|awk '{for(i=1;i<=NF;i++){$i+=1}}1')
+            sudo cp -rf "$GITHUB_WORKSPACE"/Settings/one/$file "$GITHUB_WORKSPACE"/Settings/three/classes$new.dex
+          fi
           done
           sudo unzip -o "$GITHUB_WORKSPACE"/Settings/two/Settings.apk -d "$GITHUB_WORKSPACE"/Settings/three/
           cd "$GITHUB_WORKSPACE"/Settings/three/
@@ -194,50 +193,89 @@ jobs:
           sudo rm -rf "$GITHUB_WORKSPACE"/images/system_ext/priv-app/Settings/oat
           sudo mv "$GITHUB_WORKSPACE"/images/system_ext/priv-app/Settings/Settings.apk "$GITHUB_WORKSPACE"/Settings/Settings.apk
           sudo zipalign -v 4 "$GITHUB_WORKSPACE"/Settings/Settings.apk "$GITHUB_WORKSPACE"/images/system_ext/priv-app/Settings/Settings.apk >/dev/null
-          #气泡通知修复，去除10秒等待
-          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
+          #手机管家各种修改
+          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
           sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/
           sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
-          sudo unzip -o "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk 'classes*.dex' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
+          sudo unzip -o -q "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk 'classes*.dex' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
           cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
           sudo 7z a -tzip "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk ./*
-          sudo $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
+          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res
+          cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res
+          sudo $Apktool d -b -f -m "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk
+          for files in pc_power_settings.xml pc_power_settings_v12.xml
+          do
+            device=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/ -name $files)
+            sudo sed -i -e '/http\:\/\/schemas.android.com\/apk\/res\/android/a\    \<PreferenceCategory\>\n        \<PreferenceScreen android:title\=\"高级电量统计\"\>\n            \<intent android:targetPackage\=\"com.miui.powerkeeper\" android:targetClass\=\"com.miui.powerkeeper.ui.powertools.module.batterylife.BatteryStatusActivity\" \/\>\n        \<\/PreferenceScreen\>\n    \<\/PreferenceCategory\>' $device
+          done
+          mod=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/ -type f -name '*.xml' 2>/dev/null | xargs grep -rl 'APKTOOL_DUMMY_' | sed 's/^\.\///' | sort)
+          for a in $mod
+          do
+            sudo sed -i '/APKTOOL_DUMMY_/d' $a
+          done
+          mod1=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/ -type f -name '*.xml' 2>/dev/null | xargs grep -rl 'isAccessibilityTool' | sed 's/^\.\///' | sort)
+          for b in $mod2
+          do
+            sudo sed -i 's/android:isAccessibilityTool\=\"true\"//g' $b
+          done
+          cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter
+          sudo $Apktool b -f "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/ -o MIUISecurityCenter.apk
+          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
+          cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
+          sudo $Apktool d -b -r -f -m "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
           mod1="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/com/miui/bubbles/utils/MiuiFreeFormManagerWrapper.smali
           sudo sed -i '/^.method public static isSupportPin()Z/,/^.end method/{//!d}' $mod1
           sudo sed -i -e '/^.method public static isSupportPin()Z/a\    .registers 3\n\n    const/4 v0, 0x1\n\n   return v0' $mod1
-          Mod1=${mod1#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
-          Mod1=${Mod1%/*.smali}
-          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod1
-          sudo cp -rf $mod1 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod1
           mod2="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/com/miui/permcenter/privacymanager/InterceptBaseFragment.smali
           sudo sed -i 's/0x5/0x0/g' $mod2
           mod3="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/com/miui/permcenter/privacymanager/InterceptPermissionFragment.smali
           sudo sed -i 's/0xa/0x0/g' $mod3
-          Mod2=${mod2#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
-          Mod2=${Mod2%/*.smali}
-          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod2
-          sudo cp -rf $mod2 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod2
-          Mod3=${mod3#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
-          Mod3=${Mod3%/*.smali}
-          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod3
-          sudo cp -rf $mod3 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod3
-          sudo cp -rf "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/apktool.yml "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/
-          sudo $Apktool b -q -f -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter.apk "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/
-          filepath="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
-          for file in `ls -a $filepath`
+          mod4=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'refreshStats' | sed 's/^\.\///' | sort)
+          sudo sed -i 's/0x1f/0x63/g' $mod4
+          mod5=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name 'BatteryFragment*.smali' 2>/dev/null | xargs grep -rl 'stable' | sed 's/^\.\///' | sort)
+          for i in $mod5
           do
-            if [ "${file##*.}"x = "dex"x ];then
-              old=$(echo $file | tr -d "a-zA-Z" | tr -d ".")
-              if [ -Z $old ];then
-                 old=1
-              fi
-              new=$(echo $old|awk '{for(i=1;i<=NF;i++){$i+=1}}1')
-              sudo cp -rf "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/$file "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/classes$new.dex
+            int=$(cat $i | grep -n "stable" | cut -d ":" -f 1)
+            int=$(echo "$int + 4" | bc)
+            sudo sed -i -e "${int}a const/4 v1, 0x1" $i
+          done
+          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/miui/
+          sudo cp -rf "$GITHUB_WORKSPACE"/resource/czh.smali "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/miui/
+          mod6=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'mi_lab_ai_clipboard_enable' | sed 's/^\.\///' | sort)
+          sudo sed -i 's/Lmiui\/os\/Build;->IS_STABLE_VERSION\:Z/Lmiui\/czh;->TRUE\:Z/g' $mod6
+          mod7=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'gb_game_content' | sed 's/^\.\///' | sort)
+          int=$(cat $mod7 | grep -n "gb_game_content" | cut -d ":" -f 1)
+          for i in $int
+          do
+            i=$(echo "$i - 3" | bc)
+            uu=$(sed -n "${i}p" $mod7 | sed 's/.method public static//g' | awk -F "(" '{print $2}')
+            if [ $uu = ")Z" ];then
+              moduu=$(sed -n "${i}p" $mod7)
+              sudo sed -i "/^$moduu/,/^.end method/{//!d}" $mod7
+              sudo sed -i -e "/^$moduu/a\    .registers 3\n\n    const/4 v0, 0x0\n\n   return v0" $mod7
             fi
           done
-          sudo unzip -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter.apk -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
+          mod8=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'key_check_item_root' | sed 's/^\.\///' | sort)
+          item=$(grep -B 10 key_check_item_root $mod8 | grep -n "()Z" | cut -d ":" -f 2)
+          sudo sed -i "/^$item/,/^.end method/{//!d}" $mod8
+          sudo sed -i -e "/^$item/a\    .registers 3\n\n    const/4 v0, 0x0\n\n   return v0" $mod8
+          mod9=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'pref_gb_unsupport_macro_apps' | sed 's/^\.\///' | sort)
+          sudo sed -i 's/const\/4 p0, 0x1/const\/4 p0, 0x0/g' $mod9
+          mod10=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'nothing when close recommend' | sed 's/^\.\///' | sort)
+          sudo sed -i 's/invoke-static {v2}, Lcom\/miui\/gamebooster\/globalgame\/util\/d;->a(Ljava\/util\/Collection;)Z/invoke-static {v2}, Lmiui\/czh;->Enable(Ljava\/util\/Collection;)Z/g' $mod10
+          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali/miui/
+          sudo cp -rf "$GITHUB_WORKSPACE"/resource/czh.smali "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali/miui/
+          cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
+          sudo $Apktool b -q -f "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ -o MIUISecurityCenter.apk
+          sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/res/xml/
+          for files in pc_power_settings.xml pc_power_settings_v12.xml
+          do
+            b=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/build/ -name $files)
+            sudo cp -rf $b "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/res/xml/
+          done
+          sudo unzip -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
           cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
-          sudo 7z a "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk ./*.dex -mx0
+          sudo 7z a "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk ./* -mx0
           sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/oat
           sudo mv "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk "$GITHUB_WORKSPACE"/MIUISecurityCenter/MIUISecurityCenter.apk
           sudo zipalign -v 4 "$GITHUB_WORKSPACE"/MIUISecurityCenter/MIUISecurityCenter.apk "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk >/dev/null
@@ -246,8 +284,8 @@ jobs:
           #部分精简
           for files in MIGalleryLockscreen MIUIDriveMode MIUIDuokanReader MIUIGameCenter MIUINewHome MIUIYoupin
           do
-            device=$(find "$GITHUB_WORKSPACE"/images/system/system/data-app/ -name $files)
-            sudo rm -rf $device
+          device=$(sudo find "$GITHUB_WORKSPACE"/images/system/system/data-app/ -name $files)
+          sudo rm -rf $device
           done
           sudo mv -f "$GITHUB_WORKSPACE"/resource/vbmeta.img "$GITHUB_WORKSPACE"/images/firmware-update
           sudo mv -f "$GITHUB_WORKSPACE"/resource/vbmeta_system.img "$GITHUB_WORKSPACE"/images/firmware-update
@@ -255,41 +293,28 @@ jobs:
           sudo rm -rf "$GITHUB_WORKSPACE"/MiLink
           sudo rm -rf "$GITHUB_WORKSPACE"/MiuiCamera
           sudo rm -rf "$GITHUB_WORKSPACE"/Settings
-          for i in system vendor product odm system_ext
+          for i in system vendor product system_ext odm
           do
             sudo touch -t 200901010000.00 "$GITHUB_WORKSPACE"/images/$i/lost+found
           done
-      - name: 6.打包
-        run: |
+       - name: 6.打包
+         run: |
           sudo chmod 777 "$GITHUB_WORKSPACE"/tools/mke2fs
           sudo chmod 777 "$GITHUB_WORKSPACE"/tools/e2fsdroid
-          sudo chmod 777 "$GITHUB_WORKSPACE"/tools/img2simg
           sudo chmod 777 "$GITHUB_WORKSPACE"/tools/lpmake
-          URL=${{ env.ROM_URL }}
-          DATE=${URL%/*}
-          date=${DATE##*/}
-          product_size=${{ env.product_size }}
-          vendor_size=${{ env.vendor_size }}
-          system_ext_size=${{ env.system_ext_size }}
-          system_size=${{ env.system_size }}
-          odm_size=${{ env.odm_size }}
           for i in system vendor product odm system_ext
           do
-            eval "$i"_size_orig=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})
-            if [[ "$(eval echo "$"$i"_size_orig")" -le "10485760" ]]; then
-              size=$(echo "$(eval echo "$"$i"_size_orig") * 12 / 10 / 4096 * 4096" | bc)
-            elif [[ "$(eval echo "$"$i"_size_orig")" -gt "2684354560" ]]; then
-              size=$(echo "$(eval echo "$"$i"_size_orig") * 109 / 105 / 4096 * 4096" | bc)
-            else
-              size=$(echo "$(eval echo "$"$i"_size_orig") * 12 / 11 / 4096 * 4096" | bc)
-            fi
-            eval "$i"_size_orig=$size
+          eval "$i"_size_orig=$(sudo du -sb "$GITHUB_WORKSPACE"/images/$i | awk {'print $1'})
+          if [[ "$(eval echo "$"$i"_size_orig")" -le "10485760" ]]; then
+            size=$(echo "$(eval echo "$"$i"_size_orig") * 12 / 10 / 4096 * 4096" | bc)
+          elif [[ "$(eval echo "$"$i"_size_orig")" -gt "2684354560" ]]; then
+            size=$(echo "$(eval echo "$"$i"_size_orig") * 109 / 105 / 4096 * 4096" | bc)
+          else
+            size=$(echo "$(eval echo "$"$i"_size_orig") * 12 / 11 / 4096 * 4096" | bc)
+          fi
+          echo $size
+          eval "$i"_size=$size
           done
-          system_size=$(echo "$system_size + $system_size_orig" | bc)
-          vendor_size=$(echo "$vendor_size + $vendor_size_orig" | bc)
-          product_size=$(echo "$product_size +$product_size_orig" | bc)
-          odm_size=$(echo "$odm_size +$odm_size_orig" | bc)
-          system_ext_size=$(echo "$system_ext_size + $system_ext_size_orig" | bc)
           system_size=$(echo "$system_size * 4096 / 4096 / 4096" | bc)
           vendor_size=$(echo "$vendor_size * 4096 / 4096 / 4096" | bc)
           product_size=$(echo "$product_size * 4096 / 4096 / 4096" | bc)
@@ -304,9 +329,10 @@ jobs:
           for i in system vendor product odm system_ext
           do
               while true;do
+              eval echo "$"$i"_size"
               sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/$i "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config
               "$GITHUB_WORKSPACE"/tools/mke2fs -O ^has_journal -L $i -I 256 -N $(eval echo "$"$i"_indoe") -M /$i -m 0 -t ext4 -b 4096 "$GITHUB_WORKSPACE"/images/$i.img $(eval echo "$"$i"_size")
-              sudo "$GITHUB_WORKSPACE"/tools/e2fsdroid -T 1230768000 -C "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config -S "$GITHUB_WORKSPACE"/images/TI_config/"$i"_file_contexts -f "$GITHUB_WORKSPACE"/images/$i -a /$i -e -s "$GITHUB_WORKSPACE"/images/$i.img 
+              sudo "$GITHUB_WORKSPACE"/tools/e2fsdroid -T 1230768000 -C "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config -S "$GITHUB_WORKSPACE"/images/TI_config/"$i"_file_contexts -f "$GITHUB_WORKSPACE"/images/$i -a /$i -e -s "$GITHUB_WORKSPACE"/images/$i.img
               resize2fs -f -M "$GITHUB_WORKSPACE"/images/$i.img
               eval "$i"_size=$(du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})
               size_free=$(tune2fs -l "$GITHUB_WORKSPACE"/images/$i.img | awk '/Free blocks:/ { print $3}')
@@ -314,7 +340,23 @@ jobs:
               eval "$i"_size=$(echo "$(eval echo "$"$i"_size") - $size_free" | bc)
               eval "$i"_size=$(echo "$(eval echo "$"$i"_size") / 4096" | bc)
               if [[ $size_free = 0 ]];then
+                system_indoe=${{ env.system_indoe }}
+                vendor_indoe=${{ env.vendor_indoe }}
+                product_indoe=${{ env.product_indoe }}
+                odm_indoe=192
+                system_ext_indoe=${{ env.system_ext_indoe }}
                 eval "$i"_size=$(du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})
+                sudo rm -rf "$GITHUB_WORKSPACE"/images/$i.img
+                original_size=$(echo "$(eval echo "$"$i"_size") / 524288000 * 377 * 4096" | bc)
+                eval "$i"_size=$(echo "$original_size + $(eval echo "$"$i"_size")" | bc)
+                eval echo "$"$i"_size"
+                eval "$i"_size=$(echo "$(eval echo "$"$i"_size") / 4096" | bc)
+                sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/$i "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config
+                "$GITHUB_WORKSPACE"/tools/mke2fs -O ^has_journal -L $i -I 256 -N $(eval echo "$"$i"_indoe") -M /$i -m 0 -t ext4 -b 4096 "$GITHUB_WORKSPACE"/images/$i.img $(eval echo "$"$i"_size")
+                sudo "$GITHUB_WORKSPACE"/tools/e2fsdroid -T 1230768000 -C "$GITHUB_WORKSPACE"/images/TI_config/"$i"_fs_config -S "$GITHUB_WORKSPACE"/images/TI_config/"$i"_file_contexts -f "$GITHUB_WORKSPACE"/images/$i -a /$i -e -s "$GITHUB_WORKSPACE"/images/$i.img
+                resize2fs -f -M "$GITHUB_WORKSPACE"/images/$i.img
+                eval "$i"_size=$(du -sb "$GITHUB_WORKSPACE"/images/$i.img | awk {'print $1'})
+                eval echo "$"$i"_size"
                 sudo rm -rf "$GITHUB_WORKSPACE"/images/$i
                 break
               else
@@ -336,20 +378,30 @@ jobs:
           sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/images/*
           sudo rm -rf "$GITHUB_WORKSPACE"/images
           md5=$(md5sum "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip)
-          echo "MD5=${md5:0:32}" >> $GITHUB_ENV
+          MD5=${md5:0:32}
           zipmd5=${md5:0:10}
-          mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip
-          echo "NEW_PACKAGE_NAME=miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip" >> $GITHUB_ENV
-      - name: 7.上传到123盘
-        run: |
-          rclone mkdir 123pan:/RubbishBin
-          rclone sync -P ./zip/* 123pan:/RubbishBin
-      - name: 8.发送打包成功通知
-        run: |
-          curl -i -X POST -H 'Content-type':'application/json' -d '{"token":"${{ secrets.appToken2 }}","title":"红米K30Pro ${{ env.date }}已构建完成","content":" **红米K30Pro ${{ env.date }}已构建完成** \n \n **包名：${{ env.NEW_PACKAGE_NAME }}** \n \n **MD5：${{ env.MD5 }}** \n \n **下载地址为：[https://alist.zjw.js.cn/d/123pan_xiaosi/RubbishBin/${{ env.NEW_PACKAGE_NAME }}](https://alist.zjw.js.cn/d/123pan_xiaosi/RubbishBin/${{ env.NEW_PACKAGE_NAME }})** ","topic":"lmi","template":"markdown"}' http://www.pushplus.plus/send || true
-      - name: 9.删除工作流运行
-        uses: Mattraks/delete-workflow-runs@v2
-        with:
+          mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0_2in1.zip
+          NEW_PACKAGE_NAME=miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip
+          cd "$GITHUB_WORKSPACE"/zip/
+          sudo split -b 1536m miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0_2in1.zip -d -a 2 miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0_2in1.zip
+          sudo rm -rf "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0_2in1.zip
+          sudo mv -f "$GITHUB_WORKSPACE"/resource/合并.sh "$GITHUB_WORKSPACE"/zip/
+          sudo sed -i "s/ROM_name/$NEW_PACKAGE_NAME/g" "$GITHUB_WORKSPACE"/zip/合并.sh
+          touch "$GITHUB_WORKSPACE"/file.log
+          echo "md5: $MD5" > "$GITHUB_WORKSPACE"/file.log
+       - name: 6.上传到Github Release
+         uses: ncipollo/release-action@main
+         with:
+           artifacts: ${{ github.workspace }}/zip/*
+           name: "${{ env.date }}_encryptable"
+           tag: "${{ env.date }}_encryptable"
+           bodyFile: "${{ github.workspace }}/file.log"
+           allowUpdates: true
+           artifactErrorsFailBuild: true
+           token: ${{ secrets.GITHUB_TOKEN }}
+       - name: 7.删除工作流运行
+         uses: Mattraks/delete-workflow-runs@v2
+         with:
           token: ${{ github.token }}
           repository: ${{ github.repository }}
           retain_days: 0
