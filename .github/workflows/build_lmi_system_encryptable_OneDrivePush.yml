@@ -1,4 +1,4 @@
-name: build_lmi_system_encryptable
+name: build_lmi_system_encryptable_OneDrivePush
 on:
   workflow_dispatch:
 
@@ -26,6 +26,9 @@ jobs:
           pip3 install requests
           pip3 install beautifulsoup4
           pip3 install --ignore-installed pyyaml
+          curl https://rclone.org/install.sh | sudo bash
+          mkdir -p ~/.config/rclone/
+          unzip -P ${{ secrets.PASSWORD }} "$GITHUB_WORKSPACE"/tools/rclone.zip -d ~/.config/rclone/
        - name: 3.下载系统包
          run: |
           aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${{ env.ROM_URL }}
@@ -365,7 +368,7 @@ jobs:
               done
           done
           sudo rm -rf "$GITHUB_WORKSPACE"/images/TI_config
-          "$GITHUB_WORKSPACE"/tools/lpmake --metadata-size 65536 --super-name super --block-size=4096 --partition odm:readonly:$odm_size:qti_dynamic_partitions --image odm="$GITHUB_WORKSPACE"/images/odm.img --partition product:readonly:$product_size:qti_dynamic_partitions --image product="$GITHUB_WORKSPACE"/images/product.img --partition system:readonly:$system_size:qti_dynamic_partitions --image system="$GITHUB_WORKSPACE"/images/system.img --partition system_ext:readonly:$system_ext_size:qti_dynamic_partitions --image system_ext="$GITHUB_WORKSPACE"/images/system_ext.img --partition vendor:readonly:$vendor_size:qti_dynamic_partitions --image vendor="$GITHUB_WORKSPACE"/images/vendor.img --device super:9126805504 --metadata-slots 2 --group qti_dynamic_partitions:9126805504 -F --output "$GITHUB_WORKSPACE"/images/super.img
+          "$GITHUB_WORKSPACE"/tools/lpmake --metadata-size 65536 --super-name super --block-size 4096 --partition odm:readonly:$odm_size:qti_dynamic_partitions --image odm="$GITHUB_WORKSPACE"/images/odm.img --partition product:readonly:$product_size:qti_dynamic_partitions --image product="$GITHUB_WORKSPACE"/images/product.img --partition system:readonly:$system_size:qti_dynamic_partitions --image system="$GITHUB_WORKSPACE"/images/system.img --partition system_ext:readonly:$system_ext_size:qti_dynamic_partitions --image system_ext="$GITHUB_WORKSPACE"/images/system_ext.img --partition vendor:readonly:$vendor_size:qti_dynamic_partitions --image vendor="$GITHUB_WORKSPACE"/images/vendor.img --device super:9126805504 --metadata-slots 2 --group qti_dynamic_partitions:9126805504 -F --output "$GITHUB_WORKSPACE"/images/super.img
           for i in product system system_ext vendor odm; do
               rm -rf "$GITHUB_WORKSPACE"/images/$i.img
           done
@@ -378,27 +381,14 @@ jobs:
           sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/images/*
           sudo rm -rf "$GITHUB_WORKSPACE"/images
           md5=$(md5sum "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip)
-          MD5=${md5:0:32}
+          echo "MD5=${md5:0:32}" >> $GITHUB_ENV
           zipmd5=${md5:0:10}
-          mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0_2in1.zip
-          NEW_PACKAGE_NAME=miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip
-          cd "$GITHUB_WORKSPACE"/zip/
-          sudo split -b 1536m miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0_2in1.zip -d -a 2 miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0_2in1.zip
-          sudo rm -rf "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0_2in1.zip
-          sudo mv -f "$GITHUB_WORKSPACE"/resource/合并.sh "$GITHUB_WORKSPACE"/zip/
-          sudo sed -i "s/ROM_name/$NEW_PACKAGE_NAME/g" "$GITHUB_WORKSPACE"/zip/合并.sh
-          touch "$GITHUB_WORKSPACE"/file.log
-          echo "md5: $MD5" > "$GITHUB_WORKSPACE"/file.log
-       - name: 6.上传到Github Release
-         uses: ncipollo/release-action@main
-         with:
-           artifacts: ${{ github.workspace }}/zip/*
-           name: "${{ env.date }}_encryptable"
-           tag: "${{ env.date }}_encryptable"
-           bodyFile: "${{ github.workspace }}/file.log"
-           allowUpdates: true
-           artifactErrorsFailBuild: true
-           token: ${{ secrets.GITHUB_TOKEN }}
+          mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1_Root.zip
+          echo "NEW_PACKAGE_NAME=miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1_Root.zip" >> $GITHUB_ENV
+       - name: 6.上传到Onedrive
+         run: |
+          rclone mkdir OneDrive:/MI_Packages/LMI_Packages
+          rclone sync -P ./zip/* OneDrive:/MI_Packages/LMI_Packages
        - name: 7.删除工作流运行
          uses: Mattraks/delete-workflow-runs@v2
          with:
