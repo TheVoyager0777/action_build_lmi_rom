@@ -7,14 +7,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
        - uses: actions/checkout@master
-       - name: 获取配置
+       - name: 1.获取配置
          run: |
           source "$GITHUB_WORKSPACE"/resource/config.env
           echo "ROM_URL=$ROM_URL" >> $GITHUB_ENV
           echo "date=$(echo $ROM_URL | cut -d"/" -f4)" >> $GITHUB_ENV
           echo "camera1=$camera1" >> $GITHUB_ENV
           echo "camera2=$camera2" >> $GITHUB_ENV
-       - name: 1.安装依赖
+       - name: 2.安装依赖
          run: |
           sudo apt install python3 python3-pip aria2 zip p7zip-full zipalign
           sudo apt --fix-broken install
@@ -389,7 +389,7 @@ jobs:
           sudo sed -i "s/ROM_name/$NEW_PACKAGE_NAME/g" "$GITHUB_WORKSPACE"/zip/合并.sh
           touch "$GITHUB_WORKSPACE"/file.log
           echo "md5: $MD5" > "$GITHUB_WORKSPACE"/file.log
-       - name: 6.上传到Github Release
+       - name: 7.上传到Github Release
          uses: ncipollo/release-action@main
          with:
            artifacts: ${{ github.workspace }}/zip/*
@@ -399,7 +399,7 @@ jobs:
            allowUpdates: true
            artifactErrorsFailBuild: true
            token: ${{ secrets.GITHUB_TOKEN }}
-       - name: 7.删除工作流运行
+       - name: 8.删除工作流运行
          uses: Mattraks/delete-workflow-runs@v2
          with:
           token: ${{ github.token }}

@@ -7,14 +7,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
        - uses: actions/checkout@master
-       - name: 获取配置
+       - name: 1.获取配置
          run: |
           source "$GITHUB_WORKSPACE"/resource/config.env
           echo "ROM_URL=$ROM_URL" >> $GITHUB_ENV
           echo "date=$(echo $ROM_URL | cut -d"/" -f4)" >> $GITHUB_ENV
           echo "camera1=$camera1" >> $GITHUB_ENV
           echo "camera2=$camera2" >> $GITHUB_ENV
-       - name: 1.安装依赖
+       - name: 2.安装依赖
          run: |
           sudo apt install python3 python3-pip aria2 zip p7zip-full zipalign
           sudo apt --fix-broken install
@@ -385,18 +385,18 @@ jobs:
           zipmd5=${md5:0:10}
           mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1_Root.zip
           echo "NEW_PACKAGE_NAME=miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1_Root.zip" >> $GITHUB_ENV
-       - name: 6.上传到Onedrive
+       - name: 7.上传到Onedrive
          run: |
           rclone mkdir OneDrive:/MI_Packages/LMI_Packages
           rclone sync -P ./zip/* OneDrive:/MI_Packages/LMI_Packages
-       - name: 7.更新rom信息
+       - name: 8.更新rom信息
          run: |
           mkdir "$GITHUB_WORKSPACE"/romdata && touch "$GITHUB_WORKSPACE"/romdata/lmi.ini
           echo lmiPKG=${{ env.NEW_PACKAGE_NAME }} >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
           echo lmiMD5=${{ env.MD5 }} >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
           echo lmiTIME=\"$(TZ=':Asia/Shanghai' date '+%Y.%m.%d %H:%M')\" >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
           echo lmiURL=https://onedrive.zjw.js.cn/Direct/LMI_Packages/${{ env.NEW_PACKAGE_NAME }} >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
-       - name: 8.导出信息
+       - name: 9.导出信息
          uses: dmnemec/copy_file_to_another_repo_action@main
          env:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
@@ -407,7 +407,7 @@ jobs:
           user_email: 'example@email.com'
           user_name: 'zjw2017'
           commit_message: 'Update from $GITHUB_REF'
-       - name: 9.删除工作流运行
+       - name: 10.删除工作流运行
          uses: Mattraks/delete-workflow-runs@v2
          with:
           token: ${{ github.token }}
