@@ -113,18 +113,18 @@ jobs:
           #取消强制加密
           fstab=$(sudo find "$GITHUB_WORKSPACE"/images/vendor/ -name "fstab*")
           if [[ $fstab == "" ]];then
-          echo -e "\e[31m     >>>>>>>>找不到相关文件,也许没有加密呢>>>>>>>>>  \e[0m"
-          echo ""
-          sleep 5
-          else
-          echo -e "\e[31m     >>>>>>  正在去除,请等待....  >>>>>>> \e[0m"
-          for file in $fstab; do
-          sudo sed -i 's/,avb.*system//g' $file
-          sudo sed -i 's/,avb,/,/g' $file
-          sudo sed -i 's/,avb_keys.*key//g' $file
-          sudo sed -i "s/\b\(forceencrypt\|forcefdeorfbe\)=/encryptable=/g" "$file"
-          sudo sed -i "s/\bfileencryption/encryptable/g" "$file"
-          done
+            echo -e "\e[31m     >>>>>>>>找不到相关文件,也许没有加密呢>>>>>>>>>  \e[0m"
+            echo ""
+            sleep 5
+            else
+            echo -e "\e[31m     >>>>>>  正在去除,请等待....  >>>>>>> \e[0m"
+            for file in $fstab; do
+              sudo sed -i 's/,avb.*system//g' $file
+              sudo sed -i 's/,avb,/,/g' $file
+              sudo sed -i 's/,avb_keys.*key//g' $file
+              sudo sed -i "s/\b\(forceencrypt\|forcefdeorfbe\)=/encryptable=/g" "$file"
+              sudo sed -i "s/\bfileencryption/encryptable/g" "$file"
+            done
           fi
           #系统升降修复
           mkdir -p "$GITHUB_WORKSPACE"/popupfix
