@@ -113,8 +113,8 @@ jobs:
             cd "$GITHUB_WORKSPACE"/popup/miui-services/
             $Apktool b -q -f -c "$GITHUB_WORKSPACE"/popup/miui-services/ -o miui-services.jar
             sudo cp -rf "$GITHUB_WORKSPACE"/popup/miui-services/miui-services.jar "$GITHUB_WORKSPACE"/images/system/system/framework/miui-services.jar
-            mkdir -p "$GITHUB_WORKSPACE"/popupfix
-            cp -rf "$GITHUB_WORKSPACE"/popup/miui-services/miui-services.jar "$GITHUB_WORKSPACE"framework/miui-services.jar
+            mkdir -p "$GITHUB_WORKSPACE"/framework
+            cp -rf "$GITHUB_WORKSPACE"/popup/miui-services/miui-services.jar "$GITHUB_WORKSPACE"/framework/miui-services.jar
        - name: 5.打包
          run: |
             sudo 7z a "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_popup.zip "$GITHUB_WORKSPACE"/framework/*
