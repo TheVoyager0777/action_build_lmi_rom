@@ -108,7 +108,6 @@ jobs:
           sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/nfc.zip -d "$GITHUB_WORKSPACE"/images/system_ext
           sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/audio.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/audio/ui/
           sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/etc.zip -d "$GITHUB_WORKSPACE"/images/system/system/etc/audio/
-          sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/popup.zip -d "$GITHUB_WORKSPACE"/images/system/system/framework/
           sudo unzip -o -q "$GITHUB_WORKSPACE"/resource/bootan.zip -d "$GITHUB_WORKSPACE"/images/system/system/media/
           #取消强制加密
           fstab=$(sudo find "$GITHUB_WORKSPACE"/images/vendor/ -name "fstab*")
