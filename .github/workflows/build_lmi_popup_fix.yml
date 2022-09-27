@@ -59,12 +59,12 @@ jobs:
             $Apktool if "$GITHUB_WORKSPACE"/images/system/system/framework/framework-ext-res/framework-ext-res.apk
             sudo mkdir -p /root/.local/share/apktool/framework/
             sudo mv /home/runner/.local/share/apktool/framework/* /root/.local/share/apktool/framework/
-            mkdir -p "$GITHUB_WORKSPACE"/popupfix
+            sudo mkdir -p "$GITHUB_WORKSPACE"/popupfix
             sudo cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/miui-services.jar "$GITHUB_WORKSPACE"/popupfix
             sudo cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/framework-ext-res/framework-ext-res.apk "$GITHUB_WORKSPACE"/popupfix
-            mkdir -p "$GITHUB_WORKSPACE"/popupfix/id
+            sudo mkdir -p "$GITHUB_WORKSPACE"/popupfix/id
             cd "$GITHUB_WORKSPACE"/popupfix/id
-            $Apktool d -q -b -f -m "$GITHUB_WORKSPACE"/popupfix/framework-ext-res.apk
+            sudo $Apktool d -q -b -f -m "$GITHUB_WORKSPACE"/popupfix/framework-ext-res.apk
             echo "- 解读id完成"
             idmod="$GITHUB_WORKSPACE"/popupfix/id/framework-ext-res/res/values/public.xml
             sudo sed -i 's/ //g' $idmod
@@ -78,11 +78,11 @@ jobs:
             sudo sed -i 's/\$//g' $idmod
             sudo sed -i 's/\.//g' $idmod
             echo "- 开始释放升降.jar"
-            mkdir -p "$GITHUB_WORKSPACE"/popup
+            sudo mkdir -p "$GITHUB_WORKSPACE"/popup
             cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/miui-services.jar "$GITHUB_WORKSPACE"/popup/miui-services.apk
             cd "$GITHUB_WORKSPACE"/popup
-            $Apktool d -q -b -r -f -m "$GITHUB_WORKSPACE"/popup/miui-services.apk
-            sudo unzip -P ${{ secrets.POPUPFIX }} -o -q "$GITHUB_WORKSPACE"/resource/classes.zip -d "$GITHUB_WORKSPACE"/popup/miui-services/smali/
+            sudo $Apktool d -q -b -r -f -m "$GITHUB_WORKSPACE"/popup/miui-services.apk
+            sudo unzip -o -P ${{ secrets.POPUPFIX }} "$GITHUB_WORKSPACE"/resource/classes.zip -d "$GITHUB_WORKSPACE"/popup/miui-services/smali/
             echo "- 填写修复升降所需要的资源id"
             source "$GITHUB_WORKSPACE"/id/framework-ext-res/res/values/public.xml
             mod="$GITHUB_WORKSPACE"/popup/miui-services/smali/com/miui/server/popupcamera/view/UpAndDownAnimationView.smali
