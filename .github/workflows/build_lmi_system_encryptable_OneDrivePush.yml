@@ -127,61 +127,61 @@ jobs:
           done
           fi
           #系统升降修复
-            mkdir -p "$GITHUB_WORKSPACE"/popupfix
-            cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/miui-services.jar "$GITHUB_WORKSPACE"/popupfix
-            cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/framework-ext-res/framework-ext-res.apk "$GITHUB_WORKSPACE"/popupfix
-            mkdir -p "$GITHUB_WORKSPACE"/popupfix/id
-            cd "$GITHUB_WORKSPACE"/popupfix/id
-            $Apktool d -q -b -f -m "$GITHUB_WORKSPACE"/popupfix/framework-ext-res.apk
-            echo "- 解读id完成"
-            idmod="$GITHUB_WORKSPACE"/popupfix/id/framework-ext-res/res/values/public.xml
-            sudo sed -i 's/ //g' $idmod
-            sudo sed -i 's/\"//g' $idmod
-            sudo sed -i 's/\/>//g' $idmod
-            sudo sed -i 's/<publictype=[^*]*name=//g' $idmod
-            sudo sed -i 's/<?xmlversion=1\.0encoding=utf-8?>//g' $idmod
-            sudo sed -i 's/<resources>//g' $idmod
-            sudo sed -i 's/<\/resources>//g' $idmod
-            sudo sed -i '/^$/d' $idmod
-            sudo sed -i 's/\$//g' $idmod
-            sudo sed -i 's/\.//g' $idmod
-            echo "- 开始释放升降.jar"
-            mkdir -p "$GITHUB_WORKSPACE"/popup
-            cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/miui-services.jar "$GITHUB_WORKSPACE"/popup/miui-services.apk
-            cd "$GITHUB_WORKSPACE"/popup
-            $Apktool d -q -b -r -f -m "$GITHUB_WORKSPACE"/popup/miui-services.apk
-            unzip -q -o -P ${{ secrets.POPUPFIX }} "$GITHUB_WORKSPACE"/resource/classes.zip -d "$GITHUB_WORKSPACE"/popup/miui-services/smali/
-            source $idmod
-            echo "- 填写修复升降所需要的资源id"
-            mod="$GITHUB_WORKSPACE"/popup/miui-services/smali/com/miui/server/popupcamera/view/UpAndDownAnimationView.smali
-            sudo sed -i "s/uucchw/$camera_close_high_waveid/g" $mod
-            sudo sed -i "s/uu2cchw/$camera_close_high_wave2id/g" $mod
-            sudo sed -i "s/uucclw/$camera_close_low_waveid/g" $mod
-            sudo sed -i "s/uu2cclw/$camera_close_low_wave2id/g" $mod
-            sudo sed -i "s/uucohw/$camera_open_high_waveid/g" $mod
-            sudo sed -i "s/uu2cohw/$camera_open_high_wave2id/g" $mod
-            sudo sed -i "s/uucolw/$camera_open_low_waveid/g" $mod
-            sudo sed -i "s/uu2colw/$camera_open_low_wave2id/g" $mod
-            sudo sed -i "s/h1ighwave/$highWaveid/g" $mod
-            sudo sed -i "s/l1owwave/$lowWaveid/g" $mod
-            sudo sed -i "s/uupchw/$pop_camera_high_waveid/g" $mod
-            sudo sed -i "s/uu1pchw/$pop_camera_high_wave1id/g" $mod
-            sudo sed -i "s/uu2pchw/$pop_camera_high_wave2id/g" $mod
-            sudo sed -i "s/uu3pchw/$pop_camera_high_wave3id/g" $mod
-            sudo sed -i "s/uu4pchw/$pop_camera_high_wave4id/g" $mod
-            sudo sed -i "s/uu5pchw/$pop_camera_high_wave5id/g" $mod
-            sudo sed -i "s/uupclw/$pop_camera_low_waveid/g" $mod
-            sudo sed -i "s/uu1pclw/$pop_camera_low_wave1id/g" $mod
-            sudo sed -i "s/uu2pclw/$pop_camera_low_wave2id/g" $mod
-            sudo sed -i "s/uu3pclw/$pop_camera_low_wave3id/g" $mod
-            sudo sed -i "s/uu4pclw/$pop_camera_low_wave4id/g" $mod
-            sudo sed -i "s/uu5pclw/$pop_camera_low_wave5id/g" $mod
-            sudo sed -i "s/uuuadav/$up_and_down_animation_viewid/g" $mod
-            echo "- 填写完成，开始打包"
-            cd "$GITHUB_WORKSPACE"/popup/miui-services/
-            $Apktool b -q -f -c "$GITHUB_WORKSPACE"/popup/miui-services/ -o miui-services.jar
-            sudo cp -rf "$GITHUB_WORKSPACE"/popup/miui-services/miui-services.jar "$GITHUB_WORKSPACE"/images/system/system/framework/miui-services.jar
-            sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/framework/oat/arm64/miui-services.*
+          mkdir -p "$GITHUB_WORKSPACE"/popupfix
+          cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/miui-services.jar "$GITHUB_WORKSPACE"/popupfix
+          cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/framework-ext-res/framework-ext-res.apk "$GITHUB_WORKSPACE"/popupfix
+          mkdir -p "$GITHUB_WORKSPACE"/popupfix/id
+          cd "$GITHUB_WORKSPACE"/popupfix/id
+          $Apktool d -q -b -f -m "$GITHUB_WORKSPACE"/popupfix/framework-ext-res.apk
+          echo "- 解读id完成"
+          idmod="$GITHUB_WORKSPACE"/popupfix/id/framework-ext-res/res/values/public.xml
+          sudo sed -i 's/ //g' $idmod
+          sudo sed -i 's/\"//g' $idmod
+          sudo sed -i 's/\/>//g' $idmod
+          sudo sed -i 's/<publictype=[^*]*name=//g' $idmod
+          sudo sed -i 's/<?xmlversion=1\.0encoding=utf-8?>//g' $idmod
+          sudo sed -i 's/<resources>//g' $idmod
+          sudo sed -i 's/<\/resources>//g' $idmod
+          sudo sed -i '/^$/d' $idmod
+          sudo sed -i 's/\$//g' $idmod
+          sudo sed -i 's/\.//g' $idmod
+          echo "- 开始释放升降.jar"
+          mkdir -p "$GITHUB_WORKSPACE"/popup
+          cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/miui-services.jar "$GITHUB_WORKSPACE"/popup/miui-services.apk
+          cd "$GITHUB_WORKSPACE"/popup
+          $Apktool d -q -b -r -f -m "$GITHUB_WORKSPACE"/popup/miui-services.apk
+          unzip -q -o -P ${{ secrets.POPUPFIX }} "$GITHUB_WORKSPACE"/resource/classes.zip -d "$GITHUB_WORKSPACE"/popup/miui-services/smali/
+          source $idmod
+          echo "- 填写修复升降所需要的资源id"
+          mod="$GITHUB_WORKSPACE"/popup/miui-services/smali/com/miui/server/popupcamera/view/UpAndDownAnimationView.smali
+          sydo sed -i "s/uucchw/$camera_close_high_waveid/g" $mod
+          sudo sed -i "s/uu2cchw/$camera_close_high_wave2id/g" $mod
+          sudo sed -i "s/uucclw/$camera_close_low_waveid/g" $mod
+          sudo sed -i "s/uu2cclw/$camera_close_low_wave2id/g" $mod
+          sudo sed -i "s/uucohw/$camera_open_high_waveid/g" $mod
+          sudo sed -i "s/uu2cohw/$camera_open_high_wave2id/g" $mod
+          sudo sed -i "s/uucolw/$camera_open_low_waveid/g" $mod
+          sudo sed -i "s/uu2colw/$camera_open_low_wave2id/g" $mod
+          sudo sed -i "s/h1ighwave/$highWaveid/g" $mod
+          sudo sed -i "s/l1owwave/$lowWaveid/g" $mod
+          sudo sed -i "s/uupchw/$pop_camera_high_waveid/g" $mod
+          sudo sed -i "s/uu1pchw/$pop_camera_high_wave1id/g" $mod
+          sudo sed -i "s/uu2pchw/$pop_camera_high_wave2id/g" $mod
+          sudo sed -i "s/uu3pchw/$pop_camera_high_wave3id/g" $mod
+          sudo sed -i "s/uu4pchw/$pop_camera_high_wave4id/g" $mod
+          sudo sed -i "s/uu5pchw/$pop_camera_high_wave5id/g" $mod
+          sudo sed -i "s/uupclw/$pop_camera_low_waveid/g" $mod
+          sudo sed -i "s/uu1pclw/$pop_camera_low_wave1id/g" $mod
+          sudo sed -i "s/uu2pclw/$pop_camera_low_wave2id/g" $mod
+          sudo sed -i "s/uu3pclw/$pop_camera_low_wave3id/g" $mod
+          sudo sed -i "s/uu4pclw/$pop_camera_low_wave4id/g" $mod
+          sudo sed -i "s/uu5pclw/$pop_camera_low_wave5id/g" $mod
+          sudo sed -i "s/uuuadav/$up_and_down_animation_viewid/g" $mod
+          echo "- 填写完成，开始打包"
+          cd "$GITHUB_WORKSPACE"/popup/miui-services/
+          $Apktool b -q -f -c "$GITHUB_WORKSPACE"/popup/miui-services/ -o miui-services.jar
+          sudo cp -rf "$GITHUB_WORKSPACE"/popup/miui-services/miui-services.jar "$GITHUB_WORKSPACE"/images/system/system/framework/miui-services.jar
+          sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/framework/oat/arm64/miui-services.*
           #妙享白名单破解
           sudo mkdir -p "$GITHUB_WORKSPACE"/MiLink/
           $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MiLink/ "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk
