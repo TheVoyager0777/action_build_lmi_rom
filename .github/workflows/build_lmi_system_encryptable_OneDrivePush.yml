@@ -273,11 +273,6 @@ jobs:
           do
             sudo sed -i '/APKTOOL_DUMMY_/d' $a
           done
-          mod1=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/ -type f -name '*.xml' 2>/dev/null | xargs grep -rl 'isAccessibilityTool' | sed 's/^\.\///' | sort)
-          for b in $mod2
-          do
-            sudo sed -i 's/android:isAccessibilityTool\=\"true\"//g' $b
-          done
           cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter
           sudo $Apktool b -f "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/ -o MIUISecurityCenter.apk
           sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
