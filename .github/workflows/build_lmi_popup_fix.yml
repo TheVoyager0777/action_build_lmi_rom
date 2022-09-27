@@ -69,11 +69,11 @@ jobs:
             idmod="$GITHUB_WORKSPACE"/popupfix/id/framework-ext-res/res/values/public.xml
             sudo sed -i 's/ //g' $idmod
             sudo sed -i 's/\"//g' $idmod
-            sudo sed -i 's/\/\>//g' $idmod
-            sudo sed -i 's/\<publictype\=[^*]*name\=//g' $idmod
-            sudo sed -i 's/\<\?xmlversion\=1\.0encoding\=utf-8\?\>//g' $idmod
-            sudo sed -i 's/\<resources\>//g' $idmod
-            sudo sed -i 's/\<\/resources\>//g' $idmod
+            sudo sed -i 's/\/>//g' $idmod
+            sudo sed -i 's/<publictype=[^*]*name=//g' $idmod
+            sudo sed -i 's/<?xmlversion=1\.0encoding=utf-8?>//g' $idmod
+            sudo sed -i 's/<resources>//g' $idmod
+            sudo sed -i 's/<\/resources>//g' $idmod
             sudo sed -i '/^$/d' $idmod
             sudo sed -i 's/\$//g' $idmod
             sudo sed -i 's/\.//g' $idmod
