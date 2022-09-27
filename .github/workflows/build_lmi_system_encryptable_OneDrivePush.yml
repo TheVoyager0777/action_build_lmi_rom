@@ -128,8 +128,8 @@ jobs:
           fi
           #系统升降修复
           mkdir -p "$GITHUB_WORKSPACE"/popupfix
-          cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/miui-services.jar "$GITHUB_WORKSPACE"/popupfix
-          cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/framework-ext-res/framework-ext-res.apk "$GITHUB_WORKSPACE"/popupfix
+          sudo cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/miui-services.jar "$GITHUB_WORKSPACE"/popupfix
+          sudo cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/framework-ext-res/framework-ext-res.apk "$GITHUB_WORKSPACE"/popupfix
           mkdir -p "$GITHUB_WORKSPACE"/popupfix/id
           cd "$GITHUB_WORKSPACE"/popupfix/id
           $Apktool d -q -b -f -m "$GITHUB_WORKSPACE"/popupfix/framework-ext-res.apk
