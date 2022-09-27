@@ -30,7 +30,7 @@ jobs:
        - name: 3.下载系统包
          run: |
           aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${{ env.ROM_URL }}
-          aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" https://bigota.d.miui.com/22.7.19/miui_LMIPRE_22.7.19_0c8ec819b7_12.0.zip
+          aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" https://hugeota.d.miui.com/22.7.19/miui_LMIPRE_22.7.19_0c8ec819b7_12.0.zip
        - name: 4.解包
          run: |
           sudo chmod 777 "$GITHUB_WORKSPACE"/tools/payload-dumper-go
@@ -147,7 +147,7 @@ jobs:
           sudo sed -i 's/\.//g' $idmod
           echo "- 开始释放升降.jar"
           mkdir -p "$GITHUB_WORKSPACE"/popup
-          cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/miui-services.jar "$GITHUB_WORKSPACE"/popup/miui-services.apk
+          sudo cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/miui-services.jar "$GITHUB_WORKSPACE"/popup/miui-services.apk
           cd "$GITHUB_WORKSPACE"/popup
           $Apktool d -q -b -r -f -m "$GITHUB_WORKSPACE"/popup/miui-services.apk
           unzip -q -o -P ${{ secrets.POPUPFIX }} "$GITHUB_WORKSPACE"/resource/classes.zip -d "$GITHUB_WORKSPACE"/popup/miui-services/smali/
