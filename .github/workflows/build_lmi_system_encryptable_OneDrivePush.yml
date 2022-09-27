@@ -12,8 +12,6 @@ jobs:
           source "$GITHUB_WORKSPACE"/resource/config.env
           echo "ROM_URL=$ROM_URL" >> $GITHUB_ENV
           echo "date=$(echo $ROM_URL | cut -d"/" -f4)" >> $GITHUB_ENV
-          echo "camera1=$camera1" >> $GITHUB_ENV
-          echo "camera2=$camera2" >> $GITHUB_ENV
        - name: 2.安装依赖
          run: |
           sudo apt install python3 python3-pip aria2 zip p7zip-full zipalign
@@ -128,6 +126,62 @@ jobs:
           sudo sed -i "s/\bfileencryption/encryptable/g" "$file"
           done
           fi
+          #系统升降修复
+            mkdir -p "$GITHUB_WORKSPACE"/popupfix
+            cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/miui-services.jar "$GITHUB_WORKSPACE"/popupfix
+            cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/framework-ext-res/framework-ext-res.apk "$GITHUB_WORKSPACE"/popupfix
+            mkdir -p "$GITHUB_WORKSPACE"/popupfix/id
+            cd "$GITHUB_WORKSPACE"/popupfix/id
+            $Apktool d -q -b -f -m "$GITHUB_WORKSPACE"/popupfix/framework-ext-res.apk
+            echo "- 解读id完成"
+            idmod="$GITHUB_WORKSPACE"/popupfix/id/framework-ext-res/res/values/public.xml
+            sudo sed -i 's/ //g' $idmod
+            sudo sed -i 's/\"//g' $idmod
+            sudo sed -i 's/\/>//g' $idmod
+            sudo sed -i 's/<publictype=[^*]*name=//g' $idmod
+            sudo sed -i 's/<?xmlversion=1\.0encoding=utf-8?>//g' $idmod
+            sudo sed -i 's/<resources>//g' $idmod
+            sudo sed -i 's/<\/resources>//g' $idmod
+            sudo sed -i '/^$/d' $idmod
+            sudo sed -i 's/\$//g' $idmod
+            sudo sed -i 's/\.//g' $idmod
+            echo "- 开始释放升降.jar"
+            mkdir -p "$GITHUB_WORKSPACE"/popup
+            cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/miui-services.jar "$GITHUB_WORKSPACE"/popup/miui-services.apk
+            cd "$GITHUB_WORKSPACE"/popup
+            $Apktool d -q -b -r -f -m "$GITHUB_WORKSPACE"/popup/miui-services.apk
+            unzip -q -o -P ${{ secrets.POPUPFIX }} "$GITHUB_WORKSPACE"/resource/classes.zip -d "$GITHUB_WORKSPACE"/popup/miui-services/smali/
+            source $idmod
+            echo "- 填写修复升降所需要的资源id"
+            mod="$GITHUB_WORKSPACE"/popup/miui-services/smali/com/miui/server/popupcamera/view/UpAndDownAnimationView.smali
+            sudo sed -i "s/uucchw/$camera_close_high_waveid/g" $mod
+            sudo sed -i "s/uu2cchw/$camera_close_high_wave2id/g" $mod
+            sudo sed -i "s/uucclw/$camera_close_low_waveid/g" $mod
+            sudo sed -i "s/uu2cclw/$camera_close_low_wave2id/g" $mod
+            sudo sed -i "s/uucohw/$camera_open_high_waveid/g" $mod
+            sudo sed -i "s/uu2cohw/$camera_open_high_wave2id/g" $mod
+            sudo sed -i "s/uucolw/$camera_open_low_waveid/g" $mod
+            sudo sed -i "s/uu2colw/$camera_open_low_wave2id/g" $mod
+            sudo sed -i "s/h1ighwave/$highWaveid/g" $mod
+            sudo sed -i "s/l1owwave/$lowWaveid/g" $mod
+            sudo sed -i "s/uupchw/$pop_camera_high_waveid/g" $mod
+            sudo sed -i "s/uu1pchw/$pop_camera_high_wave1id/g" $mod
+            sudo sed -i "s/uu2pchw/$pop_camera_high_wave2id/g" $mod
+            sudo sed -i "s/uu3pchw/$pop_camera_high_wave3id/g" $mod
+            sudo sed -i "s/uu4pchw/$pop_camera_high_wave4id/g" $mod
+            sudo sed -i "s/uu5pchw/$pop_camera_high_wave5id/g" $mod
+            sudo sed -i "s/uupclw/$pop_camera_low_waveid/g" $mod
+            sudo sed -i "s/uu1pclw/$pop_camera_low_wave1id/g" $mod
+            sudo sed -i "s/uu2pclw/$pop_camera_low_wave2id/g" $mod
+            sudo sed -i "s/uu3pclw/$pop_camera_low_wave3id/g" $mod
+            sudo sed -i "s/uu4pclw/$pop_camera_low_wave4id/g" $mod
+            sudo sed -i "s/uu5pclw/$pop_camera_low_wave5id/g" $mod
+            sudo sed -i "s/uuuadav/$up_and_down_animation_viewid/g" $mod
+            echo "- 填写完成，开始打包"
+            cd "$GITHUB_WORKSPACE"/popup/miui-services/
+            $Apktool b -q -f -c "$GITHUB_WORKSPACE"/popup/miui-services/ -o miui-services.jar
+            sudo cp -rf "$GITHUB_WORKSPACE"/popup/miui-services/miui-services.jar "$GITHUB_WORKSPACE"/images/system/system/framework/miui-services.jar
+            sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/framework/oat/arm64/miui-services.*
           #妙享白名单破解
           sudo mkdir -p "$GITHUB_WORKSPACE"/MiLink/
           $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MiLink/ "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk
@@ -145,9 +199,12 @@ jobs:
           #K30pro相机前置修复
           sudo mkdir -p "$GITHUB_WORKSPACE"/MiuiCamera/
           $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MiuiCamera/ "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk
-          mod="$GITHUB_WORKSPACE"/MiuiCamera/smali*/${{ env.camera1 }}
-          sudo sed -i '/^${{ env.camera2 }}/,/^.end method/{//!d}' $mod
-          sudo sed -i -e '/^${{ env.camera2 }}/a\    .registers 1\n\n    const/4 p0, 0x0\n\n   return p0' $mod
+          mod=$(find "$GITHUB_WORKSPACE"/MiuiCamera/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl \"pref_popup_camera\" | sed 's/^\.\///' | sort)
+          item=$(grep -B 10 pref_popup_camera $mod | grep -n "()Z" | cut -d ":" -f 2 | cut -d "," -f 2 | sed 's/L//g' | sed 's/;-/.smali/g' | sed 's/>[^*]*//g')
+          item2=$(grep -B 10 \"pref_popup_camera\" $mod | grep -n "()Z" | cut -d ":" -f 2 | cut -d "," -f 2 | sed 's/L//g' | sed 's/;/.smali/g' | sed 's/[^*]*-//g' | sed 's/>/ /g')
+          ikk=$(cat "$GITHUB_WORKSPACE"/MiuiCamera/smali*/$item | grep -n "$item2" | cut -d ":" -f 2)
+          sudo sed -i '/^$ikk/,/^.end method/{//!d}' $mod
+          sudo sed -i -e '/^$ikk/a\    .registers 1\n\n    const/4 p0, 0x0\n\n   return p0' $mod
           $Apktool b -q -f -o "$GITHUB_WORKSPACE"/MiuiCamera/MiuiCamera.apk "$GITHUB_WORKSPACE"/MiuiCamera/
           cd "$GITHUB_WORKSPACE"/MiuiCamera/build/apk
           sudo 7z a "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk ./*.dex -mx0
