@@ -180,14 +180,15 @@ jobs:
             sudo zipalign -v 4 "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk >/dev/null
             sudo mkdir -p "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/lib/arm64/
             sudo mv "$GITHUB_WORKSPACE"/MiLink/lib/arm64-v8a/* "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/lib/arm64/
+            #相机升降修复
             sudo mkdir -p "$GITHUB_WORKSPACE"/MiuiCamera/
             $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MiuiCamera/ "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk
             mod=$(find "$GITHUB_WORKSPACE"/MiuiCamera/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl \"pref_popup_camera\" | sed 's/^\.\///' | sort)
             item=$(grep -B 10 pref_popup_camera $mod | grep -n "()Z" | cut -d ":" -f 2 | cut -d "," -f 2 | sed 's/L//g' | sed 's/;-/.smali/g' | sed 's/>[^*]*//g')
             item2=$(grep -B 10 \"pref_popup_camera\" $mod | grep -n "()Z" | cut -d ":" -f 2 | cut -d "," -f 2 | sed 's/L//g' | sed 's/;/.smali/g' | sed 's/[^*]*-//g' | sed 's/>/ /g')
             ikk=$(cat "$GITHUB_WORKSPACE"/MiuiCamera/smali*/$item | grep -n "$item2" | cut -d ":" -f 2)
-            sudo sed -i '/^$ikk/,/^.end method/{//!d}' $mod
-            sudo sed -i -e '/^$ikk/a\    .registers 1\n\n    const/4 p0, 0x0\n\n   return p0' $mod
+            sudo sed -i '/^$ikk/,/^.end method/{//!d}' "$GITHUB_WORKSPACE"/MiuiCamera/smali*/$item
+            sudo sed -i -e '/^$ikk/a\    .registers 1\n\n    const/4 p0, 0x0\n\n   return p0' "$GITHUB_WORKSPACE"/MiuiCamera/smali*/$item
             $Apktool b -q -f -o "$GITHUB_WORKSPACE"/MiuiCamera/MiuiCamera.apk "$GITHUB_WORKSPACE"/MiuiCamera/
             cd "$GITHUB_WORKSPACE"/MiuiCamera/build/apk
             sudo 7z a "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk ./*.dex -mx0
@@ -195,59 +196,7 @@ jobs:
             sudo mv "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk "$GITHUB_WORKSPACE"/MiuiCamera/MiuiCamera.apk
             sudo zipalign -v 4 "$GITHUB_WORKSPACE"/MiuiCamera/MiuiCamera.apk "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk >/dev/null
             sudo mv "$GITHUB_WORKSPACE"/MiuiCamera/lib/arm64-v8a/* "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/lib/arm64/
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
-            sudo unzip -o "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk 'classes*.dex' -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
-            cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
-            sudo 7z a -tzip "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk ./*
-            sudo $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/ "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter.apk
-            echo 编译完成
-            mod1="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/com/miui/bubbles/utils/MiuiFreeFormManagerWrapper.smali
-            sudo sed -i '/^.method public static isSupportPin()Z/,/^.end method/{//!d}' $mod1
-            sudo sed -i -e '/^.method public static isSupportPin()Z/a\    .registers 3\n\n    const/4 v0, 0x1\n\n   return v0' $mod1
-            echo 修改完成
-            Mod1=${mod1#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
-            Mod1=${Mod1%/*.smali}
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod1
-            sudo cp -rf $mod1 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod1
-            mod2="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/com/miui/permcenter/privacymanager/InterceptBaseFragment.smali
-            sudo sed -i 's/0x5/0x0/g' $mod2
-            mod3="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/com/miui/permcenter/privacymanager/InterceptPermissionFragment.smali
-            sudo sed -i 's/0xa/0x0/g' $mod3
-            Mod2=${mod2#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
-            Mod2=${Mod2%/*.smali}
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod2
-            sudo cp -rf $mod2 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod2
-            Mod3=${mod3#"$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/}
-            Mod3=${Mod3%/*.smali}
-            sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod3
-            sudo cp -rf $mod3 "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/$Mod3
-            sudo cp -rf "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/apktool.yml "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/
-            echo 开始反编译
-            sudo $Apktool b -q -f -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter.apk "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/
-            echo 反编译完成
-            filepath="$GITHUB_WORKSPACE"/MIUISecurityCenter/one/
-            for file in `ls -a $filepath`
-            do
-              if [ "${file##*.}"x = "dex"x ];then
-                old=$(echo $file | tr -d "a-zA-Z" | tr -d ".")
-                if [ -Z $old ];then
-                   old=1
-                fi
-                new=$(echo $old|awk '{for(i=1;i<=NF;i++){$i+=1}}1')
-                sudo cp -rf "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/$file "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/classes$new.dex
-              fi
-            done
-            echo 移动文件完成
-            sudo unzip -o "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter.apk -d "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
-            cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/three/
-            sudo 7z a "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk ./*.dex -mx0
-            sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/oat
-            sudo mv "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk "$GITHUB_WORKSPACE"/MIUISecurityCenter/MIUISecurityCenter.apk
-            sudo zipalign -v 4 "$GITHUB_WORKSPACE"/MIUISecurityCenter/MIUISecurityCenter.apk "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/MIUISecurityCenter.apk >/dev/null
-            sudo unzip -o -q "$GITHUB_WORKSPACE"/MIUISecurityCenter/MIUISecurityCenter.apk 'lib/arm64-v8a/*' -d "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/
-            sudo mv "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/lib/arm64-v8a "$GITHUB_WORKSPACE"/images/system/system/priv-app/MIUISecurityCenter/lib/arm64
+            #精简
             for files in MIGalleryLockscreen MIUIDriveMode MIUIDuokanReader MIUIGameCenter MIUINewHome MIUIYoupin
             do
             device=$(find "$GITHUB_WORKSPACE"/images/system/system/data-app/ -name $files)
