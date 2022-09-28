@@ -167,10 +167,6 @@ jobs:
             sudo cp -rf "$GITHUB_WORKSPACE"/popup/miui-services/miui-services.jar "$GITHUB_WORKSPACE"/images/system/system/framework/miui-services.jar
             sudo rm -rf "$GITHUB_WORKSPACE"/images/system/system/framework/oat/arm64/miui-services.*
             #妙享白名单破解
-            sudo mv "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk
-            sudo zipalign -v 4 "$GITHUB_WORKSPACE"/MiLink/MiLinkCirculate.apk "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk >/dev/null
-            sudo mkdir -p "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/lib/arm64/
-            sudo mv "$GITHUB_WORKSPACE"/MiLink/lib/arm64-v8a/* "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/lib/arm64/
             sudo mkdir -p "$GITHUB_WORKSPACE"/MiLink/
             $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MiLink/ "$GITHUB_WORKSPACE"/images/system/system/app/MiLinkCirculate/MiLinkCirculate.apk
             mod="$GITHUB_WORKSPACE"/MiLink/smali*/com/miui/circulate/world/permission/method/PermissionCheck\$BaseCheck.smali
