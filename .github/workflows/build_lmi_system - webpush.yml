@@ -25,6 +25,9 @@ jobs:
             pip3 install requests
             pip3 install beautifulsoup4
             pip3 install --ignore-installed pyyaml
+            curl https://rclone.org/install.sh | sudo bash
+            mkdir -p ~/.config/rclone/
+            unzip -P ${{ secrets.PASSWORD }} "$GITHUB_WORKSPACE"/tools/rclone.zip -d ~/.config/rclone/
        - name: 3.下载系统包
          run: |
             aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${{ env.ROM_URL }}
@@ -340,21 +343,28 @@ jobs:
             echo "MD5=${md5:0:32}" >> $GITHUB_ENV
             mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip
             echo "NEW_PACKAGE_NAME=miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0.zip" >> $GITHUB_ENV
-            cd "$GITHUB_WORKSPACE"/zip/
-            sudo split -b 1536m miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0.zip -d -a 2 miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0.zip
-            sudo rm -rf "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0.zip
-            touch "$GITHUB_WORKSPACE"/file.log
-            echo "${{ env.NEW_PACKAGE_NAME }}" > "$GITHUB_WORKSPACE"/file.log
-       - name: 6.上传到Github Release
-         uses: ncipollo/release-action@main
+       - name: 7.上传到Onedrive
+         run: |
+          rclone mkdir OneDrive:/MI_Packages/LMI_Packages
+          rclone sync -P ./zip/* OneDrive:/MI_Packages/LMI_Packages
+       - name: 8.更新rom信息
+         run: |
+          mkdir "$GITHUB_WORKSPACE"/romdata && touch "$GITHUB_WORKSPACE"/romdata/lmi.ini
+          echo lmiPKG=${{ env.NEW_PACKAGE_NAME }} >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
+          echo lmiMD5=${{ env.MD5 }} >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
+          echo lmiTIME=\"$(TZ=':Asia/Shanghai' date '+%Y.%m.%d %H:%M')\" >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
+          echo lmiURL=https://onedrive.zjw.js.cn/Direct/LMI_Packages/${{ env.NEW_PACKAGE_NAME }} >> "$GITHUB_WORKSPACE"/romdata/lmi.ini
+       - name: 9.导出信息
+         uses: dmnemec/copy_file_to_another_repo_action@main
+         env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
          with:
-           artifacts: ${{ github.workspace }}/zip/*
-           name: "${{ env.date }}"
-           tag: "${{ env.date }}"
-           bodyFile: "${{ github.workspace }}/file.log"
-           allowUpdates: true
-           artifactErrorsFailBuild: true
-           token: ${{ secrets.GITHUB_TOKEN }}
+          source_file: 'romdata/lmi.ini'
+          destination_repo: 'zjw2017/sm8250-page'
+          destination_folder: 'device'
+          user_email: 'example@email.com'
+          user_name: 'zjw2017'
+          commit_message: 'Update from $GITHUB_REF'
        - name: 10.删除工作流运行
          uses: Mattraks/delete-workflow-runs@v2
          with:
