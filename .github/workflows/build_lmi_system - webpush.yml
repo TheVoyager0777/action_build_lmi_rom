@@ -187,9 +187,12 @@ jobs:
             item=$(grep -B 10 pref_popup_camera $mod | grep -n "()Z" | cut -d ":" -f 2 | cut -d "," -f 2 | sed 's/L//g' | sed 's/;-/.smali/g' | sed 's/>[^*]*//g')
             item2=$(grep -B 10 \"pref_popup_camera\" $mod | grep -n "()Z" | cut -d ":" -f 2 | cut -d "," -f 2 | sed 's/L//g' | sed 's/;/.smali/g' | sed 's/[^*]*-//g' | sed 's/>/ /g')
             item3=$(find "$GITHUB_WORKSPACE"/MiuiCamera/smali*/$item 2>/dev/null | sed 's/^\.\///' | sort)
-            ikk=$(cat $item3 | grep -n "$item2" | cut -d ":" -f 2)
-            sudo sed -i '/^$ikk/,/^.end method/{//!d}' $item3
-            sudo sed -i -e '/^$ikk/a\    .registers 1\n\n    const/4 p0, 0x0\n\n   return p0' $item3
+            item3=${item%/*.smali}
+            item4=${item#$item3/}
+            item5=$(find "$GITHUB_WORKSPACE"/MiuiCamera/smali*/$item3 -type f -name '$item4' 2>/dev/null | sed 's/^\.\///' | sort)
+            ikk=$(cat $item5 | grep -n "$item2" | cut -d ":" -f 2)
+            sudo sed -i '/^$ikk/,/^.end method/{//!d}' $item5
+            sudo sed -i -e '/^$ikk/a\    .registers 1\n\n    const/4 p0, 0x0\n\n   return p0' $item5
             $Apktool b -q -f -o "$GITHUB_WORKSPACE"/MiuiCamera/MiuiCamera.apk "$GITHUB_WORKSPACE"/MiuiCamera/
             cd "$GITHUB_WORKSPACE"/MiuiCamera/build/apk
             sudo 7z a "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk ./*.dex -mx0
