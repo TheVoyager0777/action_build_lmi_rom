@@ -213,11 +213,6 @@ jobs:
           do
             sudo sed -i '/APKTOOL_DUMMY_/d' $a
           done
-          mod1=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/ -type f -name '*.xml' 2>/dev/null | xargs grep -rl 'isAccessibilityTool' | sed 's/^\.\///' | sort)
-          for b in $mod2
-          do
-            sudo sed -i 's/android:isAccessibilityTool\=\"true\"//g' $b
-          done
           cd "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter
           sudo $Apktool b -f "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/res/MIUISecurityCenter/ -o MIUISecurityCenter.apk
           sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/
@@ -232,13 +227,6 @@ jobs:
           sudo sed -i 's/0xa/0x0/g' $mod3
           mod4=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'refreshStats' | sed 's/^\.\///' | sort)
           sudo sed -i 's/0x1f/0x63/g' $mod4
-          mod5=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name 'BatteryFragment*.smali' 2>/dev/null | xargs grep -rl 'stable' | sed 's/^\.\///' | sort)
-          for i in $mod5
-          do
-            int=$(cat $i | grep -n "stable" | cut -d ":" -f 1)
-            int=$(echo "$int + 4" | bc)
-            sudo sed -i -e "${int}a const/4 v1, 0x1" $i
-          done
           sudo mkdir -p "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/miui/
           sudo cp -rf "$GITHUB_WORKSPACE"/resource/czh.smali "$GITHUB_WORKSPACE"/MIUISecurityCenter/two/MIUISecurityCenter/smali/miui/
           mod6=$(find "$GITHUB_WORKSPACE"/MIUISecurityCenter/one/MIUISecurityCenter/smali*/ -type f -name '*.smali' 2>/dev/null | xargs grep -rl 'mi_lab_ai_clipboard_enable' | sed 's/^\.\///' | sort)
