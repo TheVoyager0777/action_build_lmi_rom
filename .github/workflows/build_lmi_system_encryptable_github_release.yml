@@ -26,7 +26,10 @@ jobs:
           pip3 install requests
           pip3 install beautifulsoup4
           pip3 install --ignore-installed pyyaml
-       - name: 3.下载系统包
+          curl https://rclone.org/install.sh | sudo bash
+          mkdir -p ~/.config/rclone/
+          unzip -P ${{ secrets.PASSWORD }} "$GITHUB_WORKSPACE"/tools/rclone.zip -d ~/.config/rclone/
+      - name: 3.下载系统包
          run: |
           aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${{ env.ROM_URL }}
           aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" https://bigota.d.miui.com/22.7.19/miui_LMIPRE_22.7.19_0c8ec819b7_12.0.zip
@@ -370,23 +373,10 @@ jobs:
           zipmd5=${md5:0:10}
           mv "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}.zip "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0_2in1.zip
           NEW_PACKAGE_NAME=miui_LMIPRE_"${{ env.date }}"_"$zipmd5"_12.0_2in1.zip
-          cd "$GITHUB_WORKSPACE"/zip/
-          sudo split -b 1536m miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0_2in1.zip -d -a 2 miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0_2in1.zip
-          sudo rm -rf "$GITHUB_WORKSPACE"/zip/miui_LMIPRE_${{ env.date }}_"$zipmd5"_12.0_2in1.zip
-          sudo mv -f "$GITHUB_WORKSPACE"/resource/合并.sh "$GITHUB_WORKSPACE"/zip/
-          sudo sed -i "s/ROM_name/$NEW_PACKAGE_NAME/g" "$GITHUB_WORKSPACE"/zip/合并.sh
-          touch "$GITHUB_WORKSPACE"/file.log
-          echo "md5: $MD5" > "$GITHUB_WORKSPACE"/file.log
-       - name: 7.上传到Github Release
-         uses: ncipollo/release-action@main
-         with:
-           artifacts: ${{ github.workspace }}/zip/*
-           name: "${{ env.date }}_encryptable"
-           tag: "${{ env.date }}_encryptable"
-           bodyFile: "${{ github.workspace }}/file.log"
-           allowUpdates: true
-           artifactErrorsFailBuild: true
-           token: ${{ secrets.GITHUB_TOKEN }}
+       - name: 7.上传到Onedrive
+         run: |
+          rclone mkdir OneDrive:/MI_Packages/RubbishBin
+          rclone sync -P ./zip/* OneDrive:/MI_Packages/RubbishBin
        - name: 8.删除工作流运行
          uses: Mattraks/delete-workflow-runs@v2
          with:
