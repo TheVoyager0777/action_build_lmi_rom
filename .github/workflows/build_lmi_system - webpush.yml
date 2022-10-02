@@ -189,7 +189,8 @@ jobs:
             item3=$(find "$GITHUB_WORKSPACE"/MiuiCamera/smali*/$item 2>/dev/null | sed 's/^\.\///' | sort)
             item3=${item%/*.smali}
             item4=${item#$item3/}
-            item5=$(find "$GITHUB_WORKSPACE"/MiuiCamera/smali*/$item3 -type f -name '$item4')
+            item5=$(find "$GITHUB_WORKSPACE"/MiuiCamera/smali*/$item3 -name '$item4')
+            echo $item5
             ikk=$(cat $item5 | grep -n "$item2" | cut -d ":" -f 2)
             sudo sed -i '/^$ikk/,/^.end method/{//!d}' $item5
             sudo sed -i -e '/^$ikk/a\    .registers 1\n\n    const/4 p0, 0x0\n\n   return p0' $item5
