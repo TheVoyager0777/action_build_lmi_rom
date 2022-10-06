@@ -55,8 +55,8 @@ jobs:
             sudo mkdir -p "$GITHUB_WORKSPACE"/MiuiCamera/
             $Apktool d -q -r -f -o "$GITHUB_WORKSPACE"/MiuiCamera/ "$GITHUB_WORKSPACE"/images/system/system/priv-app/MiuiCamera/MiuiCamera.apk
             mod=$(find "$GITHUB_WORKSPACE"/MiuiCamera/smali*/ -type f -name \*.smali 2>/dev/null | xargs grep -rl \"pref_popup_camera\" | sed 's/^\.\///' | sort)
-            item=$(grep -B 10 pref_popup_camera $mod | grep -n "()Z" | cut -d ":" -f 2 | cut -d "," -f 2 | sed 's/L//g' | sed 's/;-/.smali/g' | sed 's/>[^*]*//g')
-            item2=$(grep -B 10 \"pref_popup_camera\" $mod | grep -n "()Z" | cut -d ":" -f 2 | cut -d "," -f 2 | sed 's/L//g' | sed 's/;/.smali/g' | sed 's/[^*]*-//g' | sed 's/>/ /g')
+            item=$(grep -B 10 pref_popup_camera $mod | grep -n "()Z" | cut -d ":" -f 2 | cut -d "," -f 2 | sed 's/L//g' | sed 's/;-/.smali/g' | sed 's/>[^*]*//g' | sed 's/ //g')
+            item2=$(grep -B 10 \"pref_popup_camera\" $mod | grep -n "()Z" | cut -d ":" -f 2 | cut -d "," -f 2 | sed 's/L//g' | sed 's/;/.smali/g' | sed 's/[^*]*-//g' | sed 's/>/ /g' | sed 's/ //g')
             for i in $(sudo ls -F "$GITHUB_WORKSPACE"/MiuiCamera/ | grep "smali" | sed "s/\///g")
             do
               echo "$GITHUB_WORKSPACE"/MiuiCamera/$i/$item
