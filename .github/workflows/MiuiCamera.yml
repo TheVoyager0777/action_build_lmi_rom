@@ -65,7 +65,7 @@ jobs:
               fi
             done
             echo $item3
-            ikk=$(cat $item3 | grep -n "$item2" | cut -d ":" -f 2)
+            ikk=$(cat $item3 | grep -n "$item2" | cut -d ":" -f 2 | grep ".method")
             echo $ikk
             sudo sed -i '/^$ikk/,/^.end method/{//!d}' $item3
             sudo sed -i -e '/^$ikk/a\    .registers 1\n\n    const/4 p0, 0x0\n\n   return p0' $item3
