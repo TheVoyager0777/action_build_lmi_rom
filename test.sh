@@ -1,6 +1,5 @@
 #!/bin/bash
-git clone https://github.com/Meetingfate/action_build_lmi_rom
-GITHUB_WORKSPACE=/home/runner/work/action-tmate/action-tmate/action_build_lmi_rom
+
 source "$GITHUB_WORKSPACE"/resource/config.env
 ROM_URL=$ROM_URL
 camera1=$camera1
