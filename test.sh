@@ -1,9 +1,4 @@
 #!/bin/bash
-
-source "$GITHUB_WORKSPACE"/resource/config.env
-ROM_URL=$ROM_URL
-camera1=$camera1
-camera2=$camera2
 sudo apt install python3 python3-pip aria2 zip p7zip-full zipalign
 sudo apt --fix-broken install
 sudo apt update --fix-missing
