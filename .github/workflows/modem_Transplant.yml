@@ -72,6 +72,7 @@ jobs:
             sudo rm -rf "$GITHUB_WORKSPACE"/images/firmware-update/
        - name: 5.打包
          run: |
+            touch "$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "#!/sbin/sh\n" > "$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "set -e" >> "$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "OUTFD=/proc/self/fd/\$2" >> "$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
