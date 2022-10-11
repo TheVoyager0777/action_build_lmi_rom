@@ -75,17 +75,22 @@ jobs:
             mkdir -p "$GITHUB_WORKSPACE"/images/META-INF/com/google/android/
             touch "$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "#!/sbin/sh" > "$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
-            echo "set -e" >> "$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
+            echo "">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "OUTFD=/proc/self/fd/\$2" >> "$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "ZIPFILE=\"\$3\"" >> "$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
+            echo "">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "ui_print() {">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
-            echo "  echo -e \"ui_print \$1\\\\nui_print\" >>\$OUTFD">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
+            echo "  echo -e \"ui_print \$1\\nui_print\" >>\$OUTFD">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "}">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
+            echo "">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "package_extract_file() {">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "  ui_print \" - 正在刷入 \$(echo \$1 | awk -F \"/\" '{print \$NF}') 至 \$(echo \$2 | awk -F \"/\" '{print \$NF}') 分区\"">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "  unzip -p \"\$ZIPFILE\" \$1 >\$2">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "}">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
+            echo "">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
+            echo "">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "package_extract_file \"modem.img\" \"/dev/block/bootdevice/by-name/modem\"">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
+            echo "">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "ui_print \"刷入完成\"" >>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "ui_print \"挂载错误信息不用管，直接重启既可\"" >>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "exit 0" >> "$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
