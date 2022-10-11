@@ -57,7 +57,7 @@ jobs:
             for i in $(ls "$GITHUB_WORKSPACE"/modem/image/)
             do
             if [[ $i != modem_pr ]] && [[ $i != sdx55 ]] && [[ $i != sdx55m ]];then
-              rm -rf "$GITHUB_WORKSPACE"/modem/image/$i
+              sudo rm -rf "$GITHUB_WORKSPACE"/modem/image/$i
             fi
             done
             for i in $(sudo ls "$GITHUB_WORKSPACE"/modem1/image/)
@@ -83,7 +83,7 @@ jobs:
             echo "  ui_print \" - 正在刷入 \$(echo \$1 | awk -F \"/\" '{print \$NF}') 至 \$(echo \$2 | awk -F \"/\" '{print \$NF}') 分区\"">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "  unzip -p \"\$ZIPFILE\" \$1 >\$2">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "}\n">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
-            echo "package_extract_file "firmware-update/NON-HLOS.bin" "/dev/block/bootdevice/by-name/modem"">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
+            echo "package_extract_file \"modem.img\" \"/dev/block/bootdevice/by-name/modem\"">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "\nui_print \"刷入完成\"" >>update-binary
             echo "ui_print \"挂载错误信息不用管，直接重启既可\"" >>update-binary
             echo "exit 0" >> update-binary
