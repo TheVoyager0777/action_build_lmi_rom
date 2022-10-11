@@ -88,7 +88,6 @@ jobs:
             echo "  unzip -p \"\$ZIPFILE\" \$1 >\$2">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "}">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
-            echo "">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "package_extract_file \"modem.img\" \"/dev/block/bootdevice/by-name/modem\"">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "">>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
             echo "ui_print \"刷入完成\"" >>"$GITHUB_WORKSPACE"/images/META-INF/com/google/android/update-binary
