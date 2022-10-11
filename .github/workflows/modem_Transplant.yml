@@ -27,7 +27,7 @@ jobs:
        - name: 2.下载系统包
          run: |
             aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${{ env.ROM_URL }}
-            aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" https://bigota.d.miui.com/22.7.19/miui_LMIPRE_22.7.19_0c8ec819b7_12.0.zip
+            aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" https://hugeota.d.miui.com/22.7.19/miui_UMIPRE_22.7.19_c2ae8f91d4_12.0.zip
        - name: 3.解包
          run: |
             sudo chmod 777 "$GITHUB_WORKSPACE"/tools/payload-dumper-go
@@ -40,7 +40,7 @@ jobs:
             ZIP_NAME_PSYCHE=$(echo ${{ env.ROM_URL }} | cut -d"/" -f5)
             7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE -r -o"$GITHUB_WORKSPACE"/PSYCHE
             rm -rf "$GITHUB_WORKSPACE"/$ZIP_NAME_PSYCHE
-            ZIP_NAME_LMI=miui_LMIPRE_22.7.19_0c8ec819b7_12.0.zip
+            ZIP_NAME_LMI=miui_UMIPRE_22.7.19_c2ae8f91d4_12.0.zip
             7z x "$GITHUB_WORKSPACE"/$ZIP_NAME_LMI -r -o"$GITHUB_WORKSPACE"/images firmware-update
             for i in modem
             do
