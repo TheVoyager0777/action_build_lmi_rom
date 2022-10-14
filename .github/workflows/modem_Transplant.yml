@@ -10,6 +10,7 @@ jobs:
        - name: 获取配置
          run: |
             source "$GITHUB_WORKSPACE"/resource/config.env
+            $ROM_URL=https://hugeota.d.miui.com/22.10.12/miui_PSYCHEPRE_22.10.12_b4a181fdac_12.0.zip
             echo "ROM_URL=$ROM_URL" >> $GITHUB_ENV
             echo "date=$(echo $ROM_URL | cut -d"/" -f4)" >> $GITHUB_ENV
        - name: 1.安装依赖
